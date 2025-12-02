@@ -1,0 +1,407 @@
+{% extends 'base_admin_page.html' %}
+{% load static %}
+
+{% block title %}Cursos - Administração{% endblock %}
+
+{% with page_title="Gerenciar Cursos" page_subtitle="Administre todos os cursos oferecidos pela instituição" page_icon="fas fa-graduation-cap" show_dashboard_btn=True show_breadcrumb=True show_navigation=True show_refresh_btn=True %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item">
+  <a href="{% url 'administrativo2' %}">Painel</a>
+</li>
+<li class="breadcrumb-item active" aria-current="page">Cursos</li>
+{% endblock %}
+
+{% block nav_items %}
+<div class="nav-item">
+  <a href="{% url 'adm_cursos_cadastrar' %}" class="nav-link">
+    <i class="fa-solid fa-plus me-2"></i>Novo Curso
+  </a>
+</div>
+<div class="nav-item">
+  <a href="{% url 'adm_cursos_listar' %}" class="nav-link active">
+    <i class="fa-regular fa-file-lines me-2"></i>Listar/Editar Cursos
+  </a>
+</div>
+{% endblock %}
+
+{% block card_content %}
+<!-- Filtros -->
+<div class="filters-section mb-4">
+  <div class="row">
+    <div class="col-md-4">
+      <div class="filter-group">
+        <label class="filter-label">
+          <i class="fas fa-filter me-2"></i>Filtrar por Status
+        </label>
+        <select class="form-control" id="statusFilter">
+          <option value="">Todos os status</option>
+          <option value="ativo">Ativo</option>
+          <option value="inativo">Inativo</option>
+          <option value="rascunho">Rascunho</option>
+        </select>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="filter-group">
+        <label class="filter-label">
+          <i class="fas fa-tags me-2"></i>Filtrar por Categoria
+        </label>
+        <select class="form-control" id="categoryFilter">
+          <option value="">Todas as categorias</option>
+          {% for categoria in categorias %}
+          <option value="{{ categoria.id }}">{{ categoria.nome }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="filter-group">
+        <label class="filter-label">
+          <i class="fas fa-search me-2"></i>Buscar
+        </label>
+        <input type="text" class="form-control" id="searchFilter" placeholder="Digite o nome do curso...">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="admin-table">
+  <table class="table table-modern">
+    <thead>
+      <tr>
+        <th><i class="fas fa-graduation-cap me-2"></i>Curso</th>
+        <th><i class="fas fa-tag me-2"></i>Categoria</th>
+        <th><i class="fas fa-clock me-2"></i>Duração</th>
+        <th><i class="fas fa-users me-2"></i>Turmas</th>
+        <th><i class="fas fa-toggle-on me-2"></i>Status</th>
+        <th class="text-center"><i class="fas fa-cogs me-2"></i>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for curso in cursos %}
+      <tr data-status="{{ curso.status|default:'ativo' }}" data-category="{{ curso.categoria.id|default:'' }}">
+        <td>
+          <div class="d-flex align-items-center">
+            <div class="me-3">
+              {% if curso.banner %}
+                <img src="{{ curso.banner.url }}" alt="{{ curso.nome }}" 
+                     style="width: 50px; height: 50px; object-fit: cover; border-radius: 10px;">
+              {% else %}
+                <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #3b82f6, #60a5fa); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white;">
+                  <i class="fas fa-graduation-cap"></i>
+                </div>
+              {% endif %}
+            </div>
+            <div>
+              <strong style="color: var(--gray-800);">{{ curso.nome }}</strong>
+              {% if curso.descricao %}
+              <div style="font-size: 0.85rem; color: var(--gray-600);">{{ curso.descricao|truncatechars:60 }}</div>
+              {% endif %}
+              {% if curso.modalidade %}
+              <span class="badge bg-info" style="font-size: 0.75rem;">{{ curso.modalidade }}</span>
+              {% endif %}
+            </div>
+          </div>
+        </td>
+        <td>
+          {% if curso.categoria %}
+            <div class="d-flex align-items-center">
+              <div style="width: 20px; height: 20px; background: {{ curso.categoria.cor|default:'#6366f1' }}; border-radius: 4px; margin-right: 0.5rem;"></div>
+              <span style="color: var(--gray-700);">{{ curso.categoria.nome }}</span>
+            </div>
+          {% else %}
+            <span class="text-muted">
+              <i class="fas fa-minus me-2"></i>
+              Sem categoria
+            </span>
+          {% endif %}
+        </td>
+        <td>
+          {% if curso.carga_horaria %}
+            <span class="badge bg-primary" style="font-size: 0.85rem;">
+              <i class="fas fa-clock me-1"></i>
+              {{ curso.carga_horaria }}h
+            </span>
+          {% else %}
+            <span class="text-muted">
+              <i class="fas fa-question me-2"></i>
+              Não definida
+            </span>
+          {% endif %}
+        </td>
+        <td>
+          {% if curso.turma_set.count > 0 %}
+            <span class="badge bg-success" style="font-size: 0.85rem;">
+              <i class="fas fa-users me-1"></i>
+              {{ curso.turma_set.count }} turma{{ curso.turma_set.count|pluralize:",s" }}
+            </span>
+          {% else %}
+            <span class="badge bg-warning" style="font-size: 0.85rem;">
+              <i class="fas fa-exclamation me-1"></i>
+              Sem turmas
+            </span>
+          {% endif %}
+        </td>
+        <td>
+          {% if curso.ativo %}
+            <span class="status-badge status-active">
+              <i class="fas fa-check-circle"></i>
+              Ativo
+            </span>
+          {% else %}
+            <span class="status-badge status-inactive">
+              <i class="fas fa-times-circle"></i>
+              Inativo
+            </span>
+          {% endif %}
+        </td>
+        <td class="text-center">
+          <div class="btn-group" role="group">
+            <a href="{% url 'adm_curso_detalhes' curso.id %}" class="table-action-btn btn-info" title="Ver detalhes">
+              <i class="fas fa-eye"></i>
+              Detalhes
+            </a>
+            <a href="{% url 'adm_curso_editar' curso.id %}" class="table-action-btn" title="Editar curso">
+              <i class="fas fa-edit"></i>
+              Editar
+            </a>
+            <!-- URL para excluir curso não encontrada
+            <a href="{% url 'excluir_curso' curso.id %}" class="table-action-btn btn-danger" 
+               title="Excluir curso"
+               onclick="return confirm('⚠️ Tem certeza que deseja excluir o curso &quot;{{ curso.nome }}&quot;?\n\n{% if curso.turma_set.count > 0 %}Este curso possui {{ curso.turma_set.count }} turma(s) ativa(s).{% endif %}\n\nEsta ação não pode ser desfeita.')">
+              <i class="fas fa-trash"></i>
+              Excluir
+            </a>
+            -->
+          </div>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="6">
+          <div class="empty-state">
+            <i class="fas fa-graduation-cap"></i>
+            <h3>Nenhum curso cadastrado</h3>
+            <p>Comece cadastrando o primeiro curso para oferecer aos seus alunos.</p>
+            <a href="{% url 'adm_cursos_cadastrar' %}" class="btn-admin">
+              <i class="fas fa-plus"></i>
+              Cadastrar Primeiro Curso
+            </a>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Statistics Cards -->
+{% if cursos %}
+<div class="row mt-4">
+  <div class="col-md-3">
+    <div class="card border-0" style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); border-radius: 16px;">
+      <div class="card-body text-center">
+        <i class="fas fa-graduation-cap fa-2x text-primary mb-2"></i>
+        <h4 class="text-primary mb-0">{{ cursos|length }}</h4>
+        <small class="text-muted">{{ cursos|length|pluralize:"Curso,Cursos" }} cadastrado{{ cursos|length|pluralize:",s" }}</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0" style="background: linear-gradient(135deg, #d1fae5, #a7f3d0); border-radius: 16px;">
+      <div class="card-body text-center">
+        <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+        <h4 class="text-success mb-0">
+          {% with ativos=0 %}
+            {% for curso in cursos %}
+              {% if curso.ativo %}
+                {% widthratio 1 1 1 as one %}
+                {{ ativos|add:one }}
+              {% endif %}
+            {% endfor %}
+          {% endwith %}
+        </h4>
+        <small class="text-muted">Cursos ativos</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0" style="background: linear-gradient(135deg, #fef3c7, #fde68a); border-radius: 16px;">
+      <div class="card-body text-center">
+        <i class="fas fa-users fa-2x text-warning mb-2"></i>
+        <h4 class="text-warning mb-0">
+          {% with total_turmas=0 %}
+            {% for curso in cursos %}
+              {% widthratio curso.turma_set.count 1 1 as turmas %}
+              {{ total_turmas|add:turmas }}
+            {% endfor %}
+          {% endwith %}
+        </h4>
+        <small class="text-muted">Turmas criadas</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0" style="background: linear-gradient(135deg, #fce4ec, #f8bbd9); border-radius: 16px;">
+      <div class="card-body text-center">
+        <i class="fas fa-clock fa-2x text-danger mb-2"></i>
+        <h4 class="text-danger mb-0">
+          {% with total_horas=0 %}
+            {% for curso in cursos %}
+              {% if curso.carga_horaria %}
+                {% widthratio curso.carga_horaria 1 1 as horas %}
+                {{ total_horas|add:horas }}
+              {% endif %}
+            {% endfor %}
+          {% endwith %}
+        </h4>
+        <small class="text-muted">Horas de conteúdo</small>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block admin_javascript %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Filtros
+    const statusFilter = document.getElementById('statusFilter');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const searchFilter = document.getElementById('searchFilter');
+    const tableRows = document.querySelectorAll('.table-modern tbody tr[data-status]');
+
+    function applyFilters() {
+        const statusValue = statusFilter.value.toLowerCase();
+        const categoryValue = categoryFilter.value;
+        const searchValue = searchFilter.value.toLowerCase();
+
+        tableRows.forEach(row => {
+            const rowStatus = row.getAttribute('data-status').toLowerCase();
+            const rowCategory = row.getAttribute('data-category');
+            const rowText = row.textContent.toLowerCase();
+
+            const statusMatch = !statusValue || rowStatus.includes(statusValue);
+            const categoryMatch = !categoryValue || rowCategory === categoryValue;
+            const searchMatch = !searchValue || rowText.includes(searchValue);
+
+            if (statusMatch && categoryMatch && searchMatch) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    // Event listeners para filtros
+    statusFilter.addEventListener('change', applyFilters);
+    categoryFilter.addEventListener('change', applyFilters);
+    searchFilter.addEventListener('input', applyFilters);
+
+    // Inicializar tooltips do Bootstrap
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(element) {
+        new bootstrap.Tooltip(element);
+    });
+
+    // Animação suave para os cards de estatísticas
+    const statCards = document.querySelectorAll('.card');
+    statCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        
+        setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, 200 + (index * 100));
+    });
+
+    // Highlight da linha da tabela ao passar o mouse
+    document.querySelectorAll('.table-modern tbody tr').forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = 'rgba(59, 130, 246, 0.08)';
+            this.style.transform = 'translateX(5px)';
+            this.style.transition = 'all 0.2s ease';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = '';
+            this.style.transform = 'translateX(0)';
+        });
+    });
+
+    console.log('🎓 Página de Cursos carregada com sucesso!');
+});
+</script>
+
+<style>
+.filters-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.filter-group {
+  margin-bottom: 0;
+}
+
+.filter-label {
+  display: block;
+  font-weight: 600;
+  color: var(--gray-700);
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: 2px solid transparent;
+}
+
+.status-active {
+  background: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+  border-color: rgba(34, 197, 94, 0.2);
+}
+
+.status-inactive {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.table-action-btn.btn-info {
+  background: #06b6d4;
+}
+
+.table-action-btn.btn-info:hover {
+  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+}
+
+@media (max-width: 768px) {
+  .filters-section .row {
+    gap: 1rem;
+  }
+  
+  .btn-group {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .table-action-btn {
+    justify-content: center;
+    width: 100%;
+  }
+}
+</style>
+{% endblock %}

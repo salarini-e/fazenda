@@ -1,0 +1,116 @@
+{% extends 'template_new.html' %}
+{% load bootstrap5 %}
+{% block title %}Desenvolve NF - Bem-Estar Animal - Censo{% endblock %}
+{% block css %}{% endblock %}
+{% block nav %}
+{% include 'nav_bemestaranimal.html' %}
+{% endblock %}
+{% block main %}
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h2>Cadastrar informações extras</h2>
+            <h4 class="my-4">Animal:
+            </h4>
+            <table class=" pt-5 table table-borderless table-responsive">
+                {% if animal.tipo == 'AVES' %}
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Tutor</th>
+                        <th>Tipo</th>
+                        <th>Espécie</th>
+                        <th>Anilha</th>
+                    </tr>
+                </thead>
+                <tr>
+                   <td>{{animal.nome}}</td>
+                   <td>{{animal.tutor.pessoa.nome}}</td>
+                   <td>{{animal.tipo}}</td>
+                   {% if animal.especie %}
+                   <td>{{animal.especie}}</td>
+                   {% else %}
+                   <td>-</td>
+                   {% endif %}
+                    <td>{{animal.anilha}}</td>
+                </tr>
+                {% else %} 
+                <!-- outra -->
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Tutor</th>
+                        <th>Tipo</th>
+                        <th>Espécie</th>
+                        <th>Castrado</th>
+                    </tr>
+                </thead>
+                <tr>
+                   <td>{{animal.nome}}</td>
+                   <td>{{animal.tutor.pessoa.nome}}</td>
+                   <td>{{animal.tipo}}</td>
+    
+                   {% if animal.especie %}
+                   <td>{{animal.especie}}</td>
+                   {% else %}
+                   <td>-</td>
+                   {% endif %}
+                   {% if animal.castrado == 0 %}
+                   <td>NÃO</td>
+                   {% else %}
+                   <td>SIM</td>
+                   {% endif %}
+                </tr>
+                {% endif %}
+            </table>
+            <form method="POST">
+            {% csrf_token %}
+            {% bootstrap_form info_extras_form %}
+            <button type="submit" class="btn btn-primary w-100 mb-3" id="send">Cadastrar</button>
+            </form>
+        </div>
+    </div>
+    </div>
+</div>
+<script>
+    const especie = document.getElementById('id_nome_especie');
+    hide_parent(especie)
+    especie.value = "";
+
+
+    function yes_or_no_check(e){
+        if(e.target.value == 1 || e.target.value == 6 ){
+            setRequired(especie)
+            show_parent(especie)
+        }else{
+            console.log(e.target.value)
+            removeRequired(especie)
+            hide_parent(especie)
+            especie.value = "";
+
+        }
+    }
+    function setRequired(...elements){
+        elements.forEach(e => {
+            e.setAttribute('required', '');
+        })
+    }
+    function removeRequired(...elements){
+        elements.forEach(e => {
+            e.removeAttribute('required');
+        })
+    }
+    function show_parent(e){
+            e.parentNode.style.display = "block";
+    }
+    function hide_parent(e){
+            e.parentNode.style.display = "none";
+    }
+    document.getElementById('id_tipo_0').addEventListener('change', yes_or_no_check);
+    document.getElementById('id_tipo_1').addEventListener('change', yes_or_no_check);
+    document.getElementById('id_tipo_2').addEventListener('change', yes_or_no_check);
+    document.getElementById('id_tipo_3').addEventListener('change', yes_or_no_check);
+    document.getElementById('id_tipo_4').addEventListener('change', yes_or_no_check);
+</script>
+{% endblock %}

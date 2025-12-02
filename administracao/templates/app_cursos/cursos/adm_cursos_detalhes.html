@@ -1,0 +1,718 @@
+{% extends 'template_administrativo.html' %}
+{% load static %}
+
+{% block title %}{{ curso.nome }} - Detalhes{% endblock %}
+
+{% block nav_cursos_active %}active{% endblock %}
+
+{% block page_icon %}fas fa-graduation-cap{% endblock %}
+{% block page_title %}{{ curso.nome }}{% endblock %}
+{% block page_subtitle %}Detalhes completos do curso e gerenciamento{% endblock %}
+{% block page_header_icon %}fas fa-graduation-cap{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'administrativo2' %}">Painel</a></li>
+<li class="breadcrumb-item"><a href="{% url 'adm_cursos_listar' %}">Cursos</a></li>
+<li class="breadcrumb-item active" aria-current="page">{{ curso.nome }}</li>
+{% endblock %}
+
+{% block content_actions %}
+<a href="{% url 'adm_cursos_listar' %}" class="btn-admin btn-secondary">
+  <i class="fas fa-arrow-left"></i>
+  <span>Voltar aos Cursos</span>
+</a>
+<a href="{% url 'adm_curso_editar' curso.id %}" class="btn-admin btn-warning">
+  <i class="fas fa-edit"></i>
+  <span>Editar Curso</span>
+</a>
+<a href="#" class="btn-admin">
+  <i class="fas fa-plus"></i>
+  <span>Nova Turma</span>
+</a>
+<a href="{% url 'adm_disciplina_adicionar' curso.id %}" class="btn-admin btn-info">
+  <i class="fas fa-book"></i>
+  <span>Gerenciar Matriz Curricular</span>
+</a>
+{% endblock %}
+
+{% block admin_content %}
+<div class="admin-table">
+  <!-- Card com informações do Curso -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
+    <div class="card-header" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); color: white; border-radius: 16px 16px 0 0;">
+      <h5 class="mb-0 d-flex align-items-center">
+        <i class="fas fa-graduation-cap me-3"></i>
+        Informações do Curso
+      </h5>
+    </div>
+    <div class="card-body p-4">
+      <div class="row">
+        <div class="col-md-6">
+          <table class="table table-borderless">
+            <tr>
+              <th width="30%">Nome:</th>
+              <td><strong>{{ curso.nome }}</strong></td>
+            </tr>
+            <tr>
+              <th>Sigla:</th>
+              <td><span class="badge bg-info">{{ curso.sigla }}</span></td>
+            </tr>
+            <tr>
+              <th>Categoria:</th>
+              <td>
+                {% if curso.categoria %}
+                  <span class="badge" style="background-color: {{ curso.categoria.cor }}; color: white;">
+                    <i class="fas fa-tag me-1"></i>
+                    {{ curso.categoria.nome }}
+                  </span>
+                {% else %}
+                  <span class="text-muted">Não definida</span>
+                {% endif %}
+              </td>
+            </tr>
+            <tr>
+              <th>Instituição:</th>
+              <td>
+                {% if curso.instituicao %}
+                  <a href="{% url 'adm_instituicao_visualizar' curso.instituicao.id %}" class="text-decoration-none">
+                    <i class="fas fa-university me-2 text-primary"></i>
+                    {{ curso.instituicao.nome }}
+                  </a>
+                {% else %}
+                  <span class="text-muted">Não definida</span>
+                {% endif %}
+              </td>
+            </tr>
+            <tr>
+              <th>Tipo:</th>
+              <td>
+                {% if curso.tipo == 'C' %}
+                  <span class="badge bg-success">
+                    <i class="fas fa-graduation-cap me-1"></i>
+                    Curso
+                  </span>
+                {% else %}
+                  <span class="badge bg-warning">
+                    <i class="fas fa-microphone me-1"></i>
+                    Palestra
+                  </span>
+                {% endif %}
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="col-md-6">
+          <table class="table table-borderless">
+            <tr>
+              <th width="30%">Carga Horária:</th>
+              <td>
+                <strong>{{ curso.carga_horaria }}{% if curso.tipo_carga_horaria == 'h' %}h{% else %}min{% endif %}</strong>
+              </td>
+            </tr>
+            <tr>
+              <th>Nível de Ensino:</th>
+              <td>
+                <span class="badge bg-secondary">{{ curso.get_nivel_ensino_display }}</span>
+              </td>
+            </tr>
+            <tr>
+              <th>Status:</th>
+              <td>
+                {% if curso.ativo %}
+                  <span class="badge bg-success">
+                    <i class="fas fa-check-circle me-1"></i>
+                    Ativo
+                  </span>
+                {% else %}
+                  <span class="badge bg-danger">
+                    <i class="fas fa-times-circle me-1"></i>
+                    Inativo
+                  </span>
+                {% endif %}
+              </td>
+            </tr>
+            <tr>
+              <th>Criado em:</th>
+              <td>{{ curso.dt_inclusao|date:"d/m/Y H:i" }}</td>
+            </tr>
+            <tr>
+              <th>Última alteração:</th>
+              <td>{{ curso.dt_alteracao|date:"d/m/Y" }}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      
+      {% if curso.descricao %}
+      <div class="row mt-3">
+        <div class="col-12">
+          <h6 class="text-muted mb-2">
+            <i class="fas fa-align-left me-2"></i>
+            Descrição:
+          </h6>
+          <p class="text-muted">{{ curso.descricao }}</p>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Cards de Estatísticas -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card border-0" style="background: linear-gradient(135deg, #e3f2fd, #bbdefb); border-radius: 16px;">
+        <div class="card-body text-center">
+          <i class="fas fa-users fa-2x text-primary mb-2"></i>
+          <h4 class="text-primary mb-0">{{ interessados.count }}</h4>
+          <small class="text-muted">Interessado{{ interessados.count|pluralize:",s" }}</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0" style="background: linear-gradient(135deg, #e8f5e8, #c8e6c8); border-radius: 16px;">
+        <div class="card-body text-center">
+          <i class="fas fa-book fa-2x text-success mb-2"></i>
+          <h4 class="text-success mb-0">{{ matrizesCur.count }}</h4>
+          <small class="text-muted">Disciplina{{ matrizesCur.count|pluralize:",s" }}</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0" style="background: linear-gradient(135deg, #fff3e0, #ffe0b2); border-radius: 16px;">
+        <div class="card-body text-center">
+          <i class="fas fa-chalkboard fa-2x text-warning mb-2"></i>
+          <h4 class="text-warning mb-0">{{ turmas.count }}</h4>
+          <small class="text-muted">Turma{{ turmas.count|pluralize:",s" }}</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card border-0" style="background: linear-gradient(135deg, #fce4ec, #f8bbd9); border-radius: 16px;">
+        <div class="card-body text-center">
+          <i class="fas fa-clock fa-2x text-info mb-2"></i>
+          <h4 class="text-info mb-0">
+            {{ curso.carga_horaria }}{% if curso.tipo_carga_horaria == 'h' %}h{% else %}min{% endif %}
+          </h4>
+          <small class="text-muted">Carga Horária</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Seção de Abas com Conteúdo -->
+  <div class="card border-0 shadow-sm" style="border-radius: 16px;">
+    <div class="card-header" style="background: linear-gradient(135deg, #f8f9fa, #e9ecef); border-radius: 16px 16px 0 0;">
+      <ul class="nav nav-tabs card-header-tabs border-0" id="courseDetailsTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active border-0 rounded-pill me-2" id="interessados-tab" data-bs-toggle="tab" data-bs-target="#interessados" type="button" role="tab">
+            <i class="fas fa-users me-2"></i>
+            Lista de Interessados
+            <span class="badge bg-primary ms-2">{{ interessados.count }}</span>
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link border-0 rounded-pill me-2" id="matriz-tab" data-bs-toggle="tab" data-bs-target="#matriz" type="button" role="tab">
+            <i class="fas fa-list-alt me-2"></i>
+            Matriz Curricular
+            <span class="badge bg-success ms-2">{{ matrizesCur.count }}</span>
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link border-0 rounded-pill" id="turmas-tab" data-bs-toggle="tab" data-bs-target="#turmas" type="button" role="tab">
+            <i class="fas fa-chalkboard-teacher me-2"></i>
+            Turmas
+            <span class="badge bg-warning ms-2">{{ turmas.count }}</span>
+          </button>
+        </li>
+      </ul>
+    </div>
+    <div class="card-body p-4">
+      <div class="tab-content" id="courseDetailsTabContent">
+                <!-- Aba Interessados -->
+                <div class="tab-pane fade show active" id="interessados" role="tabpanel" aria-labelledby="interessados-tab">
+                    {% if interessados %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>CPF</th>
+                                        <th>Email</th>
+                                        <th>Telefone</th>
+                                        <th>Bairro</th>
+                                        <th>Data de Interesse</th>
+                                        <th class="text-center">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for interessado in interessados %}
+                                    <tr id="int_{{ interessado.id }}">
+                                        <td>
+                                            <strong>{{ interessado.aluno.pessoa.nome }}</strong>
+                                        </td>
+                                        <td>{{ interessado.aluno.pessoa.cpf }}</td>
+                                        <td>{{ interessado.aluno.pessoa.email|default:"Não informado" }}</td>
+                                        <td>
+                                            {% if interessado.aluno.pessoa.telefone %}
+                                                {{ interessado.aluno.pessoa.telefone }}
+                                                <a class="ms-1" href="https://api.whatsapp.com/send?phone=55{{ interessado.aluno.pessoa.telefone }}" target="_blank" title="Conversar no WhatsApp">
+                                                    <i class="fab fa-whatsapp text-success"></i>
+                                                </a>
+                                            {% else %}
+                                                Não informado
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ interessado.aluno.pessoa.bairro|default:"Não informado" }}</td>
+                                        <td>{{ interessado.dt_inclusao|date:"d/m/Y H:i" }}</td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                    onclick="mostrarModal({{ interessado.id }}, '{{ interessado.aluno.pessoa.nome }}', '{{ interessado.curso.nome }}')"
+                                                    id="btn_{{ interessado.id }}"
+                                                    title="Remover da lista de interessados">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Nenhum interessado cadastrado</h5>
+                            <p class="text-muted">Este curso ainda não possui interessados na lista de espera.</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Aba Matriz Curricular -->
+                <div class="tab-pane fade" id="matriz" role="tabpanel" aria-labelledby="matriz-tab">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">Disciplinas do Curso</h6>
+                        <a href="{% url 'adm_disciplina_adicionar' curso.id %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus"></i> Adicionar Disciplina
+                        </a>
+                    </div>
+                    
+                    {% if matrizesCur %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Disciplina</th>
+                                        <th>Nº de Aulas</th>
+                                        <th>Carga Horária</th>
+                                        <th class="text-center">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for matriz in matrizesCur %}
+                                    <tr>
+                                        <td>
+                                            <strong>{{ matriz.nome }}</strong>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">{{ matriz.n_aulas }} aulas</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-success">{{ matriz.carga_horaria }}h</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <a href="{% url 'adm_disciplina_editar' matriz.id %}" 
+                                               class="btn btn-sm btn-outline-warning" title="Editar disciplina">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Totais -->
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h4 class="text-primary">
+                                            {% with total_aulas=0 %}
+                                                {% for matriz in matrizesCur %}
+                                                    {% with total_aulas=total_aulas|add:matriz.n_aulas %}
+                                                    {% endwith %}
+                                                {% endfor %}
+                                                {{ total_aulas }}
+                                            {% endwith %}
+                                        </h4>
+                                        <small class="text-muted">Total de Aulas</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h4 class="text-success">
+                                            {% with total_horas=0 %}
+                                                {% for matriz in matrizesCur %}
+                                                    {% with total_horas=total_horas|add:matriz.carga_horaria %}
+                                                    {% endwith %}
+                                                {% endfor %}
+                                                {{ total_horas }}
+                                            {% endwith %}h
+                                        </h4>
+                                        <small class="text-muted">Total de Horas</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-list-alt fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Nenhuma disciplina cadastrada</h5>
+                            <p class="text-muted">Este curso ainda não possui disciplinas na matriz curricular.</p>
+                            <a href="{% url 'adm_disciplina_adicionar' curso.id %}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Adicionar Primeira Disciplina
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Aba Turmas -->
+                <div class="tab-pane fade" id="turmas" role="tabpanel" aria-labelledby="turmas-tab">
+                                <div class="row">
+                                    <div class="col-12">
+                                        {% if turmas %}
+                                            <div class="table-responsive">
+                                                <table class="table table-striped table-hover">
+                                                    <thead class="table-primary">
+                                                        <tr>
+                                                            <th>Turma</th>
+                                                            <th>Local</th>
+                                                            <th>Período</th>
+                                                            <th>Instrutores</th>
+                                                            <th>Alunos Matriculados</th>
+                                                            <th>Status</th>
+                                                            <th>Ações</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {% for turma in turmas %}
+                                                            <tr>
+                                                                <td>
+                                                                    <strong>{{ turma.nome }}</strong>
+                                                                    {% if turma.observacoes %}
+                                                                        <br><small class="text-muted">{{ turma.observacoes|truncatechars:50 }}</small>
+                                                                    {% endif %}
+                                                                </td>
+                                                                <td>
+                                                                    {% if turma.local %}
+                                                                        <i class="fas fa-map-marker-alt text-primary me-1"></i>
+                                                                        {{ turma.local.nome }}
+                                                                    {% else %}
+                                                                        <span class="text-muted">Não definido</span>
+                                                                    {% endif %}
+                                                                </td>
+                                                                <td>
+                                                                    {% if turma.data_inicio %}
+                                                                        <strong>Início:</strong> {{ turma.data_inicio|date:"d/m/Y" }}<br>
+                                                                    {% endif %}
+                                                                    {% if turma.data_termino %}
+                                                                        <strong>Término:</strong> {{ turma.data_termino|date:"d/m/Y" }}
+                                                                    {% endif %}
+                                                                    {% if not turma.data_inicio and not turma.data_termino %}
+                                                                        <span class="text-muted">Não definido</span>
+                                                                    {% endif %}
+                                                                </td>
+                                                                <td>
+                                                                    {% for instrutor in turma.instrutores.all %}
+                                                                        <span class="badge bg-info me-1">
+                                                                            <i class="fas fa-user-tie me-1"></i>
+                                                                            {{ instrutor.pessoa.nome }}
+                                                                        </span>
+                                                                        {% if not forloop.last %}<br>{% endif %}
+                                                                    {% empty %}
+                                                                        <span class="text-muted">Nenhum instrutor</span>
+                                                                    {% endfor %}
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <span class="badge bg-primary fs-6">
+                                                                        {{ turma.matricula_set.count }}
+                                                                    </span>
+                                                                </td>
+                                                                <td>
+                                                                    {% if turma.ativa %}
+                                                                        <span class="badge bg-success">
+                                                                            <i class="fas fa-check me-1"></i>
+                                                                            Ativa
+                                                                        </span>
+                                                                    {% else %}
+                                                                        <span class="badge bg-secondary">
+                                                                            <i class="fas fa-pause me-1"></i>
+                                                                            Inativa
+                                                                        </span>
+                                                                    {% endif %}
+                                                                </td>
+                                                                <td>
+                                                                    <div class="btn-group" role="group">
+                                                                        <a href="#" class="btn btn-outline-primary btn-sm" title="Ver Detalhes">
+                                                                            <i class="fas fa-eye"></i>
+                                                                        </a>
+                                                                        <a href="#" class="btn btn-outline-warning btn-sm" title="Editar">
+                                                                            <i class="fas fa-edit"></i>
+                                                                        </a>
+                                                                        <a href="#" class="btn btn-outline-info btn-sm" title="Matrículas">
+                                                                            <i class="fas fa-users"></i>
+                                                                        </a>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        {% else %}
+                                            <div class="alert alert-info text-center" role="alert">
+                                                <i class="fas fa-info-circle fa-3x text-muted mb-3"></i>
+                                                <h5>Nenhuma turma cadastrada</h5>
+                                                <p class="mb-3">Este curso ainda não possui turmas cadastradas.</p>
+                                                <a href="#" class="btn btn-primary">
+                                                    <i class="fas fa-plus me-2"></i>
+                                                    Criar Nova Turma
+                                                </a>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Remover Interessado -->
+<div class="modal fade" id="excluirInteressado" tabindex="-1" aria-labelledby="excluirInteressadoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="excluirInteressadoLabel">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                    Remover Interessado
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <p>Você tem certeza que deseja remover este interessado da lista?</p>
+                    <div class="alert alert-warning d-none" id="msg-alert"></div>
+                    <div class="mb-3">
+                        <strong>Nome:</strong> <span id="nome-interessado"></span><br>
+                        <strong>Curso:</strong> <span id="curso-interessado"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmar-remocao">
+                    <i class="fas fa-trash me-2"></i>Remover da Lista
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.nav-tabs .nav-link {
+    color: #495057;
+    border: none;
+    border-bottom: 2px solid transparent;
+}
+
+.nav-tabs .nav-link.active {
+    color: #0066cc;
+    border-bottom: 2px solid #0066cc;
+    background-color: transparent;
+}
+
+.nav-tabs .nav-link:hover {
+    border-bottom: 2px solid #0066cc;
+}
+
+.table th {
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+</style>
+{% endblock %}
+
+{% block admin_javascript %}
+<script>
+// JavaScript moderno para a página de detalhes do curso
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar tooltips do Bootstrap
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(element) {
+        new bootstrap.Tooltip(element);
+    });
+
+    // Animação suave para os cards de estatísticas
+    const statCards = document.querySelectorAll('.card');
+    statCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        
+        setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, 200 + (index * 100));
+    });
+
+    // Animação para as abas
+    document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
+        tab.addEventListener('shown.bs.tab', function (e) {
+            const targetPane = document.querySelector(e.target.getAttribute('data-bs-target'));
+            if (targetPane) {
+                targetPane.style.opacity = '0';
+                targetPane.style.transform = 'translateY(10px)';
+                setTimeout(() => {
+                    targetPane.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                    targetPane.style.opacity = '1';
+                    targetPane.style.transform = 'translateY(0)';
+                }, 50);
+            }
+        });
+    });
+
+    console.log('🎓 Página de Detalhes do Curso carregada com sucesso!');
+});
+
+// Funções para o modal de remoção (mantendo compatibilidade)
+let interessadoParaRemover = null;
+
+function mostrarModal(id, nome, curso) {
+    interessadoParaRemover = id;
+    const nomeEl = document.getElementById('nome-interessado');
+    const cursoEl = document.getElementById('curso-interessado');
+    const alertEl = document.getElementById('msg-alert');
+    
+    if (nomeEl && cursoEl) {
+        nomeEl.textContent = nome;
+        cursoEl.textContent = curso;
+        if (alertEl) alertEl.classList.add('d-none');
+        
+        const modalEl = document.getElementById('excluirInteressado');
+        if (modalEl) {
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+        }
+    }
+}
+
+// Event listener para confirmação de remoção
+const confirmarBtn = document.getElementById('confirmar-remocao');
+if (confirmarBtn) {
+    confirmarBtn.addEventListener('click', function() {
+        if (interessadoParaRemover) {
+            removerInteressado(interessadoParaRemover);
+        }
+    });
+}
+
+function removerInteressado(id) {
+    const botaoConfirmar = document.getElementById('confirmar-remocao');
+    const alertDiv = document.getElementById('msg-alert');
+    
+    if (!botaoConfirmar) return;
+    
+    // Desabilitar botão durante requisição
+    botaoConfirmar.disabled = true;
+    botaoConfirmar.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Removendo...';
+    
+    fetch(`remover-interessado/${id}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Remover linha da tabela
+            const linha = document.querySelector(`#int_${id}`);
+            if (linha) {
+                linha.style.transition = 'opacity 0.5s ease';
+                linha.style.opacity = '0';
+                setTimeout(() => {
+                    linha.remove();
+                    // Atualizar contador na aba
+                    const tab = document.querySelector('#interessados-tab');
+                    const remainingRows = document.querySelectorAll('#interessados tbody tr');
+                    const count = remainingRows.length;
+                    if (tab) {
+                        tab.innerHTML = `<i class="fas fa-users me-2"></i>Lista de Interessados<span class="badge bg-primary ms-2">${count}</span>`;
+                    }
+                    
+                    // Atualizar card de estatísticas
+                    const statCard = document.querySelector('.text-primary');
+                    if (statCard) statCard.textContent = count;
+                }, 500);
+            }
+            
+            // Fechar modal
+            const modalEl = document.getElementById('excluirInteressado');
+            if (modalEl) {
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                if (modal) modal.hide();
+            }
+            
+            // Mostrar notificação de sucesso
+            showAlert('Interessado removido da lista com sucesso!', 'success');
+            
+        } else {
+            if (alertDiv) {
+                alertDiv.classList.remove('d-none');
+                alertDiv.textContent = 'Falha ao tentar remover este interessado.';
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        if (alertDiv) {
+            alertDiv.classList.remove('d-none');
+            alertDiv.textContent = 'Erro na solicitação: ' + error.message;
+        }
+    })
+    .finally(() => {
+        // Reabilitar botão
+        if (botaoConfirmar) {
+            botaoConfirmar.disabled = false;
+            botaoConfirmar.innerHTML = '<i class="fas fa-trash me-2"></i>Remover da Lista';
+        }
+    });
+}
+
+// Função para mostrar alertas modernos
+function showAlert(message, type) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+    alertDiv.style.top = '20px';
+    alertDiv.style.right = '20px';
+    alertDiv.style.zIndex = '9999';
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.body.appendChild(alertDiv);
+    
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}
+</script>
+{% endblock %}

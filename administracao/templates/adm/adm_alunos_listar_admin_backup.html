@@ -1,0 +1,425 @@
+{% extends 'template_administrativo.html' %}
+{% load static %}
+
+{% block title %}Alunos - Administração{% endblock %}
+
+{% block nav_alunos_active %}active{% endblock %}
+
+{% block page_icon %}fas fa-user-graduate{% endblock %}
+{% block page_title %}Gerenciar Alunos{% endblock %}
+{% block page_subtitle %}Administre todos os alunos cadastrados no sistema{% endblock %}
+{% block page_header_icon %}fas fa-user-graduate{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'administrativo2' %}">Painel</a></li>
+<li class="breadcrumb-item active" aria-current="page">Alunos</li>
+{% endblock %}
+
+{% block content_title %}Lista de Alunos{% endblock %}
+
+{% block content_actions %}
+<a href="{% url 'administrativo2' %}" class="btn-admin btn-secondary">
+  <i class="fas fa-arrow-left"></i>
+  <span>Voltar ao Painel</span>
+</a>
+<a href="{% url 'adm_cadastrar_aluno' %}" class="btn-admin">
+  <i class="fas fa-user-plus"></i>
+  <span>Novo Aluno</span>
+</a>
+{% endblock %}
+
+{% block content_body %}
+<!-- Filtros e Busca -->
+<div class="filters-section mb-4">
+  <div class="row">
+    <div class="col-md-6">
+      <div class="filter-group">
+        <label class="filter-label">
+          <i class="fas fa-search me-2"></i>Buscar Aluno
+        </label>
+        <input type="text" class="form-control" id="searchFilter" placeholder="Digite nome, CPF ou email...">
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="filter-group">
+        <label class="filter-label">
+          <i class="fas fa-filter me-2"></i>Status
+        </label>
+        <select class="form-control" id="statusFilter">
+          <option value="">Todos</option>
+          <option value="ativo">Ativo</option>
+          <option value="inativo">Inativo</option>
+        </select>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="filter-group">
+        <label class="filter-label">
+          <i class="fas fa-sort me-2"></i>Ordenar por
+        </label>
+        <select class="form-control" id="sortFilter">
+          <option value="nome">Nome</option>
+          <option value="data">Data de Cadastro</option>
+          <option value="cursos">Nº de Cursos</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="admin-table">
+  <table class="table table-modern">
+    <thead>
+      <tr>
+        <th><i class="fas fa-user me-2"></i>Aluno</th>
+        <th><i class="fas fa-id-card me-2"></i>CPF</th>
+        <th><i class="fas fa-envelope me-2"></i>Contato</th>
+        <th><i class="fas fa-graduation-cap me-2"></i>Cursos</th>
+        <th><i class="fas fa-calendar-plus me-2"></i>Cadastro</th>
+        <th class="text-center"><i class="fas fa-cogs me-2"></i>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for aluno in alunos %}
+      <tr data-search="{{ aluno.nome|lower }} {{ aluno.cpf|default:'' }} {{ aluno.email|default:'' }}">
+        <td>
+          <div class="d-flex align-items-center">
+            <div class="me-3">
+              {% if aluno.foto %}
+                <img src="{{ aluno.foto.url }}" alt="{{ aluno.nome }}" 
+                     style="width: 45px; height: 45px; object-fit: cover; border-radius: 50%;">
+              {% else %}
+                <div style="width: 45px; height: 45px; background: linear-gradient(135deg, #8b5cf6, #a78bfa); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">
+                  <i class="fas fa-user"></i>
+                </div>
+              {% endif %}
+            </div>
+            <div>
+              <strong style="color: var(--gray-800);">{{ aluno.nome }}</strong>
+              {% if aluno.data_nascimento %}
+              <div style="font-size: 0.85rem; color: var(--gray-600);">
+                <i class="fas fa-birthday-cake me-1"></i>
+                {{ aluno.data_nascimento|date:"d/m/Y" }}
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </td>
+        <td>
+          {% if aluno.cpf %}
+            <code style="background: rgba(0,0,0,0.05); padding: 4px 8px; border-radius: 4px; font-size: 0.85rem;">
+              {{ aluno.cpf }}
+            </code>
+          {% else %}
+            <span class="text-muted">
+              <i class="fas fa-minus me-2"></i>
+              Não informado
+            </span>
+          {% endif %}
+        </td>
+        <td>
+          <div class="contact-info">
+            {% if aluno.email %}
+              <div style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 0.25rem;">
+                <i class="fas fa-envelope me-1"></i>
+                {{ aluno.email|truncatechars:25 }}
+              </div>
+            {% endif %}
+            {% if aluno.telefone %}
+              <div style="font-size: 0.85rem; color: var(--gray-600);">
+                <i class="fas fa-phone me-1"></i>
+                {{ aluno.telefone }}
+              </div>
+            {% endif %}
+            {% if not aluno.email and not aluno.telefone %}
+              <span class="text-muted">
+                <i class="fas fa-minus me-2"></i>
+                Não informado
+              </span>
+            {% endif %}
+          </div>
+        </td>
+        <td>
+          {% if aluno.inscricoes.count > 0 %}
+            <div class="courses-info">
+              <span class="badge bg-primary" style="font-size: 0.85rem;">
+                <i class="fas fa-graduation-cap me-1"></i>
+                {{ aluno.inscricoes.count }} curso{{ aluno.inscricoes.count|pluralize:",s" }}
+              </span>
+              {% if aluno.certificados.count > 0 %}
+                <span class="badge bg-success" style="font-size: 0.75rem; margin-left: 0.25rem;">
+                  <i class="fas fa-certificate me-1"></i>
+                  {{ aluno.certificados.count }} certificado{{ aluno.certificados.count|pluralize:",s" }}
+                </span>
+              {% endif %}
+            </div>
+          {% else %}
+            <span class="badge bg-warning" style="font-size: 0.85rem;">
+              <i class="fas fa-exclamation me-1"></i>
+              Sem cursos
+            </span>
+          {% endif %}
+        </td>
+        <td>
+          <div style="color: var(--gray-600); font-size: 0.9rem;">
+            <i class="fas fa-calendar me-2"></i>
+            {% if aluno.created_at %}
+              {{ aluno.created_at|date:"d/m/Y" }}
+            {% else %}
+              --
+            {% endif %}
+          </div>
+        </td>
+        <td class="text-center">
+          <div class="btn-group" role="group">
+                        <a href="{% url 'adm_aluno_visualizar' aluno.id %}" class="table-action-btn btn-info" title="Ver perfil">
+              <i class="fas fa-user"></i>
+            </a>
+            <a href="{% url 'adm_aluno_editar' aluno.id %}" class="table-action-btn" title="Editar aluno">
+              <i class="fas fa-edit"></i>
+            </a>
+            <a href="{% url 'excluir_aluno' aluno.id %}" class="table-action-btn btn-danger" 
+               title="Excluir aluno"
+               onclick="return confirm('⚠️ Tem certeza que deseja excluir o aluno &quot;{{ aluno.nome }}&quot;?\n\n{% if aluno.inscricoes.count > 0 %}Este aluno possui {{ aluno.inscricoes.count }} inscrição(ões) ativa(s).{% endif %}\n\nEsta ação não pode ser desfeita.')">
+              <i class="fas fa-trash"></i>
+              Excluir
+            </a>
+          </div>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="6">
+          <div class="empty-state">
+            <i class="fas fa-user-graduate"></i>
+            <h3>Nenhum aluno cadastrado</h3>
+            <p>Comece cadastrando o primeiro aluno no sistema.</p>
+            <a href="{% url 'adm_cadastrar_aluno' %}" class="btn-admin">
+              <i class="fas fa-user-plus"></i>
+              Cadastrar Primeiro Aluno
+            </a>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Statistics Cards -->
+{% if alunos %}
+<div class="row mt-4">
+  <div class="col-md-3">
+    <div class="card border-0" style="background: linear-gradient(135deg, #f3e8ff, #ddd6fe); border-radius: 16px;">
+      <div class="card-body text-center">
+        <i class="fas fa-user-graduate fa-2x" style="color: #8b5cf6;" class="mb-2"></i>
+        <h4 style="color: #8b5cf6;" class="mb-0">{{ alunos|length }}</h4>
+        <small class="text-muted">{{ alunos|length|pluralize:"Aluno,Alunos" }} cadastrado{{ alunos|length|pluralize:",s" }}</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0" style="background: linear-gradient(135deg, #d1fae5, #a7f3d0); border-radius: 16px;">
+      <div class="card-body text-center">
+        <i class="fas fa-graduation-cap fa-2x text-success mb-2"></i>
+        <h4 class="text-success mb-0">
+          {% with total_inscricoes=0 %}
+            {% for aluno in alunos %}
+              {% widthratio aluno.inscricoes.count 1 1 as inscricoes %}
+              {{ total_inscricoes|add:inscricoes }}
+            {% endfor %}
+          {% endwith %}
+        </h4>
+        <small class="text-muted">Inscrições ativas</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0" style="background: linear-gradient(135deg, #fef3c7, #fde68a); border-radius: 16px;">
+      <div class="card-body text-center">
+        <i class="fas fa-certificate fa-2x text-warning mb-2"></i>
+        <h4 class="text-warning mb-0">
+          {% with total_certificados=0 %}
+            {% for aluno in alunos %}
+              {% widthratio aluno.certificados.count 1 1 as certificados %}
+              {{ total_certificados|add:certificados }}
+            {% endfor %}
+          {% endwith %}
+        </h4>
+        <small class="text-muted">Certificados emitidos</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0" style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); border-radius: 16px;">
+      <div class="card-body text-center">
+        <i class="fas fa-chart-line fa-2x text-primary mb-2"></i>
+        <h4 class="text-primary mb-0">
+          {% widthratio alunos|length 1 1 %}%
+        </h4>
+        <small class="text-muted">Taxa de crescimento</small>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Quick Actions -->
+<div class="mt-4">
+  <div class="row">
+    <div class="col-md-4">
+      <div class="quick-action-card">
+        <i class="fas fa-file-export"></i>
+        <div>
+          <h4>Exportar Lista</h4>
+          <p>Exporte a lista de alunos para Excel ou PDF</p>
+          <button class="btn btn-outline-primary btn-sm">Exportar</button>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="quick-action-card">
+        <i class="fas fa-envelope-bulk"></i>
+        <div>
+          <h4>Email em Massa</h4>
+          <p>Envie comunicados para todos os alunos</p>
+          <button class="btn btn-outline-info btn-sm">Enviar Email</button>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="quick-action-card">
+        <i class="fas fa-chart-bar"></i>
+        <div>
+          <h4>Relatórios</h4>
+          <p>Gere relatórios detalhados dos alunos</p>
+          <button class="btn btn-outline-warning btn-sm">Ver Relatórios</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block admin_javascript %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Filtros e busca
+    const searchFilter = document.getElementById('searchFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    const sortFilter = document.getElementById('sortFilter');
+    const tableRows = document.querySelectorAll('.table-modern tbody tr[data-search]');
+
+    function applyFilters() {
+        const searchValue = searchFilter.value.toLowerCase();
+        const statusValue = statusFilter.value.toLowerCase();
+
+        tableRows.forEach(row => {
+            const searchData = row.getAttribute('data-search');
+            const searchMatch = !searchValue || searchData.includes(searchValue);
+            const statusMatch = true; // Implementar lógica de status se necessário
+
+            if (searchMatch && statusMatch) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    // Event listeners
+    searchFilter.addEventListener('input', applyFilters);
+    statusFilter.addEventListener('change', applyFilters);
+
+    // Inicializar tooltips do Bootstrap
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(element) {
+        new bootstrap.Tooltip(element);
+    });
+
+    // Animação suave para os cards de estatísticas
+    const statCards = document.querySelectorAll('.card');
+    statCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        
+        setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, 200 + (index * 100));
+    });
+
+    // Highlight da linha da tabela ao passar o mouse
+    document.querySelectorAll('.table-modern tbody tr').forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = 'rgba(139, 92, 246, 0.08)';
+            this.style.transform = 'translateX(5px)';
+            this.style.transition = 'all 0.2s ease';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = '';
+            this.style.transform = 'translateX(0)';
+        });
+    });
+
+    console.log('🎓 Página de Alunos carregada com sucesso!');
+});
+</script>
+
+<style>
+.quick-action-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  margin-bottom: 1rem;
+}
+
+.quick-action-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.quick-action-card i {
+  font-size: 2rem;
+  color: var(--primary-color);
+  width: 60px;
+  text-align: center;
+}
+
+.quick-action-card h4 {
+  margin: 0 0 0.5rem 0;
+  color: var(--gray-800);
+  font-weight: 600;
+}
+
+.quick-action-card p {
+  margin: 0 0 1rem 0;
+  color: var(--gray-600);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .quick-action-card {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .btn-group {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .table-action-btn {
+    justify-content: center;
+    width: 100%;
+  }
+}
+</style>
+{% endblock %}

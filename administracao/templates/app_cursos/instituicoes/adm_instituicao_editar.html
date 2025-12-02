@@ -1,0 +1,155 @@
+{% extends 'template_new.html' %}
+{% load bootstrap5 %}
+{% load static%}
+{% block title %}EDITAR INSTITUIÇÃO - CURSOS LIVRES{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/administrativo.css' %}">
+{% endblock %}
+{% block administrativo %}fw-bold{% endblock %}
+{% block main %}
+
+<!-- Usando o novo componente padronizado -->
+{% include 'includes/admin_page_header.html' with page_title="Editar Instituição" page_subtitle="Atualizar informações da instituição" page_icon="fas fa-building" show_back_btn=True back_url="adm_instituicoes_listar" show_dashboard_btn=True show_breadcrumb=True %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item">
+  <a href="{% url 'adm_instituicoes_listar' %}">Instituições</a>
+</li>
+<li class="breadcrumb-item active" aria-current="page">Editar</li>
+{% endblock %}
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          
+          <!-- Menu de navegação -->
+          <div class="admin-nav-tabs mb-4">
+            <div class="nav-item">
+              <a href="{% url 'adm_cadastrar_instituicao' %}" class="nav-link">
+                <i class="fa-solid fa-plus me-2"></i>Nova Instituição
+              </a>
+            </div>
+            <div class="nav-item">
+              <a href="{% url 'adm_instituicoes_listar' %}" class="nav-link active">
+                <i class="fa-regular fa-file-lines me-2"></i>Listar/Editar Instituições
+              </a>
+            </div>
+          </div>
+          
+          <!-- Formulário -->
+          <form method="POST" class="row g-3">
+            {% csrf_token %}
+            
+            <div class="col-12">
+              {% bootstrap_form form %}
+            </div>
+            
+            <div class="col-12">
+              <hr>
+              <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-success">
+                  <i class="fas fa-save me-2"></i>
+                  Salvar Alterações
+                </button>
+                <a href="{% url 'adm_instituicoes_listar' %}" class="btn btn-secondary">
+                  <i class="fas fa-times me-2"></i>
+                  Cancelar
+                </a>
+              </div>
+            </div>
+          </form>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Estilos para a navegação administrativa */
+.admin-nav-tabs {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.admin-nav-tabs .nav-item .nav-link {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #64748b;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.admin-nav-tabs .nav-item .nav-link:hover {
+  background-color: #f1f5f9;
+  color: #334155;
+  text-decoration: none;
+}
+
+.admin-nav-tabs .nav-item .nav-link.active {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  border-color: #3b82f6;
+}
+
+.admin-nav-tabs .nav-item .nav-link i {
+  font-size: 0.875rem;
+}
+
+/* Card styling */
+.card {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.card-body {
+  padding: 2rem;
+}
+
+/* Form styling */
+.form-control {
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  padding: 0.75rem;
+}
+
+.form-control:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.1);
+}
+
+.btn {
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .admin-nav-tabs {
+    flex-direction: column;
+  }
+  
+  .card-body {
+    padding: 1.5rem;
+  }
+  
+  .d-flex.gap-2 {
+    flex-direction: column;
+  }
+  
+  .d-flex.gap-2 .btn {
+    width: 100%;
+  }
+}
+</style>
+
+{% endblock %}

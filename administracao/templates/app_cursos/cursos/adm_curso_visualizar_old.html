@@ -1,0 +1,99 @@
+{% extends 'template_new.html' %} {% load static%} 
+{% block title %}BEM VINDO - CURSOS LIVRES{% endblock %} 
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/administrativo.css' %}" />
+{% endblock %} 
+
+{% block main %}
+<div class="row w-100">
+  <div class="col-10 m-auto bg-white">
+    <div class="row">
+      <div class="col text-dark px-4 pt-4">
+        <h1 class="text-uppercase">Painel -> Curso -> {{curso}}</h1>
+        <div class="row px-2 pt-2">
+          <div class="col px-0">
+            <a href="#" class="btn btn-dark ms-auto">PAINEL</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row px-2 pt-2">
+      <form method="POST">
+        <div class="col-12 d-flex w-100">
+          <a
+            class="btn btn-outline-dark ms-auto"
+            href="{% url 'adm_cursos_listar' %}"
+          >
+            <i class="fa-solid fa-rotate-left"></i>
+            Voltar
+          </a>
+        </div>
+
+        <!-- <div class="row px-2 pt-2 d-flex">
+          <div class="col px-0 painel">
+              <a href="#" class="ativo"><i class="fa-solid fa-plus me-3"></i>Criar requisito</a>
+              <a href="{% url 'adm_cursos_listar' %}"><i class="fa-regular fa-file-lines me-3"></i>Listar/editar cursos</a>
+          </div>
+      </div> -->
+
+        <table class="table">
+          <tr style="border-color: white">
+            <td><b>Nome:</b>{{curso.nome}}</td>
+            <td><b>Código:</b>{{curso.id}}</td>
+          </tr>
+          <tr style="border-color: white">
+            <td><b>Sigla:</b>{{curso.sigla}}</td>
+            <td><b>Categoria:</b>{{curso.categoria}}</td>
+          </tr>
+        </table>
+      </form>
+    </div>
+
+    <div class="row">
+      <h2>Turmas:</h2>
+      <table class="table table-striped table-primary">
+        <thead>
+          <th>Nome</th>
+          <th>Quantidade máxima</th>
+          <th>Data início</th>
+          <th>Data fim</th>
+          <th class="text-center">Status</th>
+        </thead>
+        <tbody>
+          {% for turma in turmas %}
+          <tr>
+            <td>
+              <a
+                target="_blank"
+                href="{% url 'adm_turma_visualizar' turma.id %}"
+                style="text-decoration: none"
+              >
+                {{turma}}
+              </a>
+            </td>
+            <td>{{turma.quantidade_permitido}}</td>
+
+            <td>{{turma.data_inicio}}</td>
+            <td>{{turma.data_final}}</td>
+
+            <td class="text-center">
+              {% if turma.status == 'pre' %}
+              <div class="bg-danger w-100 rounded text-light">Pré-inscrição</div>
+              {% elif turma.status == 'ati' %}
+              <div class="bg-success w-100 rounded text-light">Ativa</div>
+              {% elif turma.status == 'agu' %}
+              <div class="bg-warning w-100 rounded text-dark">Aguardando</div>
+              {% elif turma.status == 'acc' %}
+              <div class="bg-info w-100 px-3 rounded text-dark">Ativo e aceitando...</div>
+              {% elif turma.status == 'enc' %}
+              <div class="bg-dark w-100 rounded text-light">Encerrada</div>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

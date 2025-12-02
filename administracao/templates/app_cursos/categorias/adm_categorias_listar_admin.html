@@ -1,0 +1,347 @@
+{% extends 'template_administrativo.html' %}
+{% load static %}
+
+{% block title %}Categorias - Administração{% endblock %}
+
+{% block nav_categorias_active %}active{% endblock %}
+
+{% block page_icon %}fas fa-tags{% endblock %}
+{% block page_title %}Gerenciar Categorias{% endblock %}
+{% block page_subtitle %}Administre as categorias dos cursos e organize o conteúdo{% endblock %}
+{% block page_header_icon %}fas fa-tags{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'administrativo2' %}">Painel</a></li>
+<li class="breadcrumb-item active" aria-current="page">Categorias</li>
+{% endblock %}
+
+{% block content_title %}Lista de Categorias{% endblock %}
+
+{% block content_actions %}
+<a href="{% url 'administrativo2' %}" class="btn-admin btn-secondary">
+  <i class="fas fa-arrow-left"></i>
+  <span>Voltar ao Painel</span>
+</a>
+<a href="{% url 'cadastrar_categoria' %}" class="btn-admin">
+  <i class="fas fa-plus"></i>
+  <span>Nova Categoria</span>
+</a>
+{% endblock %}
+
+{% block content_body %}
+<div class="admin-table">
+  <table class="table table-modern">
+    <thead>
+      <tr>
+        <th><i class="fas fa-tag me-2"></i>Nome da Categoria</th>
+        <th><i class="fas fa-palette me-2"></i>Cor & Ícone</th>
+        <th><i class="fas fa-graduation-cap me-2"></i>Cursos</th>
+        <th><i class="fas fa-calendar-plus me-2"></i>Criada em</th>
+        <th class="text-center"><i class="fas fa-cogs me-2"></i>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for categoria in categorias %}
+      <tr>
+        <td>
+          <div class="d-flex align-items-center">
+            <div class="me-3">
+              <div style="width: 40px; height: 40px; background: {{ categoria.cor|default:'#6366f1' }}; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white;">
+                {% if categoria.icone %}
+                  <i class="{{ categoria.icone }}"></i>
+                {% else %}
+                  <i class="fas fa-tag"></i>
+                {% endif %}
+              </div>
+            </div>
+            <div>
+              <strong style="color: var(--gray-800);">{{ categoria.nome }}</strong>
+              {% if categoria.descricao %}
+              <div style="font-size: 0.85rem; color: var(--gray-600);">{{ categoria.descricao|truncatechars:50 }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="d-flex align-items-center gap-2">
+            <div class="color-preview" style="width: 20px; height: 20px; background: {{ categoria.cor|default:'#6366f1' }}; border-radius: 4px; border: 1px solid rgba(0,0,0,0.1);"></div>
+            <code style="font-size: 0.8rem; background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px;">
+              {{ categoria.cor|default:'#6366f1' }}
+            </code>
+            {% if categoria.icone %}
+              <span style="font-size: 0.8rem; color: var(--gray-600);">
+                <i class="{{ categoria.icone }} me-1"></i>
+                {{ categoria.icone|truncatechars:15 }}
+              </span>
+            {% endif %}
+          </div>
+        </td>
+        <td>
+          {% if categoria.curso_set.count > 0 %}
+            <span class="badge bg-primary" style="font-size: 0.85rem;">
+              <i class="fas fa-graduation-cap me-1"></i>
+              {{ categoria.curso_set.count }} curso{{ categoria.curso_set.count|pluralize:",s" }}
+            </span>
+          {% else %}
+            <span class="badge bg-secondary" style="font-size: 0.85rem;">
+              <i class="fas fa-minus me-1"></i>
+              Nenhum curso
+            </span>
+          {% endif %}
+        </td>
+        <td>
+          <div style="color: var(--gray-600); font-size: 0.9rem;">
+            <i class="fas fa-calendar me-2"></i>
+            {% if categoria.created_at %}
+              {{ categoria.created_at|date:"d/m/Y" }}
+            {% else %}
+              --
+            {% endif %}
+          </div>
+        </td>
+        <td class="text-center">
+          <div class="btn-group" role="group">
+            <a href="{% url 'adm_categorias_editar' categoria.id %}" class="table-action-btn" title="Editar categoria">
+              <i class="fas fa-edit"></i>
+              Editar
+            </a>
+            <a href="{% url 'adm_categorias_excluir' categoria.id %}" class="table-action-btn btn-danger" 
+               title="Excluir categoria"
+               onclick="return confirm('⚠️ Tem certeza que deseja excluir a categoria &quot;{{ categoria.nome }}&quot;?\n\n{% if categoria.curso_set.count > 0 %}Esta categoria possui {{ categoria.curso_set.count }} curso(s) vinculado(s).{% endif %}\n\nEsta ação não pode ser desfeita.')">
+              <i class="fas fa-trash"></i>
+              Excluir
+            </a>
+          </div>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="5">
+          <div class="empty-state">
+            <i class="fas fa-tags"></i>
+            <h3>Nenhuma categoria cadastrada</h3>
+            <p>Comece cadastrando a primeira categoria para organizar seus cursos.</p>
+            <a href="{% url 'cadastrar_categoria' %}" class="btn-admin">
+              <i class="fas fa-plus"></i>
+              Cadastrar Primeira Categoria
+            </a>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Statistics Cards -->
+{% if categorias %}
+<div class="row mt-4">
+  <div class="col-md-3">
+    <div class="card border-0" style="background: linear-gradient(135deg, #f3e8ff, #ddd6fe); border-radius: 16px;">
+      <div class="card-body text-center">
+        <i class="fas fa-tags fa-2x text-purple mb-2" style="color: #8b5cf6;"></i>
+        <h4 style="color: #8b5cf6;" class="mb-0">{{ categorias|length }}</h4>
+        <small class="text-muted">{{ categorias|length|pluralize:"Categoria,Categorias" }} cadastrada{{ categorias|length|pluralize:",s" }}</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0" style="background: linear-gradient(135deg, #e8f5e8, #c8e6c8); border-radius: 16px;">
+      <div class="card-body text-center">
+        <i class="fas fa-graduation-cap fa-2x text-success mb-2"></i>
+        <h4 class="text-success mb-0">
+          {% with total_cursos=0 %}
+            {% for cat in categorias %}
+              {% widthratio cat.curso_set.count 1 1 as cursos %}
+              {{ total_cursos|add:cursos }}
+            {% endfor %}
+          {% endwith %}
+        </h4>
+        <small class="text-muted">Cursos categorizados</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0" style="background: linear-gradient(135deg, #fff3e0, #ffe0b2); border-radius: 16px;">
+      <div class="card-body text-center">
+        <i class="fas fa-palette fa-2x text-warning mb-2"></i>
+        <h4 class="text-warning mb-0">
+          {% with com_cor=0 %}
+            {% for cat in categorias %}
+              {% if cat.cor %}
+                {% widthratio 1 1 1 as one %}
+                {{ com_cor|add:one }}
+              {% endif %}
+            {% endfor %}
+          {% endwith %}
+        </h4>
+        <small class="text-muted">Com cores personalizadas</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0" style="background: linear-gradient(135deg, #fce4ec, #f8bbd9); border-radius: 16px;">
+      <div class="card-body text-center">
+        <i class="fas fa-icons fa-2x text-danger mb-2"></i>
+        <h4 class="text-danger mb-0">
+          {% with com_icone=0 %}
+            {% for cat in categorias %}
+              {% if cat.icone %}
+                {% widthratio 1 1 1 as one %}
+                {{ com_icone|add:one }}
+              {% endif %}
+            {% endfor %}
+          {% endwith %}
+        </h4>
+        <small class="text-muted">Com ícones personalizados</small>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Categories Preview Grid -->
+{% if categorias %}
+<div class="mt-4">
+  <h3 class="mb-3"><i class="fas fa-eye me-2"></i>Visualização das Categorias</h3>
+  <div class="categories-grid">
+    {% for categoria in categorias %}
+    <div class="category-preview-card" style="border-left: 4px solid {{ categoria.cor|default:'#6366f1' }};">
+      <div class="category-icon" style="background: {{ categoria.cor|default:'#6366f1' }};">
+        {% if categoria.icone %}
+          <i class="{{ categoria.icone }}"></i>
+        {% else %}
+          <i class="fas fa-tag"></i>
+        {% endif %}
+      </div>
+      <div class="category-info">
+        <h5>{{ categoria.nome }}</h5>
+        {% if categoria.descricao %}
+          <p>{{ categoria.descricao|truncatechars:60 }}</p>
+        {% endif %}
+        <span class="course-count">{{ categoria.curso_set.count }} curso{{ categoria.curso_set.count|pluralize:",s" }}</span>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block admin_javascript %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar tooltips do Bootstrap
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(element) {
+        new bootstrap.Tooltip(element);
+    });
+
+    // Animação suave para os cards de estatísticas
+    const statCards = document.querySelectorAll('.card');
+    statCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        
+        setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, 200 + (index * 100));
+    });
+
+    // Animação para os cards de preview das categorias
+    const categoryCards = document.querySelectorAll('.category-preview-card');
+    categoryCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateX(-20px)';
+        card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        
+        setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateX(0)';
+        }, 300 + (index * 100));
+    });
+
+    // Highlight da linha da tabela ao passar o mouse
+    document.querySelectorAll('.table-modern tbody tr').forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = 'rgba(139, 92, 246, 0.08)';
+            this.style.transform = 'translateX(5px)';
+            this.style.transition = 'all 0.2s ease';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = '';
+            this.style.transform = 'translateX(0)';
+        });
+    });
+
+    console.log('🏷️ Página de Categorias carregada com sucesso!');
+});
+</script>
+
+<style>
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.category-preview-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.category-preview-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.category-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.2rem;
+}
+
+.category-info h5 {
+  margin: 0 0 0.5rem 0;
+  color: var(--gray-800);
+  font-weight: 600;
+}
+
+.category-info p {
+  margin: 0 0 0.5rem 0;
+  color: var(--gray-600);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.course-count {
+  font-size: 0.8rem;
+  color: var(--gray-500);
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .categories-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .category-preview-card {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+</style>
+{% endblock %}

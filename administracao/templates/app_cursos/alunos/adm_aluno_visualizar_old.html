@@ -1,0 +1,197 @@
+{% extends 'template_new.html' %}
+{% load bootstrap5 %}
+{% load static%}
+{% block title %}BEM VINDO - CURSOS LIVRES{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/administrativo.css' %}">
+
+{% endblock %}
+{% block administrativo %}fw-bold{% endblock %}
+{% block main %}
+<div class="row">
+    <div class="col d-flex py-5"> 
+        <div class="row w-100">
+            <div class="col-10 pb-4 m-auto bg-white">
+                             
+                <div class="row">
+                    <div class="col text-dark px-4 pt-4">
+                       <div class="row">
+                        <div class="col">
+                          <h1 class="">
+                           <span class="text-uppercase">Painel -> Aluno</span> {{aluno.pessoa.id}}
+                          </h1>
+                        </div>
+                        <div class="col-2 d-flex">
+                            <a href="{% url 'administrativo2' %}" class="btn btn-dark ms-auto my-auto">
+                              PAINEL
+                            </a>
+                        </div>
+                       </div>
+                        <div class="row">
+                          <div class="col-12 pt-4">
+                            <form class="row px-2" method="POST">
+                              <div class="col-12">
+                                <div class="d-flex w-100">
+                                  <div class="d-flex w-100">
+                                    <h3>                                      
+                                      Aluno: {{aluno.pessoa.nome}}
+                                    </h3>      
+                                    <a class="btn btn-outline-dark ms-auto my-auto" href="{% url 'adm_alunos_listar' %}">
+                                      <i class="me-2 fa-solid fa-rotate-left"></i>
+                                      Voltar
+                                    </a>    
+                                    {% comment %} href="{% url 'adm_turma_visualizar_editar' turma.id %}" {% endcomment %}
+                                    <a class="btn btn-outline-dark ms-1 my-auto" href="{% url 'adm_aluno_editar' aluno.id %}">
+                                      <i class="fa-solid fa-pen-to-square"></i>
+                                    </a>                                       
+                                  </div>                             
+                                </div>
+                                <div class="w-100 h-100 pt-3">
+                                  <div class="row">
+                                    <div class="col table-responsive">
+                                      <table class="table table-striped">
+                                        <tr style="border-color: white;">
+                                          <td><b class="me-2">Celular:</b><br>{{aluno.pessoa.telefone}}</td>
+                                          <td><b class="me-2">Email:</b><br>{{aluno.pessoa.email}}</td>
+                                          <td colspan="1"><b class="me-2">CPF:</b><br>{{aluno.pessoa.cpf}}</td>  
+                                          <td><b class="me-2">Data de nascimento:</b><br>{{aluno.pessoa.dt_nascimento}}</td>
+                                        </tr>
+                                        <tr style="border-color: white;">                                          
+                                          <td colspan="1"><b class="me-2">Endereço:</b><br>{{aluno.pessoa.endereco}}</td>
+                                          <td><b class="me-2">Bairro:</b><br>{{aluno.pessoa.bairro}}</td>
+                                          <td colspan="1"><b class="me-2">Data de inclusão:</b><br>{{aluno.pessoa.dt_inclusao}}</td>                                          
+                                          <td>
+                                            <b class="me-2">Disponibilidade:</b><br>
+                                            {% for i in aluno.disponibilidade.all %}
+                                                {{ i }}
+                                                {% if not forloop.last %}
+                                                    {% if forloop.revcounter == 2 %}
+                                                        e 
+                                                    {% else %}
+                                                        , 
+                                                    {% endif %}
+                                                {% endif %}
+                                            {% endfor %}
+                                          </td>
+                                        </tr>
+                                      </table>
+                                    </div>
+                                  </div>  
+                                  {% if responsavel %}
+                                  <div class="row">
+                                    <div class="col table-responsive mt-4">
+                                      <h3>Dados do Responsável</h3>
+                                      <table class="table table-striped">
+                                        <tr style="border-color: white;">
+                                          <td>
+                                            <b class="me-2">Nome:</b><br>{{responsavel.nome}}
+                                          </td>
+                                          <td>
+                                            <b class="me-2">Profissão:</b><br>{{responsavel.profissao}}
+                                          </td>
+                                          <td>
+                                            <b class="me-2">Profissão:</b><br>{{responsavel.profissao}}
+                                          </td>
+                                          <td><b class="me-2">Estado Civil:</b><br>{{responsavel.get_estado_civil_display}}</td>
+                                        </tr>
+                                        <tr style="border-color: white;">
+                                          <td colspan="1"><b class="me-2">RG:</b><br>{{responsavel.rg}}</td>  
+                                          <td colspan="1"><b class="me-2">CPF:</b><br>{{responsavel.cpf}}</td>  
+                                          <td><b class="me-2">Data de nascimento:</b><br>{{responsavel.dt_nascimento}}</td>
+                                          <td><b class="me-2">Celular:</b><br>{{responsavel.celular}}</td>
+                                          <td><b class="me-2">Email:</b><br>{{responsavel.email}}</td>
+                                          
+                                          
+                                        </tr>
+                                        <tr style="border-color: white;">                                          
+                                          <td colspan="1"><b class="me-2">Endereço:</b><br>{{responsavel.endereco}}</td>
+                                          <td colspan="1"><b class="me-2">Bairro:</b><br>{{responsavel.bairro}}</td>
+                                          <td colspan="1"><b class="me-2">CEP:</b><br>{{responsavel.cep}}</td>
+                                          
+                                          <td colspan="1"><b class="me-2">Data de inclusão:</b><br>{{responsavel.dt_inclusao}}</td>                                          
+                                          <td></td>
+                                        </tr>
+                                      </table>
+                                    </div>
+                                  </div> 
+                                  {% endif %}
+                                  <div class="row">
+                                    <div class="col table-responsive mt-4">
+                                      <div class="mb-2 w-100 d-flex">
+                                        <h3>Matrículas do aluno</h3>
+                                        <a class="btn btn-outline-dark ms-auto my-auto" href="{% url 'adm_aluno_matricular' aluno.id %}">
+                                          <i class="fa-solid fa-circle-plus me-2"></i>
+                                          Matricular
+                                        </a>  
+                                      </div>
+                                      <table class="table table-striped">   
+                                        <tr>
+                                          <th>Status da turma</th>
+                                          <th>Matricula</th>
+                                          <th>Status da matricula</th>
+                                          <th>Atividade</th>
+                                          <th>Local</th>
+                                          <th></th>
+                                          <th></th>
+                                        </tr>
+                                        {% for matricula in matriculas %}                                     
+                                        <tr style="border-color: white;">                                          
+                                          <td>
+                                            {% if matricula.turma.status == 'pre' %}
+                                            <span class="text-danger">Pré-inscrição</span>
+                                            {% elif matricula.turma.status == 'ati' %}
+                                            <span class="text-success">Ativa</span>
+                                            {% elif matricula.turma.status == 'agu' %}
+                                            <span class="text-warning">Aguardando</span>
+                                            {% elif matricula.turma.status == 'acc' %}
+                                            <span class="text-info">Ativo e aceitando candidatos</span>
+                                            {% elif matricula.turma.status == 'enc' %}
+                                            <span class="text-dark">Encerrada</span>
+                                            {% endif %}
+                                          </td>
+                                          <td>{{matricula.matricula}}</td>
+                                          <td>{{matricula.get_status_display}}</td>
+
+                                          <td colspan="1">                                            
+                                              {{matricula.turma.curso}}                                                                                        
+                                          </td> 
+
+                                          <td>
+                                            {{matricula.turma.local}}
+                                          </td>
+                                          <td>
+                                            <a target="_blank" href="{% url 'adm_turma_visualizar' matricula.turma.id %}">
+                                              <i class="fa-solid fa-eye ms-4"></i>
+                                            </a>
+                                          </td>    
+                                          <td>
+                                            <a target="_blank" href="{% url 'adm_desmatricular_aluno' matricula.matricula %}">
+                                              <i class="fa-solid fa-trash ms-4 text-danger"></i>
+                                            </a>
+                                          </td>                                                            
+                                        </tr>
+                                        {% endfor %}
+                                      </table>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>                                                                                          
+                          </form>
+                          </div>                          
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>    
+    </div>
+</div>
+
+  <script>
+
+  
+
+
+
+   
+  </script>
+{% endblock %}

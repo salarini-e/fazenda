@@ -1,0 +1,107 @@
+.carousel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  position: relative; /* Add position relative to carousel */
+}
+
+.slides {
+  display: flex;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+.img-wrapper {
+  border-radius: 32px;
+  overflow: hidden;
+  width: 100%;
+}
+
+.img-wrapper img {
+  width: 100%;
+}
+
+.slide {
+  visibility: collapse;
+  width: 100%;
+  opacity: 0;
+  transition: opacity 0.3s ease-out;
+}
+
+.text-wrapper {
+  padding: 24px;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.text-wrapper .btn{
+    width: 100%;
+    color: #0d578e;
+    border-color: #0d578e;
+    text-align: center;
+    padding: 0 !important;
+}
+
+.text-wrapper .btn:hover{
+    background-color: #eff6fc !important;
+}
+
+.text-wrapper .header .title{
+    font-size: 2rem !important;
+    font-weight: 600 !important;
+    margin-bottom: 0 !important;
+}
+
+.text-wrapper .header .subtitle{
+    font-size: 2rem !important;
+    font-weight: 500 !important;
+}
+
+.text-wrapper .header .subtitle{
+    font-size: 1rem !important;
+    font-weight: 400 !important;
+
+}
+
+
+.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.button-control {
+  display: block;
+  width: 30px;
+  height: 30px;
+  background: transparent no-repeat center center;
+  background-image: none;
+  background-size: auto;
+  background-size: 100% 100%;
+  border: none;
+}
+
+.button-wrapper {
+    padding: 16px 8px;
+  background-color: #303134;
+}
+
+.prev{
+    border-bottom-left-radius: 30px;
+    border-top-left-radius: 30px;
+}
+
+.next{
+    border-bottom-right-radius: 30px;
+    border-top-right-radius: 30px;
+}
+
+#next {
+
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23fff' viewBox='0 0 8 8'%3E%3Cpath d='M2.75 0l-1.5 1.5 2.5 2.5-2.5 2.5 1.5 1.5 4-4-4-4z'/%3E%3C/svg%3E");
+}
+
+#prev {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23fff' viewBox='0 0 8 8'%3E%3Cpath d='M5.25 0l-4 4 4 4 1.5-1.5-2.5-2.5 2.5-2.5-1.5-1.5z'/%3E%3C/svg%3E");
+}

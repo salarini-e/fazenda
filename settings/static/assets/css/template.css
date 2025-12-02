@@ -1,0 +1,239 @@
+html, body{
+    height: 100%;
+    min-width: 600px;
+}
+body{    
+    background-color: rgb(255, 255, 255);
+    display: flex;
+    flex-direction: column;
+}
+header{
+    min-width: 410px;;
+    background-color: white;
+}
+footer{
+    margin-top: auto;
+}
+#main-logo{
+    height: 5rem;
+}
+header a{
+    font-weight: bold;
+    text-transform: uppercase;
+    font-family: "Source Sans Pro", Helvetica, sans-serif;
+    color: black;
+    text-decoration: none;
+}
+header a:hover{
+    color: #507B9B;
+}
+.container{
+    background-color: white;
+
+}
+.m-auto{
+    margin: auto;
+}
+
+.btn-primary{
+    background-color: #507B9B;
+    border-color: #507B9B;
+    transition:  transform 0.2s;
+    box-shadow:  4px 4px 2px #507b9b52;
+}
+.btn-primary:hover{    
+    transform: scale(1.01);
+    background-color: #507B9B;
+    border-color: #507B9B;
+    box-shadow:  1px 1px 2px #507b9b52;
+    
+}
+.btn-primary:focus{
+    margin-top: -3px;
+    margin-bottom: 3px;
+    background-color: #507B9B;
+    border-color: #507B9B;
+    box-shadow:  4px 4px 2px #507b9b52;
+}
+header .menu:focus{    
+    box-shadow: none;
+    -webkit-animation:spin 0.5s linear;
+    -moz-animation:spin 0.5s linear;
+    animation:spin 0.5s linear;
+}
+@-moz-keyframes spin { 
+    100% { -moz-transform: rotate(180deg); } 
+}
+@-webkit-keyframes spin { 
+    100% { -webkit-transform: rotate(180deg); } 
+}
+@keyframes spin { 
+    100% { 
+        -webkit-transform: rotate(180deg); 
+        transform:rotate(180deg); 
+    } 
+}
+.btn{
+    border-radius: 0;
+}
+
+.btn-success{
+    transition: transform 0.8s;
+}
+.btn-success:hover{
+    transform: scale(1.05);
+}
+.btn-btfl{
+    box-shadow:  4px 4px 2px #507b9ba9;
+    background-color: #329787;
+    color: white;  
+    transition: transform 0.8s;
+}
+.btn-btfl:hover{
+    color: white;
+    transform: scale(1.05);
+    box-shadow:  4px 4px 2px #507b9b;
+}
+.btn-btfl:focus{
+    padding: 8px 16px;
+    color: white;
+    box-shadow:  4px 4px 2px #507b9b;
+}
+
+.btn-btfl2{
+    box-shadow:  4px 4px 2px #507b9ba9;
+    background-color: #507B9B;
+    color: white;  
+    transition: transform 0.8s;
+}
+.btn-btfl2:hover{
+    color: white;
+    transform: scale3d(1.05);
+    box-shadow:  4px 4px 2px #507b9b;
+}
+.btn-btfl2:focus{
+    padding: 8px 16px;
+    color: white;
+    box-shadow:  4px 4px 2px #507b9b;
+}
+#mobile{
+    display: none;
+}
+
+body{
+    background-color: rgb(248, 247, 247);
+}
+
+#div_menu{   
+    display: flex;     
+    opacity: 1;
+    padding: 8px 8px;
+    background-color: white;        
+    transition: height 0.3s linear, opacity 0.6s linear, font-size 0.3s linear, padding-top 0.3s linear, padding-bottom 0.3s linear;
+}
+#div_menu #myNavBar{
+    display: flex;
+}
+#div_menu #myNavBar .btn{
+    min-width: 160px;
+}
+
+#div_menu #myNavBar a{
+    color: rgb(37, 37, 37);
+    font-weight: bold;
+}
+#div_menu #myNavBar .btn:hover{  
+    background-color: #2a2b2a;
+    color: white; 
+}
+#div_menu #myNavBar .btn:focus{  
+    box-shadow: 0 0 0 0.25rem #2a2b2a1c !important;
+}
+#closeBtn{
+    padding: 6px 8px;
+}
+.show {
+    opacity: 1;
+  }
+
+  .bg-primary{
+    background-color: rgb(80, 123, 155) !important;
+  }
+.hidden{
+    opacity: 0;
+}
+.mobile{
+    display: none;
+}
+.mobile_show{
+    display: none;
+}
+@media (max-width: 800px){
+    .mobile{
+        display: flex;
+    }
+    .tablet_hidden{
+        display: none;
+    }
+    #div_menu{   
+        display: flex; 
+        font-size: 0;
+        height: 0;
+        opacity: 0;
+        background-color: white;        
+        transition: height 0.3s linear, opacity 0.6s linear, font-size 0.3s linear, padding-top 0.3s linear, padding-bottom 0.3s linear;
+    }
+}
+@media (max-width: 660px){
+    .mobile_hidden{
+        display: none;
+    }
+    .mobile_show{
+        display: block;
+    }
+}
+
+.for_click{
+    cursor: pointer !important;
+}
+
+.modaladm{
+    --shadow-color: 0deg 0% 63%;
+    --shadow-elevation-medium:
+    0.3px 0.2px 0.4px hsl(var(--shadow-color) / 0.36),
+    1.1px 0.7px 1.5px -0.8px hsl(var(--shadow-color) / 0.36),
+    2.7px 1.6px 3.5px -1.7px hsl(var(--shadow-color) / 0.36),
+    6.7px 4px 8.8px -2.5px hsl(var(--shadow-color) / 0.36);
+    background-color: #fff;
+    width: 450px;
+    color: rgb(0, 0, 0);
+    border: 0.5px solid rgb(180, 180, 180);
+    border-radius: 5px;
+    box-shadow: var(--shadow-elevation-medium);
+    position: absolute;
+    z-index: 999;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.warnings{
+    z-index: 9;
+}
+
+.errorlist{
+    color: red;
+    margin-top: 8px;
+}
+
+/* .modaladm::before{
+    content: "";
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0,0,0,.3);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: -99;
+} */

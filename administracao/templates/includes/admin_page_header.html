@@ -1,0 +1,242 @@
+<!-- Admin Page Header Component -->
+<!-- Inspirado no dashboard-topbar para padronização -->
+<div class="admin-page-topbar">
+  <div class="topbar-left">
+    <h1 class="page-title">
+      <i class="{{ page_icon|default:'fas fa-cog' }} me-2"></i>
+      {{ page_title|default:'Administração' }}
+    </h1>
+    <p class="page-subtitle">{{ page_subtitle|default:'Painel administrativo do sistema' }}</p>
+  </div>
+  <div class="topbar-right">
+    <div class="page-actions">
+      {% block page_actions %}
+      {% if show_back_btn %}
+      <a href="{{ back_url|default:'javascript:history.back()' }}" class="btn-page-action btn-secondary" title="Voltar">
+        <i class="fas fa-arrow-left"></i>
+        <span class="d-none d-md-inline">Voltar</span>
+      </a>
+      {% endif %}
+      
+      {% if show_dashboard_btn %}
+      <a href="{% url 'administrativo2' %}" class="btn-page-action btn-primary" title="Dashboard">
+        <i class="fas fa-tachometer-alt"></i>
+        <span class="d-none d-md-inline">Dashboard</span>
+      </a>
+      {% endif %}
+      
+      {% if show_refresh_btn %}
+      <button class="btn-page-action btn-outline" title="Atualizar dados" onclick="location.reload()">
+        <i class="fas fa-sync-alt"></i>
+      </button>
+      {% endif %}
+      {% endblock %}
+    </div>
+  </div>
+</div>
+
+<!-- Admin Breadcrumb Component -->
+{% if show_breadcrumb %}
+<div class="admin-page-breadcrumb">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{% url 'administrativo2' %}">
+          <i class="fas fa-home me-1"></i>
+          Dashboard
+        </a>
+      </li>
+      {% block breadcrumb_items %}
+      <li class="breadcrumb-item active" aria-current="page">{{ page_title|default:'Administração' }}</li>
+      {% endblock %}
+    </ol>
+  </nav>
+</div>
+{% endif %}
+
+<style>
+/* Admin Page Topbar - Padronizado baseado no dashboard-topbar */
+.admin-page-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 2rem;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-bottom: 1px solid #e2e8f0;
+  border-radius: 12px 12px 0 0;
+  margin-bottom: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.admin-page-topbar .topbar-left {
+  flex: 1;
+}
+
+.admin-page-topbar .page-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.25rem 0;
+  display: flex;
+  align-items: center;
+  line-height: 1.2;
+}
+
+.admin-page-topbar .page-title i {
+  color: #3b82f6;
+  font-size: 1.5rem;
+}
+
+.admin-page-topbar .page-subtitle {
+  color: #64748b;
+  font-size: 0.95rem;
+  font-weight: 400;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.admin-page-topbar .topbar-right {
+  display: flex;
+  align-items: center;
+}
+
+.admin-page-topbar .page-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.btn-page-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  background: none;
+}
+
+.btn-page-action:hover {
+  text-decoration: none;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-page-action.btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  border-color: #3b82f6;
+}
+
+.btn-page-action.btn-primary:hover {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+}
+
+.btn-page-action.btn-secondary {
+  background: linear-gradient(135deg, #6b7280, #4b5563);
+  color: white;
+  border-color: #6b7280;
+}
+
+.btn-page-action.btn-secondary:hover {
+  background: linear-gradient(135deg, #4b5563, #374151);
+  color: white;
+}
+
+.btn-page-action.btn-outline {
+  background: white;
+  color: #6b7280;
+  border-color: #d1d5db;
+}
+
+.btn-page-action.btn-outline:hover {
+  background: #f9fafb;
+  color: #374151;
+  border-color: #9ca3af;
+}
+
+/* Admin Breadcrumb */
+.admin-page-breadcrumb {
+  padding: 0.75rem 2rem;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.admin-page-breadcrumb .breadcrumb {
+  margin: 0;
+  background: none;
+  padding: 0;
+  font-size: 0.875rem;
+}
+
+.admin-page-breadcrumb .breadcrumb-item {
+  color: #64748b;
+}
+
+.admin-page-breadcrumb .breadcrumb-item a {
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.admin-page-breadcrumb .breadcrumb-item a:hover {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.admin-page-breadcrumb .breadcrumb-item.active {
+  color: #1e293b;
+  font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .admin-page-topbar {
+    padding: 1rem 1.5rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .admin-page-topbar .topbar-right {
+    width: 100%;
+    justify-content: flex-end;
+  }
+  
+  .admin-page-topbar .page-title {
+    font-size: 1.5rem;
+  }
+  
+  .admin-page-breadcrumb {
+    padding: 0.75rem 1.5rem;
+  }
+  
+  .btn-page-action span {
+    display: none !important;
+  }
+  
+  .btn-page-action {
+    padding: 0.5rem;
+    min-width: 40px;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-page-topbar .page-actions {
+    gap: 0.5rem;
+  }
+  
+  .btn-page-action {
+    padding: 0.375rem;
+    min-width: 36px;
+  }
+}
+</style>

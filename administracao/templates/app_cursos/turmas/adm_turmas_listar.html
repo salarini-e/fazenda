@@ -1,0 +1,483 @@
+{% extends 'template_new.html' %}
+{% load bootstrap5 %}
+{% load static %}
+{% load custom %}
+{% block title %}Gerenciar Turmas - Prefeitura de Nova Friburgo{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/administrativo.css' %}">
+<style>
+  .admin-page {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    min-height: calc(100vh - 140px);
+    padding: 2rem 0;
+  }
+  
+  .admin-card {
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    border: none;
+    overflow: hidden;
+  }
+  
+  .admin-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    padding: 2rem;
+  }
+  
+  .admin-title {
+    font-family: var(--font-secondary);
+    font-weight: 700;
+    font-size: 2rem;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .breadcrumb-custom {
+    background: rgba(255,255,255,0.1);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    margin-top: 1rem;
+  }
+  
+  .breadcrumb-custom a {
+    color: rgba(255,255,255,0.8);
+    text-decoration: none;
+  }
+  
+  .breadcrumb-custom a:hover {
+    color: white;
+  }
+  
+  .action-bar {
+    background: var(--gray-50);
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--gray-200);
+  }
+  
+  .quick-actions {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .btn-new-class {
+    background: linear-gradient(135deg, var(--secondary-color), #20c997);
+    border: none;
+    color: white;
+    padding: 0.75rem 2rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+  
+  .btn-new-class:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(40,167,69,0.3);
+    color: white;
+  }
+  
+  .btn-list-closed {
+    background: var(--gray-600);
+    border: none;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+  
+  .btn-list-closed:hover {
+    background: var(--gray-700);
+    color: white;
+    transform: translateY(-2px);
+  }
+  
+  .batch-actions {
+    background: white;
+    border: 2px solid var(--gray-200);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .batch-actions select {
+    border: 1px solid var(--gray-300);
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    min-width: 200px;
+  }
+  
+  .btn-batch {
+    background: var(--primary-color);
+    border: none;
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+  }
+  
+  .btn-batch:hover {
+    background: var(--primary-dark);
+    color: white;
+  }
+  
+  .data-table {
+    background: white;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    margin: 2rem;
+  }
+  
+  .table-modern {
+    margin: 0;
+  }
+  
+  .table-modern thead th {
+    background: linear-gradient(135deg, var(--gray-100), var(--gray-200));
+    border: none;
+    padding: 1rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    letter-spacing: 0.5px;
+  }
+  
+  .table-modern tbody td {
+    padding: 1rem;
+    border-color: var(--gray-200);
+    vertical-align: middle;
+  }
+  
+  .table-modern tbody tr:hover {
+    background-color: rgba(0,102,204,0.05);
+  }
+  
+  .status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  
+  .status-active {
+    background: rgba(40,167,69,0.1);
+    color: #155724;
+  }
+  
+  .status-pending {
+    background: rgba(255,193,7,0.1);
+    color: #856404;
+  }
+  
+  .status-closed {
+    background: rgba(108,117,125,0.1);
+    color: #495057;
+  }
+  
+  .category-badge {
+    background: var(--primary-color);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+  
+  .capacity-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .capacity-bar {
+    width: 60px;
+    height: 8px;
+    background: var(--gray-200);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  
+  .capacity-fill {
+    height: 100%;
+    transition: width 0.3s ease;
+  }
+  
+  .capacity-low { background: #28a745; }
+  .capacity-medium { background: #ffc107; }
+  .capacity-high { background: #dc3545; }
+  
+  .btn-view {
+    background: linear-gradient(135deg, #17a2b8, #138496);
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+  
+  .btn-view:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(23,162,184,0.3);
+    color: white;
+  }
+  
+  .date-info {
+    font-size: 0.875rem;
+  }
+  
+  .date-start {
+    color: var(--secondary-color);
+    font-weight: 600;
+  }
+  
+  .date-end {
+    color: var(--gray-600);
+  }
+  
+  @media (max-width: 768px) {
+    .admin-title {
+      font-size: 1.5rem;
+    }
+    
+    .quick-actions {
+      flex-direction: column;
+    }
+    
+    .batch-actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .capacity-info {
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+</style>
+{% endblock %}
+{% block administrativo %}fw-bold{% endblock %}
+{% block main %}
+<div class="admin-page">
+  <div class="container-fluid">
+    <div class="row justify-content-center">
+      <div class="col-12">
+        <div class="admin-card">
+          <div class="admin-header">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <h1 class="admin-title">
+                  <i class="fas fa-users me-3"></i>Gerenciar Turmas
+                </h1>
+                <div class="breadcrumb-custom">
+                  <a href="{% url 'administrativo2' %}">
+                    <i class="fas fa-home me-2"></i>Painel
+                  </a>
+                  <span class="mx-2">/</span>
+                  <span>Turmas</span>
+                </div>
+              </div>
+              <a href="{% url 'administrativo2' %}" class="btn btn-light">
+                <i class="fas fa-arrow-left me-2"></i>Voltar ao Painel
+              </a>
+            </div>
+          </div>
+          
+          <div class="action-bar">
+            <div class="quick-actions">
+              <a href="{% url 'adm_turmas_cadastrar' %}" class="btn-new-class">
+                <i class="fas fa-plus me-2"></i>Nova Turma
+              </a>
+              <a href="{% url 'adm_turmas_listar' %}" class="btn btn-primary">
+                <i class="fas fa-list me-2"></i>Turmas Ativas
+              </a>
+              <a href="{% url 'adm_turmas_listar_encerradas' %}" class="btn-list-closed">
+                <i class="fas fa-archive me-2"></i>Turmas Encerradas
+              </a>
+            </div>
+            
+            <form method="POST">
+              {% csrf_token %}
+              <div class="batch-actions">
+                <label for="acao" class="form-label mb-0 fw-bold">Ações em lote:</label>
+                <select class="form-select" name="acao" id="acao">
+                  <option value="0">Selecione uma ação</option>
+                  <option value="1">Encerrar turmas selecionadas</option>
+                  <option value="2">Lançar turmas selecionadas</option>
+                </select>
+                <button type="submit" class="btn-batch">
+                  <i class="fas fa-play me-2"></i>Executar
+                </button>
+              </div>
+            </form>
+          </div>
+          
+          <div class="data-table">
+            <div class="table-responsive">
+              <table class="table table-modern">
+                <thead>
+                  <tr>
+                    <th style="width: 50px;">
+                      <input type="checkbox" class="form-check-input" id="selectAll">
+                    </th>
+                    <th>Nome da Turma</th>
+                    <th>Categoria</th>
+                    <th>Atividade</th>
+                    <th class="text-center">Período</th>
+                    <th class="text-center">Capacidade</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-center">Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for turma in turmas %}
+                                        <tr>
+                  <tr>
+                    <td>
+                      <input type="checkbox" name="select_turma" value="{{turma.id}}" class="form-check-input turma-checkbox">
+                    </td>
+                    <td>
+                      <strong>{{turma}}</strong>
+                    </td>
+                    <td>
+                      <span class="category-badge">{{turma.curso.categoria}}</span>
+                    </td>
+                    <td>{{turma.curso.nome}}</td>
+                    <td class="text-center">
+                      <div class="date-info">
+                        <div class="date-start">{{turma.data_inicio|date:"d/m/Y"}}</div>
+                        <div class="date-end">{{turma.data_final|date:"d/m/Y"}}</div>
+                      </div>
+                    </td>
+                    <td class="text-center">
+                      {% with candidatos=turma.id|countCandidatos %}
+                      <div class="capacity-info">
+                        <span class="fw-bold">{{candidatos}}/{{turma.vagas}}</span>
+                        <div class="capacity-bar">
+                          {% if turma.vagas > 0 %}
+                            {% with percentage=candidatos|floatformat:0|add:"0"|mul:100|div:turma.vagas %}
+                              <div class="capacity-fill {% if percentage <= 60 %}capacity-low{% elif percentage <= 80 %}capacity-medium{% else %}capacity-high{% endif %}" 
+                                   style="width: {{percentage}}%"></div>
+                            {% endwith %}
+                          {% endif %}
+                        </div>
+                      </div>
+                      {% endwith %}
+                    </td>
+                    <td class="text-center">
+                      {% if turma.status == 'pre' %}
+                        <span class="status-badge status-pending">Pré-inscrição</span>
+                      {% elif turma.status == 'ati' %}
+                        <span class="status-badge status-active">Ativa</span>
+                      {% elif turma.status == 'agu' %}
+                        <span class="status-badge status-pending">Aguardando</span>
+                      {% elif turma.status == 'acc' %}
+                        <span class="status-badge status-active">Aceitando</span>
+                      {% elif turma.status == 'enc' %}
+                        <span class="status-badge status-closed">Encerrada</span>
+                      {% else %}
+                        <span class="status-badge">{{turma.get_status_display}}</span>
+                      {% endif %}
+                    </td>
+                    <td class="text-center">
+                      <a href="{% url 'adm_turma_visualizar' turma.id %}" class="btn-view" title="Visualizar turma completa">
+                        <i class="fas fa-eye me-1"></i>Ver
+                      </a>
+                    </td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                    <td colspan="8" class="text-center py-4">
+                      <div class="text-muted">
+                        <i class="fas fa-users fa-3x mb-3 d-block"></i>
+                        <h5>Nenhuma turma encontrada</h5>
+                        <p>Cadastre a primeira turma do sistema clicando no botão "Nova Turma".</p>
+                      </div>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Checkbox functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    const selectAllCheckbox = document.getElementById('selectAll');
+    const turmaCheckboxes = document.querySelectorAll('.turma-checkbox');
+    
+    // Select/deselect all functionality
+    selectAllCheckbox.addEventListener('change', function() {
+      turmaCheckboxes.forEach(checkbox => {
+        checkbox.checked = selectAllCheckbox.checked;
+      });
+    });
+    
+    // Update select all checkbox when individual checkboxes change
+    turmaCheckboxes.forEach(checkbox => {
+      checkbox.addEventListener('change', function() {
+        const checkedBoxes = document.querySelectorAll('.turma-checkbox:checked');
+        selectAllCheckbox.checked = checkedBoxes.length === turmaCheckboxes.length;
+        selectAllCheckbox.indeterminate = checkedBoxes.length > 0 && checkedBoxes.length < turmaCheckboxes.length;
+      });
+    });
+    
+    // Batch actions validation
+    const batchForm = document.querySelector('form');
+    batchForm.addEventListener('submit', function(e) {
+      const selectedTurmas = document.querySelectorAll('.turma-checkbox:checked');
+      const actionSelect = document.getElementById('acao');
+      
+      if (actionSelect.value === '0') {
+        e.preventDefault();
+        alert('Por favor, selecione uma ação.');
+        return;
+      }
+      
+      if (selectedTurmas.length === 0) {
+        e.preventDefault();
+        alert('Por favor, selecione pelo menos uma turma.');
+        return;
+      }
+      
+      const actionText = actionSelect.options[actionSelect.selectedIndex].text;
+      if (!confirm(`Deseja ${actionText.toLowerCase()} para ${selectedTurmas.length} turma(s) selecionada(s)?`)) {
+        e.preventDefault();
+      }
+    });
+  });
+  
+  // Add animation to capacity bars
+  window.addEventListener('load', function() {
+    const capacityBars = document.querySelectorAll('.capacity-fill');
+    capacityBars.forEach(bar => {
+      const width = bar.style.width;
+      bar.style.width = '0%';
+      setTimeout(() => {
+        bar.style.width = width;
+      }, 300);
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,270 @@
+#clima-tempo{
+    display: flex;
+    flex-direction: row;
+}
+
+#atual{
+    font-size: 480%;
+}
+
+#temperatura h2{
+    margin:0;
+}
+
+
+.sol p:first-child::before{
+    content: url(../images/clima_icons/sunrise.png) " ";
+}
+
+.sol p:last-child::before{
+    content: url(../images/clima_icons/sunset.png) " ";
+}
+
+.text-justify{
+    text-indent: 40px;
+}
+
+#perguntas{
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0 20px 20px 20px;
+}
+
+.pergunta{
+    width: 48%;
+    border-radius: 30px;
+    background-color: white;
+    padding: 4%;
+    margin: 1%;
+    box-shadow: 0px 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.pergunta img{
+    width: 10%;
+    height: 10%;
+    margin: auto;
+}
+
+#fales{
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#fales h4{
+    padding-left: 0;
+}
+
+.fale{
+    width: 31.3%;
+    border-radius: 30px;
+    background-color: white;
+    padding: 4%;
+    margin: 1%;
+    box-shadow: 0px 10px 15px -3px rgba(0, 0, 0, 0.1);
+    min-height: 150px;
+    text-align: center;
+}
+
+.fale p, .fale h4, .fale a{
+    color: black !important;
+}
+
+.fale a:hover{
+    text-decoration: underline;
+    transition: 2s;
+}
+
+.fale img{
+    width: 10%;
+    height: 25%;
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+
+.aviso{
+    border-radius: 30px;
+    background-color: white;
+    padding: 4%;
+    margin: 1%;
+    box-shadow: 0px 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.aviso img{
+    max-width: 5%;
+    height: 5%;
+    padding: 0 1%;
+}
+
+.pergunta-header{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.pergunta-header h5{
+    padding: 2%;
+}
+
+.aviso .pergunta-header h5{
+    padding: 0 ;
+}
+
+h4{
+    margin: 3% 0 1% 3%;
+}
+
+.pergunta a{
+    color: blue !important;
+}
+
+#cidade-img{
+    padding-left: 0;
+    padding-right: 0;
+    max-width: 40%;
+}
+
+#cidade-banner{
+    display: flex;
+    flex-direction: row;
+    max-height: 100%;
+    max-width: 100%;
+    box-shadow: 0px 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+#cidade-banner img{
+    min-width: 100%;
+}
+
+h3{
+    margin: 0 0 1% 0;
+    padding-top: 1%;
+}
+
+
+#banner-txt{
+    padding: 4%;
+    width: 98%;
+}
+
+#banner-txt{
+    padding-bottom: 0;
+}
+
+
+.div-transicao {
+    transition: width 0.5s linear;
+  }
+  
+#ver-detalhes{
+    width: 90%;
+    margin: 1% 5% 1% 5%;
+}
+
+.info{
+    margin: 0;
+    padding: 0 4% 0 4%;
+    transition: 2s;
+    position: relative;
+    overflow: hidden;
+    height: 0;
+    box-sizing: border-box;
+}
+
+.open-info{
+    height: 25rem;
+    padding-top: 3%; padding-bottom: 4%;
+}
+
+
+.pergunta li{
+    list-style-type: disc !important;
+    font-size: 1rem !important;
+}
+.pergunta ul{
+    list-style-type: disc !important;
+    font-size: 1rem !important;
+}
+
+#min::before{
+    content: url(../images/clima_icons/min.png);
+}
+
+#max::before{
+    content: url(../images/clima_icons/max.png);
+}
+
+@media(max-width: 1440px){
+    #cidade-img {
+        max-height: 100%;
+        max-width: 100%;
+    }
+    
+    #banner-txt{
+        width: 100%;
+    }
+    h3{
+        text-align: center;
+        margin: 0;
+    }
+}
+
+
+@media(max-width: 1024px){
+    h3{
+        margin-bottom: 1%;
+    }
+    .open-info{
+        height: 32rem;
+        padding-top: 3%; padding-bottom: 4%;
+    }
+}
+
+@media(max-width: 768px){
+    #clima-nav{
+        margin-right: auto;
+    }
+    .open-info{
+        height: 36rem;
+        padding-top: 3%; padding-bottom: 4%;
+    }
+}
+
+@media(max-width: 425px){
+    .pergunta{
+        width: 100%;
+    }
+    
+    h4{
+        text-align: center;
+        margin-left: 0;
+    }
+    .aviso img{
+        max-width: 10%;
+        max-height: 5%;
+        padding: 1%;
+    }
+    .open-info{
+        height: 60rem;
+        padding-top: 3%; padding-bottom: 4%;
+    }
+}
+
+@media(max-width: 375px){
+    .open-info{
+        height: 68rem;
+        padding-top: 3%; padding-bottom: 4%;
+    }
+}
+
+@media(max-width: 320px){
+    .open-info{
+        height: 80rem;
+        padding-top: 3%; padding-bottom: 4%;
+    }
+    .fale{
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+}

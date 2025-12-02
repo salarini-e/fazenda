@@ -1,0 +1,300 @@
+{% extends 'template_new.html' %}
+{% load bootstrap5 %}
+{% load static %}
+{% block title %}Locais - Administração{% endblock %}
+{% block nav %}
+{% include 'nav_cursos.html' %}
+{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/administrativo.css' %}">
+<style>
+  .admin-page {
+    padding: 2rem 0;
+    background: var(--light-color);
+  }
+
+  .page-header {
+    background: var(--admin-gradient);
+    color: white;
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+    border-radius: var(--border-radius-lg);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .page-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 100%;
+    height: 200%;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='2' fill='%23ffffff' fill-opacity='0.1'/%3E%3C/svg%3E");
+    background-size: 30px 30px;
+    animation: float 20s linear infinite;
+  }
+
+  .main-content {
+    background: white;
+    border-radius: var(--border-radius-xl);
+    box-shadow: var(--shadow-lg);
+    padding: 2rem;
+  }
+
+  .content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--gray-200);
+  }
+
+  .content-title {
+    font-family: var(--font-secondary);
+    font-weight: 700;
+    color: var(--dark-color);
+    margin: 0;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  .btn-action {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius-lg);
+    font-weight: 500;
+    transition: all var(--transition-normal);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .btn-action:hover {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    color: white;
+  }
+
+  .btn-secondary {
+    background: linear-gradient(135deg, var(--gray-600), var(--gray-700));
+  }
+
+  .btn-secondary:hover {
+    background: linear-gradient(135deg, var(--gray-700), var(--gray-600));
+  }
+
+  .data-table {
+    background: white;
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    margin-top: 1.5rem;
+  }
+
+  .table-modern {
+    margin: 0;
+  }
+
+  .table-modern thead {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+  }
+
+  .table-modern th {
+    font-weight: 600;
+    border: none;
+    padding: 1rem;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    letter-spacing: 0.5px;
+  }
+
+  .table-modern td {
+    border: none;
+    padding: 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid var(--gray-200);
+  }
+
+  .table-modern tbody tr:hover {
+    background-color: var(--gray-100);
+  }
+
+  .action-btn {
+    background: var(--secondary-color);
+    color: white;
+    border: none;
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--border-radius-md);
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    margin-right: 0.5rem;
+  }
+
+  .action-btn:hover {
+    background: var(--secondary-dark);
+    color: white;
+    transform: translateY(-1px);
+  }
+
+  .action-btn.btn-danger {
+    background: #dc3545;
+  }
+
+  .action-btn.btn-danger:hover {
+    background: #c82333;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: var(--gray-600);
+  }
+
+  .empty-state i {
+    font-size: 3rem;
+    color: var(--gray-400);
+    margin-bottom: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    .content-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .action-buttons {
+      width: 100%;
+      justify-content: flex-start;
+    }
+
+    .btn-action {
+      flex: 1;
+      justify-content: center;
+    }
+  }
+</style>
+{% endblock %}
+{% block main %}
+<div class="admin-page">
+  <div class="container">
+    <!-- Page Header -->
+    <div class="page-header" data-aos="fade-down">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-lg-8">
+            <h1 class="display-5 font-weight-bold mb-0">Gerenciar Locais</h1>
+            <p class="lead mb-0">Administre os locais onde os cursos são realizados</p>
+          </div>
+          <div class="col-lg-4 text-end">
+            <i class="fas fa-map-marker-alt fa-3x opacity-50"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" data-aos="fade-up">
+      <div class="content-header">
+        <h2 class="content-title">Lista de Locais</h2>
+        <div class="action-buttons">
+          <a href="{% url 'administrativo2' %}" class="btn-action btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+            <span>Voltar ao Painel</span>
+          </a>
+          <a href="{% url 'cadastrar_local' %}" class="btn-action">
+            <i class="fas fa-plus"></i>
+            <span>Novo Local</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Data Table -->
+      <div class="data-table">
+        <table class="table table-modern">
+          <thead>
+            <tr>
+              <th>Nome do Local</th>
+              <th>Endereço</th>
+              <th>Capacidade</th>
+              <th class="text-center">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for local in locais %}
+            <tr>
+              <td>
+                <strong>{{ local.nome }}</strong>
+              </td>
+              <td>
+                {% if local.endereco %}
+                  {{ local.endereco }}
+                {% else %}
+                  <span class="text-muted">Não informado</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if local.capacidade %}
+                  {{ local.capacidade }} pessoas
+                {% else %}
+                  <span class="text-muted">Não informado</span>
+                {% endif %}
+              </td>
+              <td class="text-center">
+                <a href="{% url 'editar_local' local.id %}" class="action-btn">
+                  <i class="fas fa-edit"></i>
+                  Editar
+                </a>
+                <a href="{% url 'excluir_local' local.id %}" class="action-btn btn-danger" 
+                   onclick="return confirm('Tem certeza que deseja excluir este local?')">
+                  <i class="fas fa-trash"></i>
+                  Excluir
+                </a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="4">
+                <div class="empty-state">
+                  <i class="fas fa-map-marker-alt"></i>
+                  <h4>Nenhum local cadastrado</h4>
+                  <p>Comece cadastrando o primeiro local para seus cursos.</p>
+                  <a href="{% url 'cadastrar_local' %}" class="btn-action">
+                    <i class="fas fa-plus"></i>
+                    Cadastrar Local
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize AOS animations
+    if (typeof AOS !== 'undefined') {
+      AOS.init({
+        duration: 600,
+        easing: 'ease-out-cubic',
+        once: true
+      });
+    }
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,328 @@
+{% extends 'template_new.html' %}
+{% load bootstrap5 %}
+{% load extras %}
+{% load static%}
+{% block title %}BEM VINDO - CURSOS LIVRES{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/administrativo.css' %}">
+
+{% endblock %}
+{% block administrativo %}fw-bold{% endblock %}
+{% block main %}
+<div class="row">
+    <div class="col d-flex py-5"> 
+        <div class="row w-100">
+            <div class="col-10 pb-4 m-auto bg-white">
+                             
+                <div class="row">
+                    <div class="col text-dark px-4 pt-4">
+                       <div class="row">
+                        <div class="col">
+                          <h1 class="">
+                           <span class="text-uppercase">Painel -> Turmas</span> -> {{turma}}
+                           {% if is_cheio %}<h3 class="text-danger">Turma cheia</h3>{% endif %}
+                          </h1>
+                        </div>
+                        <div class="col-2 d-flex">
+                            <a href="{% url 'administrativo2' %}" class="btn btn-dark ms-auto my-auto">
+                              PAINEL
+                            </a>
+                        </div>
+                       </div>
+                        <div class="row px-2 pt-2 d-flex">
+                            <div class="col px-0 painel">
+                                {% if turma.status == 'ati' or turma.status == 'acc'%}<a href="{% url 'adm_aulas_listar' turma.id %}"><i class="fa-solid fa-pencil me-3"></i>Visualizar aulas</a>{% endif %}
+                                <a href="{% url 'adm_turno_cadastrar' turma.id %}" class=""><i class="fa-regular fa-clock me-3"></i>Adicionar/Alterar turnos</a>
+                                <a href="{% url 'adm_turmas_listar' %}" class="ativo"><i class="fa-regular fa-file-lines me-3"></i>LISTAR/EDITAR TURMAS</a>
+                                {% if is_cheio and matriculas_selecionados or is_cheio and matriculas_candidatos %}<a href="{% url 'adm_turma_realocar' turma.id%}" class=""><i class="fa-regular fa-user me-3"></i>Realocar selecionados e candidatos</a>{% endif %}
+                            </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-12 pt-4">
+                            <form class="row px-2" method="POST">
+                              <div class="col-12">
+                                <div class="d-flex w-100">
+                                  <div class="d-flex w-100">
+                                    <a class="btn btn-outline-dark ms-auto my-auto" href="{% url 'adm_turmas_listar' %}">
+                                      <i class="me-2 fa-solid fa-rotate-left"></i>
+                                      Voltar
+                                    </a>    
+                                    {% if turma.status == 'enc' %}
+                                    <a class="btn btn-outline-dark ms-1 my-auto" href="{% url 'gerar_certificados' turma.id %}">
+                                      <i class="fa fa-light fa-print me-1"></i>
+                                      Gerar certificados
+                                    </a>  
+                                    {% endif %}
+                                    <a class="btn btn-outline-dark ms-1 my-auto" href="{% url 'adm_turma_editar' turma.id %}">
+                                      <i class="fa-solid fa-pen-to-square"></i>
+                                    </a>      
+                                    <a class="btn btn-primary ms-1 my-auto" href="{% url 'adm_turma_inscrever_aluno' turma.id %}">
+                                      <i class="fa-solid fa-user-plus me-1"></i>
+                                      Inscrever Aluno
+                                    </a>
+                                    {% if realocar %}
+                                    <a class="btn btn-success ms-1 my-auto" href="{% url 'adm_turma_realocar' turma.id %}">
+                                      <i class="fa-solid fa-user-plus me-1"></i>
+                                      Realocar
+                                    </a>      
+                                    {% endif %}   
+                                  </div>                           
+                                </div>
+                                <div class="w-100 h-100 pt-3">
+                                  <div class="row">
+                                    <div class="col table-responsive">
+                                      <table class="table">
+
+                                        <tr style="border-color: white;">
+                                          <td><b class="me-2">Atividade:</b>{{turma.curso.nome}}</td>
+                                          <td><b class="me-2">Código:</b>{{turma.id}}</td>
+                                          <td><b class="me-2">Status:</b> 
+                                            {% if turma.status == 'pre' %}
+                                            <span class="text-danger">Pré-inscrição</span>
+                                            {% elif turma.status == 'ati' %}
+                                            <span class="text-success">Ativa</span>
+                                            {% elif turma.status == 'agu' %}
+                                            <span class="text-warning">Aguardando</span>
+                                            {% elif turma.status == 'acc' %}
+                                            <span class="text-info">Ativo e aceitando candidatos</span>
+                                            {% elif turma.status == 'enc' %}
+                                            <span class="text-dark">Encerrada</span>
+                                            {% endif %}
+                                          </td>    
+                                        <td><b class="me-2">Curso:</b> {{turma.curso}}</td>    
+
+                                        <tr style="border-color: white;">
+                                          <td><b class="me-2">Data inicial:</b>{{turma.data_inicio}}</td>
+                                          <td><b class="me-2">Data final:</b>{{turma.data_final}}</td>
+                                          <td><b class="me-2">Data inclusão:</b>{{turma.data_final}}</td>
+                                          <td colspan="1"><b class="me-2">Data inclusão:</b>{{turma.data_final}}</td>                                          
+                                        </tr>
+
+                                        <tr style="border-color: white;">
+                                          <td ><b class="me-2">Faixa etária:</b>
+                                            <i>
+                                              {% if turma.idade_minima and turma.idade_maxima %}
+                                              {{turma.idade_minima}} até {{turma.idade_maxima}}
+                                              {% elif turma.idade_minima %}
+                                              {{turma.idade_minima}}+
+                                              {% elif  turma.idade_maxima%}
+                                              Até {{turma.idade_maxima}}
+                                              {% else %}
+                                              Livre
+                                              {% endif %}
+                                            </i>
+                                            
+                                        </td>                                          
+                                          <td><b class="me-2">Máximo de alunos permitidos:</b><i>{{turma.quantidade_permitido}}</i></td>
+                                          <td ><b class="me-2">Alunos matriculados:</b><i>{{qnt_alunos}}</i></td>  
+                                          <td ><b class="me-2">Alunos aguardando:</b><i>{{qnt_alunos_espera}}</i></td>  
+                                        </tr>
+
+                                        <tr style="border-color: white;">    
+    
+                                          <td ><b class="me-2">Instrutores:</b><br>
+                                          {% for i in turma.instrutores.all %}
+                                            <a href="{% url 'adm_professores_editar' i.id %}" style="text-decoration: none;">{{i}}</a><br>
+                                          {% endfor %}
+                                          </td>                                      
+                                          <td><b class="me-2">Horários:</b>
+                                            {% for i in turma.turnos.all %}
+                                              <p>{{i}}</p>
+                                            {% endfor %}
+                                            </td> 
+                                            <td class="col-2"><b class="me-2">Local:</b>{{turma.local}}</td>
+                                            <td class="col-2"><b class="me-2">Total de aulas:</b>{{total_aulas}}</td>
+                                        </tr>
+                                      </table>
+                                    </div>
+                                  </div>
+                                  <div class="row">
+                                    <div class="col pt-3 table-responsive">
+                                      <div class="row">
+                                        <div class="col">
+                                          <h2>Alunos:</h2>
+                                        </div>
+                                      </div>
+                                      <table class="table table-striped table-primary">
+                                        <thead>
+                                          <th>Nome</th>
+                                          <th>Matricula</th>
+                                          <th>Celular</th>
+                                          <th>Email</th>
+                                          <th>Idade</th>
+                                          <th>Data da matrícula</th>
+                                          <th class='text-center'>Frequência</th>
+                                        </thead>
+                                        <tbody> 
+                                          {% for matricula_aluno in matriculas_alunos %}                  
+                                            <tr>                      
+                                              <td>
+                                                <a target="_blank" href="{% url 'adm_aluno_visualizar' matricula_aluno.aluno.id %}" style="text-decoration: none;">
+                                                  {{matricula_aluno.aluno.pessoa.nome}}
+                                                </a>
+                                              </td>
+                                              <td>
+                                                {{matricula_aluno.matricula}}
+                                              </td>
+                                              <td>
+                                                <a class="ms-e" href="https://api.whatsapp.com/send?phone=55{{matricula_aluno.aluno.pessoa.telefone}}" target="_blank">
+                                                  <i class="fa-brands fa-square-whatsapp" style="font-size: 18pt; color: forestgreen;"></i>
+                                                </a>
+                                                {{matricula_aluno.aluno.pessoa.telefone}}
+                                              </td>
+                                              <td>
+                                                {{matricula_aluno.aluno.pessoa.email}}
+                                              </td>
+                                              <td>
+                                                {{matricula_aluno.aluno.pessoa.dt_nascimento|idade}}
+                                              </td>
+                                              <td>
+                                                {{matricula_aluno.matricula.dt_inclusao}}
+                                              </td>
+                                              <td class='text-center'>
+                                                {{matricula_aluno.frequencia}}
+                                              </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>                                  
+                                    </table>
+                                    </div>
+                                  </div>
+                                  {% if turma.status == 'pre' or turma.status == 'acc'%}
+                                  <div class="row">
+                                    <div class="col pt-3 table-responsive">
+                                      <div class="row">
+                                        <div class="col">
+                                          <h2>Selecionados: {{matriculas_selecionados.count}}</h2>
+                                        </div>                                            
+                                      </div>
+                                      <table class="table table-striped table-primary">
+                                        <thead>
+                                          <th>Nome</th>
+                                          <th>Matricula</th>
+                                          <th>Celular</th>
+                                          <th>Email</th>
+                                          <th>Idade</th>
+                                          <th>Data de cadastro</th>
+                                        </thead>
+                                        <tbody> 
+                                          {% for matricula_selecionado in matriculas_selecionados %}                  
+                                            <tr>                      
+                                              <td>
+                                                <a href="{% url 'adm_aluno_visualizar' matricula_selecionado.aluno.id %}" style="text-decoration: none;">
+                                                  {{matricula_selecionado.aluno.pessoa.nome}}
+                                                </a>
+                                              </td>
+                                              <td>
+                                                <a href="{% url 'adm_turma_visualizar_selecionado' matricula_selecionado.matricula %}" style="text-decoration: none;">
+                                                  {{matricula_selecionado.matricula}}
+                                                </a>
+                                              </td>
+                                              <td>
+                                                <a class="me-1" href="https://api.whatsapp.com/send?phone=55{{matricula_selecionado.aluno.pessoa.celular}}" target="_blank">
+                                                  <i class="fa-brands fa-square-whatsapp" style="font-size: 18pt; color: forestgreen;"></i>
+                                                </a>
+                                                {{matricula_selecionado.aluno.pessoa.celular}}
+                                              </td>
+                                              <td>
+                                                {{matricula_selecionado.aluno.pessoa.email}}
+                                              </td>
+                                              <td>
+                                                {{matricula_selecionado.aluno.pessoa.dt_nascimento|bg_idade}}
+                                              </td>
+                                              <td>
+                                                {{matricula_selecionado.aluno.dt_inclusao}}
+                                              </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>                                  
+                                    </table>
+                                    </div>
+                                  </div>  
+                                  <form method="POST">
+                                  <div class="row">
+                                    <div class="col pt-3 table-responsive">
+                                      <div class="row">
+                                        <div class="col">
+                                          <h2>Candidatos: {{matriculas_candidatos.count}}</h2>
+                                        </div>
+                                        <div class="col d-flex">
+                                          {% csrf_token %}
+                                          <button class="ms-auto my-auto btn btn-outline-dark">
+                                            Selecionar candidatos
+                                          </button>
+                                        </div>      
+                                      </div>
+                                      <table class="table table-striped table-primary">
+                                        <thead>
+                                          <th>
+                                            <input type="checkbox" name="" id="select_all">
+                                          </th>
+                                          <th>Nome</th>
+                                          <th>Matricula</th>
+                                          <th>Celular</th>
+                                          <th>Email</th>
+                                          <th>Idade</th>
+                                          <th>Data de cadastro</th>
+                                        </thead>
+                                        <tbody> 
+                                          {% for matricula_candidato in matriculas_candidatos %}                  
+                                            <tr>                      
+                                              <td>
+                                                <input type="checkbox" class="candidatos_selecionados" name="candidatos_selecionados" value="{{matricula_candidato.matricula}}">
+                                              </td>
+                                              <td>
+                                                <a href='{% url "adm_aluno_visualizar" matricula_candidato.aluno.id %}' style="text-decoration: none;">
+                                                  {{matricula_candidato.aluno.pessoa.nome}}
+                                                </a>
+                                              </td>
+                                              <td>
+                                                {{matricula_candidato.matricula}}
+                                              </td>
+                                              <td>
+                                                {% if matricula_candidato.aluno.pessoa.telefone%}
+                                                <a class="me-1" href="https://api.whatsapp.com/send?phone=55{{matricula_candidato.aluno.pessoa.telefone}}" target="_blank">
+                                                  <i class="fa-brands fa-square-whatsapp" style="font-size: 18pt; color: forestgreen;"></i>
+                                                </a>
+                                                {{matricula_candidato.aluno.pessoa.telefone}}
+                                                {% else %} 
+                                                N/A 
+                                                {% endif%}
+                                              </td>
+                                              <td>
+                                                {{matricula_candidato.aluno.pessoa.email}}
+                                              </td>
+                                              <td>
+                                                {{matricula_candidato.aluno.pessoa.dt_nascimento|bg_idade}}                                                                                                
+                                              </td>
+                                              <td>
+                                                {{matricula_candidato.dt_inclusao}}
+                                              </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>                                  
+                                    </table>
+                                    </div>
+                                  </div> 
+                                  </form>  
+                                  {% endif %}                               
+                                </div>
+                              </div>                                                                                          
+                          </form>
+                          </div>                          
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>    
+    </div>
+</div>
+
+<script>
+    document.querySelector('#select_all').checked = false
+    document.querySelector('#select_all').addEventListener('click', ()=>{
+      document.querySelectorAll('.candidatos_selecionados').forEach(e=>e.checked = !e.checked)
+    })
+</script>
+
+{% endblock %}

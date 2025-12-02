@@ -1,0 +1,43 @@
+{% extends 'template_new.html' %}
+{% load bootstrap5 %}
+{% block title %}Desenvolve NF - Bem-Estar Animal - Censo{% endblock %}
+{% block css %}{% endblock %}
+{% block nav %}
+{% include 'nav_bemestaranimal.html' %}
+{% endblock %}
+{% block main %}
+
+<div class="container pb-5">
+<div class="row">
+    <div class="col">
+        <h2>Entrevistas para adoção</h2>
+        <table class=" pt-5 table table-hover">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Telefone</th>
+                    <th>CPF</th>
+                    <th>Endereço</th>
+                    <th>Bairro</th>
+                    <th class="text-center">Visualizar animal</th>
+                    <th class="text-center">Visualizar questionário</th>
+                </tr>
+            </thead>
+            {% for entrevista in entrevistas %}
+                <tr>
+                    <td>{{entrevista.nome}}</td>
+                    <td>{{entrevista.telefone}}</td>
+                    <td>{{entrevista.cpf}}</td>
+                    <td>{{entrevista.endereco}}</td>
+                    <td>{{entrevista.bairro}}</td>
+                    <td class="text-center"><a href="{{entrevista.animal.animal.animal_image.url}}"><i class="fa-solid fa-image"></i></a></td>
+                    <td class="text-center"><a href="{% url 'questionario' entrevista.id %}"><i class="fa-solid fa-eye"></i></a></td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+</div>
+<script>
+</script>
+{% endblock %}

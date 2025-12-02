@@ -1,0 +1,41 @@
+#main-carousel .owl-carousel{
+    margin-top: 30px;
+}
+#main-carousel .owl-carousel{
+    width: 100%;    
+}
+#main-carousel .owl-carousel .owl-stage{
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+#main-carousel .owl-carousel .owl-item{
+    opacity: 20%;
+}
+#main-carousel .owl-carousel .cloned{
+    opacity: 20%;
+}
+#main-carousel .owl-carousel .active{    
+    opacity: 20%;
+}
+#main-carousel .owl-carousel .center img{
+    box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.059);
+    opacity: 100%;    
+    transition: linear;
+    /* transform: scale(1.01); */
+    /* box-shadow: 2px 2px 1px 1px rgba(0, 0, 0, 0.295); */
+}
+
+#main-carousel .owl-carousel .center img:hover{
+    
+}
+#main-carousel .owl-item{
+    width: 97vw;
+}
+#main-carousel .owl-carousel .item img{
+    border-radius: 30px;
+    width: 97vw;
+    height: 395px;
+}
+#main-carousel .owl-carousel .center{
+    opacity: 200% !important;
+}

@@ -1,0 +1,207 @@
+{% extends 'template_administrativo.html' %}
+{% load static %}
+
+{% block title %}{{ instrutor.nome }} - Visualizar Instrutor{% endblock %}
+
+{% block nav_professores_active %}active{% endblock %}
+
+{% block page_icon %}fas fa-chalkboard-teacher{% endblock %}
+{% block page_title %}{{ instrutor.nome }}{% endblock %}
+{% block page_subtitle %}Detalhes do instrutor e turmas ministradas{% endblock %}
+
+{% block content_actions %}
+<a href="{% url 'adm_professores_listar' %}" class="btn-admin btn-secondary">
+  <i class="fas fa-arrow-left"></i>
+  <span>Voltar aos Professores</span>
+</a>
+<a href="{% url 'adm_professores_editar' instrutor.id %}" class="btn-admin btn-warning">
+  <i class="fas fa-edit"></i>
+  <span>Editar Instrutor</span>
+</a>
+{% endblock %}
+
+{% block admin_content %}
+<div class="admin-table">
+  <!-- Card com informações do Instrutor -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
+    <div class="card-header" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); color: white; border-radius: 16px 16px 0 0;">
+      <h5 class="mb-0 d-flex align-items-center">
+        <i class="fas fa-chalkboard-teacher me-3"></i>
+        Informações do Instrutor
+      </h5>
+    </div>
+    <div class="card-body p-4">
+      <div class="row">
+        <div class="col-md-6">
+          <table class="table table-borderless">
+            <tr>
+              <th width="30%">Nome:</th>
+              <td><strong>{{ instrutor.nome }}</strong></td>
+            </tr>
+                                {% if instrutor.matricula %}
+                                <tr>
+                                    <th>Matrícula:</th>
+                                    <td>{{ instrutor.matricula }}</td>
+                                </tr>
+                                {% endif %}
+                                <tr>
+                                    <th>CPF:</th>
+                                    <td>{{ instrutor.cpf }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Celular:</th>
+                                    <td>{{ instrutor.celular }}</td>
+                                </tr>
+                                {% if instrutor.email %}
+                                <tr>
+                                    <th>Email:</th>
+                                    <td>{{ instrutor.email }}</td>
+                                </tr>
+                                {% endif %}
+                                {% if instrutor.endereco %}
+                                <tr>
+                                    <th>Endereço:</th>
+                                    <td>{{ instrutor.endereco }}</td>
+                                </tr>
+                                {% endif %}
+                                {% if instrutor.bairro %}
+                                <tr>
+                                    <th>Bairro:</th>
+                                    <td>{{ instrutor.bairro }}</td>
+                                </tr>
+                                {% endif %}
+                                <tr>
+                                    <th>Data de Inclusão:</th>
+                                    <td>{{ instrutor.dt_inclusao|date:"d/m/Y H:i" }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Estatísticas</h6>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="card bg-light text-center">
+                                        <div class="card-body">
+                                            <h4 class="text-primary">{{ total_turmas }}</h4>
+                                            <small class="text-muted">Total de Turmas</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="card bg-light text-center">
+                                        <div class="card-body">
+                                            <h4 class="text-success">{{ turmas_ativas }}</h4>
+                                            <small class="text-muted">Turmas Ativas</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-3">
+                                <div class="col-6">
+                                    <div class="card bg-light text-center">
+                                        <div class="card-body">
+                                            <h4 class="text-warning">{{ turmas_aguardando }}</h4>
+                                            <small class="text-muted">Aguardando</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="card bg-light text-center">
+                                        <div class="card-body">
+                                            <h4 class="text-info">{{ total_alunos }}</h4>
+                                            <small class="text-muted">Total de Alunos</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if turmas %}
+                        <hr>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="text-muted mb-0">Turmas do Instrutor</h6>
+                            <a href="{% url 'adm_turmas_cadastrar' %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-plus"></i> Nova Turma
+                            </a>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Curso</th>
+                                        <th>Local</th>
+                                        <th>Período</th>
+                                        <th>Alunos</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for turma in turmas %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ turma.curso.nome }}</strong>
+                                                <br>
+                                                <small class="text-muted">{{ turma.curso.sigla }}</small>
+                                            </td>
+                                            <td>
+                                                <a href="{% url 'adm_local_visualizar' turma.local.id %}" class="text-decoration-none">
+                                                    <i class="fas fa-map-marker-alt"></i> {{ turma.local.nome }}
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <small>
+                                                    {{ turma.data_inicio|date:"d/m/Y" }} -
+                                                    {{ turma.data_final|date:"d/m/Y" }}
+                                                </small>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">
+                                                    {{ turma.matricula_set.count }}/{{ turma.quantidade_permitido }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                {% if turma.status == 'ati' %}
+                                                    <span class="badge bg-success">Ativa</span>
+                                                {% elif turma.status == 'acc' %}
+                                                    <span class="badge bg-success">Ativa (Aceitando)</span>
+                                                {% elif turma.status == 'pre' %}
+                                                    <span class="badge bg-warning">Pré-inscrição</span>
+                                                {% elif turma.status == 'agu' %}
+                                                    <span class="badge bg-secondary">Aguardando</span>
+                                                {% elif turma.status == 'enc' %}
+                                                    <span class="badge bg-dark">Encerrada</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <a href="{% url 'adm_turma_visualizar' turma.id %}" 
+                                                   class="btn btn-sm btn-outline-primary" 
+                                                   title="Visualizar turma">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{% url 'adm_turma_editar' turma.id %}" 
+                                                   class="btn btn-sm btn-outline-warning" 
+                                                   title="Editar turma">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info text-center">
+                            <i class="fas fa-info-circle"></i>
+                            Este instrutor ainda não possui turmas cadastradas.
+                            <br>
+                            <a href="{% url 'adm_turmas_cadastrar' %}" class="btn btn-primary btn-sm mt-2">
+                                <i class="fas fa-plus"></i> Cadastrar Turma
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+</div>
+{% endblock %}

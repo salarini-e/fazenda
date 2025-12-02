@@ -1,0 +1,270 @@
+{% extends 'template_administrativo.html' %}
+{% load static %}
+
+{% block title %}Cadastrar Local - Administração{% endblock %}
+
+{% block nav_locais_active %}active{% endblock %}
+
+{% block page_icon %}fas fa-plus{% endblock %}
+{% block page_title %}Cadastrar Novo Local{% endblock %}
+{% block page_subtitle %}Adicione um novo local onde os cursos podem ser realizados{% endblock %}
+{% block page_header_icon %}fas fa-map-marker-alt{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'administrativo2' %}">Painel</a></li>
+<li class="breadcrumb-item"><a href="{% url 'adm_locais_listar' %}">Locais</a></li>
+<li class="breadcrumb-item active" aria-current="page">Cadastrar</li>
+{% endblock %}
+
+{% block content_title %}Informações do Local{% endblock %}
+
+{% block content_actions %}
+<a href="{% url 'adm_locais_listar' %}" class="btn-admin btn-secondary">
+  <i class="fas fa-arrow-left"></i>
+  <span>Voltar à Lista</span>
+</a>
+<button type="submit" form="local-form" class="btn-admin">
+  <i class="fas fa-save"></i>
+  <span>Salvar Local</span>
+</button>
+{% endblock %}
+
+{% block content_body %}
+<div class="form-container">
+  <form method="POST" id="local-form" class="admin-form">
+    {% csrf_token %}
+    
+    <div class="form-grid">
+      <!-- Informações Básicas -->
+      <div class="form-section">
+        <div class="section-header">
+          <i class="fas fa-info-circle"></i>
+          <h3>Informações Básicas</h3>
+          <p>Dados principais do local</p>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="{{ form.nome.id_for_label }}" class="form-label">
+              <i class="fas fa-building me-2"></i>
+              Nome do Local *
+            </label>
+            {{ form.nome }}
+            {% if form.nome.errors %}
+              <div class="form-error">
+                {% for error in form.nome.errors %}
+                  <small>{{ error }}</small>
+                {% endfor %}
+              </div>
+            {% endif %}
+            <small class="form-help">Nome identificador do local (ex: Auditório Principal, Sala 101)</small>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="{{ form.descricao.id_for_label }}" class="form-label">
+              <i class="fas fa-align-left me-2"></i>
+              Descrição
+            </label>
+            {{ form.descricao }}
+            {% if form.descricao.errors %}
+              <div class="form-error">
+                {% for error in form.descricao.errors %}
+                  <small>{{ error }}</small>
+                {% endfor %}
+              </div>
+            {% endif %}
+            <small class="form-help">Descrição detalhada do local e suas características</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Localização -->
+      <div class="form-section">
+        <div class="section-header">
+          <i class="fas fa-map-marker-alt"></i>
+          <h3>Localização</h3>
+          <p>Endereço e informações de localização</p>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="{{ form.endereco.id_for_label }}" class="form-label">
+              <i class="fas fa-map-marker-alt me-2"></i>
+              Endereço Completo
+            </label>
+            {{ form.endereco }}
+            {% if form.endereco.errors %}
+              <div class="form-error">
+                {% for error in form.endereco.errors %}
+                  <small>{{ error }}</small>
+                {% endfor %}
+              </div>
+            {% endif %}
+            <small class="form-help">Endereço completo incluindo CEP, cidade e estado</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Capacidade -->
+      <div class="form-section">
+        <div class="section-header">
+          <i class="fas fa-users"></i>
+          <h3>Capacidade</h3>
+          <p>Informações sobre a capacidade do local</p>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="{{ form.capacidade.id_for_label }}" class="form-label">
+              <i class="fas fa-users me-2"></i>
+              Capacidade Máxima
+            </label>
+            {{ form.capacidade }}
+            {% if form.capacidade.errors %}
+              <div class="form-error">
+                {% for error in form.capacidade.errors %}
+                  <small>{{ error }}</small>
+                {% endfor %}
+              </div>
+            {% endif %}
+            <small class="form-help">Número máximo de pessoas que o local pode acomodar</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botões de Ação -->
+    <div class="form-actions">
+      <a href="{% url 'adm_locais_listar' %}" class="btn-admin btn-secondary">
+        <i class="fas fa-times"></i>
+        Cancelar
+      </a>
+      <button type="submit" class="btn-admin">
+        <i class="fas fa-save"></i>
+        Cadastrar Local
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Preview Card -->
+<div class="preview-card">
+  <div class="preview-header">
+    <i class="fas fa-eye"></i>
+    <h4>Pré-visualização</h4>
+  </div>
+  <div class="preview-content">
+    <div class="local-preview">
+      <div class="local-icon">
+        <i class="fas fa-building"></i>
+      </div>
+      <div class="local-info">
+        <h5 id="preview-nome">Nome do Local</h5>
+        <p id="preview-descricao">Descrição aparecerá aqui...</p>
+        <div class="local-details">
+          <span id="preview-endereco">
+            <i class="fas fa-map-marker-alt"></i>
+            Endereço será exibido aqui
+          </span>
+          <span id="preview-capacidade">
+            <i class="fas fa-users"></i>
+            <span id="capacidade-num">0</span> pessoas
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block admin_javascript %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Preview em tempo real
+    const nomeInput = document.getElementById('{{ form.nome.id_for_label }}');
+    const descricaoInput = document.getElementById('{{ form.descricao.id_for_label }}');
+    const enderecoInput = document.getElementById('{{ form.endereco.id_for_label }}');
+    const capacidadeInput = document.getElementById('{{ form.capacidade.id_for_label }}');
+    
+    const previewNome = document.getElementById('preview-nome');
+    const previewDescricao = document.getElementById('preview-descricao');
+    const previewEndereco = document.getElementById('preview-endereco');
+    const previewCapacidade = document.getElementById('capacidade-num');
+    
+    function updatePreview() {
+        previewNome.textContent = nomeInput.value || 'Nome do Local';
+        previewDescricao.textContent = descricaoInput.value || 'Descrição aparecerá aqui...';
+        
+        const enderecoText = enderecoInput.value || 'Endereço será exibido aqui';
+        previewEndereco.innerHTML = `<i class="fas fa-map-marker-alt"></i> ${enderecoText}`;
+        
+        previewCapacidade.textContent = capacidadeInput.value || '0';
+    }
+    
+    // Adicionar listeners
+    if (nomeInput) nomeInput.addEventListener('input', updatePreview);
+    if (descricaoInput) descricaoInput.addEventListener('input', updatePreview);
+    if (enderecoInput) enderecoInput.addEventListener('input', updatePreview);
+    if (capacidadeInput) capacidadeInput.addEventListener('input', updatePreview);
+    
+    // Validação do formulário
+    const form = document.getElementById('local-form');
+    form.addEventListener('submit', function(e) {
+        const nome = nomeInput.value.trim();
+        
+        if (!nome) {
+            e.preventDefault();
+            alert('⚠️ O nome do local é obrigatório!');
+            nomeInput.focus();
+            return false;
+        }
+        
+        // Mostrar loading
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Salvando...';
+        submitBtn.disabled = true;
+        
+        // Se tudo estiver OK, permite o envio
+        return true;
+    });
+    
+    // Aplicar classes de estilo aos campos do formulário
+    const formFields = form.querySelectorAll('input, textarea, select');
+    formFields.forEach(field => {
+        field.classList.add('form-control');
+        
+        // Adicionar feedback visual
+        field.addEventListener('focus', function() {
+            this.parentElement.classList.add('focused');
+        });
+        
+        field.addEventListener('blur', function() {
+            this.parentElement.classList.remove('focused');
+            if (this.value.trim()) {
+                this.parentElement.classList.add('filled');
+            } else {
+                this.parentElement.classList.remove('filled');
+            }
+        });
+    });
+    
+    // Animação de entrada dos elementos
+    const sections = document.querySelectorAll('.form-section');
+    sections.forEach((section, index) => {
+        section.style.opacity = '0';
+        section.style.transform = 'translateY(20px)';
+        section.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        
+        setTimeout(() => {
+            section.style.opacity = '1';
+            section.style.transform = 'translateY(0)';
+        }, 100 + (index * 150));
+    });
+    
+    console.log('📝 Formulário de cadastro de local carregado!');
+});
+</script>
+{% endblock %}

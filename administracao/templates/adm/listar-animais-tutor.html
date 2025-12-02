@@ -1,0 +1,69 @@
+{% extends 'template_new.html' %}
+{% load bootstrap5 %}
+{% block title %}Desenvolve NF - Bem-Estar Animal - Censo{% endblock %}
+{% block css %}{% endblock %}
+{% block nav %}
+{% include 'nav_bemestaranimal.html' %}
+{% endblock %}
+{% block main %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="row">
+                <div class="col d-flex">
+                    <h2 style="display: inline;">Animais de {{tutor}}</h2>
+                    <a href="#" class="btn btn-primary my-auto ms-auto ">Cadastrar Animal</a>
+                </div>
+            </div>
+            <table class=" pt-5 table table-hover">
+                <thead>
+                    <tr>
+                        <th>Nome/apelido</th>
+                        <th>Tipo</th>
+                        <th>Sexo</th>
+                        <th>Castrado</th>
+                        <th>Espécie</th>
+                        <th>Anilha</th>
+                        <th>Detalhes</th>
+                        <th>Visualizar imagem</th>
+                    </tr>
+                </thead>
+                {% for animal in animais %}
+                    <tr>
+                        {% if animal.nome %}
+                        <td>{{animal.nome}}</td>
+                        {% else %}
+                        <td>-</td>
+                        {% endif %}
+                        <td>{{animal.tipo}}</td>
+                        {% if animal.sexo == 'm' %}
+                        <td>Macho</td>
+                        {% else %}
+                        <td>Fêmea</td>
+                        {% endif %}
+                        {% if animal.castrado == 0 %}
+                        <td>NÃO</td>
+                        {% else %}
+                        <td>SIM</td>
+                        {% endif %}
+                        {% if animal.especie.nome_especie %}
+                        <td>{{animal.especie|title}}</td>
+                        {% else %}
+                        <td>-</td>
+                        {% endif %}
+                        {% if animal.tipo.id == 1 %}    
+                        <td>{{animal.anilha}}</td>
+                        {% else %}
+                        <td>-</td>
+                        {% endif %}
+                        <td><a href="{% url 'cadastrar_info' animal.tutor_id animal.id %}"><i class="fa-solid fa-eye"></i></a></td>
+                        <td class="text-center"><a href="{{animal.animal_image.url}}"><i class="fa-solid fa-image"></i></a></td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+</script>
+{% endblock %}

@@ -1,0 +1,37 @@
+.opcoes_formulario .hidden_form {
+    display: none;
+}
+
+.opcoes_formulario .show_form {
+    display: block;
+}
+
+.opcoes_formulario li {
+    list-style: none;
+    margin-bottom: 10px;
+}
+
+.opcoes_formulario li button {
+    width: 100%;
+}
+
+/* Cellphones */
+@media only screen and (max-width: 599px) {
+    #navegacao {
+        width: 100vw;
+    }
+
+    #menu {
+        justify-content: center;
+    }
+
+    #cabecalho {
+        margin: 0;
+    }
+}
+
+/* Tablets */
+@media only screen and (min-width: 600px) {}
+
+/* Desktop */
+@media only screen and (min-width: 768px) {}

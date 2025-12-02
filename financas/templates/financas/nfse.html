@@ -1,0 +1,383 @@
+{% extends 'template_new_2.html' %}
+{% load static %}
+{% block nav %}
+
+{% endblock %}
+{% block css %}
+  <link rel="stylesheet" href="{% static 'css/cursos.css' %}">
+  <style>
+    .hero-section {
+
+      background: linear-gradient(135deg, rgba(9, 72, 114, 0.7  ), rgba(2, 80, 133, 0.9)), url("{% static 'images/banner_cevest.jpg' %}");
+      background-size: cover;
+      background-position: bottom;
+      color: white;
+      margin-top: 100px;
+      padding: 4rem 0 4rem 0;
+      margin-top: 0px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-content {
+      padding-top: 50px;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .hero-stats {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: var(--border-radius-xl);
+      padding: 2rem;
+      margin-top: 2rem;
+    }
+    
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      padding: 0 1rem;
+    }
+    
+    .section-title {
+      font-family: var(--font-secondary);
+      font-weight: 700;
+      color: var(--dark-color);
+      margin: 0;
+      position: relative;
+    }
+    
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      width: 60px;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+      border-radius: 2px;
+    }
+    
+    .btn-see-more {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 600;
+      padding: 0.5rem 1.5rem;
+      border: 2px solid var(--primary-color);
+      border-radius: var(--border-radius-lg);
+      transition: all var(--transition-normal);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .btn-see-more:hover {
+      background: var(--primary-color);
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    
+    .course-card {
+      background: white;
+      border-radius: var(--border-radius-xl);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      transition: all var(--transition-normal);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 2rem;
+    }
+    
+    .course-card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-xl);
+    }
+    
+    .course-image {
+      position: relative;
+      height: 200px;
+      overflow: hidden;
+    }
+    
+    .course-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform var(--transition-slow);
+    }
+    
+    .course-card:hover .course-image img {
+      transform: scale(1.1);
+    }
+    
+    .course-category {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.5rem 1rem;
+      border-radius: var(--border-radius-lg);
+      backdrop-filter: blur(5px);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .course-content {
+      padding: 1.5rem;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .course-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--dark-color);
+      margin-bottom: 0.75rem;
+      line-height: 1.4;
+    }
+    
+    .course-meta {
+      color: var(--gray-600);
+      font-size: 0.875rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .course-meta i {
+      color: var(--primary-color);
+    }
+    
+    .btn-course-details {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--border-radius-lg);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all var(--transition-normal);
+      margin-top: auto;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+    }
+    
+    .btn-course-details:hover {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+      color: white;
+    }
+    
+    .courses-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      padding: 0 1rem;
+    }
+    
+    .section-content {
+      padding: 3rem 0;
+    }
+    
+    @media (max-width: 768px) {
+      .hero-section {
+        padding: 2rem 0;
+        /* margin-top: 100px; */
+      }
+      .mobile-menu-toggle, .social-links{
+        display: none !important;
+      }
+      .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+      
+      .courses-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      
+      .course-image {
+        height: 180px;
+      }
+      .btn-homologacao{
+        flex-direction: column;
+      }
+    }
+  </style>
+{% endblock %}
+{% block main %}
+
+
+<!-- Cursos Section -->
+<section class="section-content" data-aos="fade-up" style="padding-bottom: 100px; padding-top: 150px;">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">Migração para NFS-e Nacional </h2>      
+    </div>
+    
+
+    <style>
+    
+    
+    
+
+    .section-content .container{max-width:1100px;margin:28px auto; padding:24px;background:#fff;border-radius:10px;box-shadow:0 8px 30px rgba(21,32,43,0.08)}
+    
+
+    .grid{display:grid;grid-template-columns: 1fr 320px;gap:20px;margin-top:20px}
+    .card{background:#ffffff;padding:16px;border-radius:8px;border:1px solid #eef6ff}
+    
+    .notices{margin-top:10px;display:grid;gap:10px}
+    .notice{padding:12px;border-radius:8px;background:#d6e7fd9e;}
+    .notice small{display:block;color:#6b7c90;margin-top:6px}
+
+    .links-list{display:flex;flex-direction:column;gap:8px}
+    .links-list a{display:block;padding:10px;border-radius:6px;background:#f7fbff;border:1px solid #e6f0ff}
+
+    table{width:100%;border-collapse:collapse;margin-top:8px}
+    th,td{padding:8px;border-bottom:1px solid #f0f5fb;text-align:left;font-size:14px;color:#334155}
+    th{font-size:13px;color:#0f1724;font-weight:700;background:#fbfdff}
+
+    .faq-item{margin-top:10px}
+    .faq-q{font-weight:700;color:#0b4f8a}
+    .faq-a{color:#475569;margin-top:6px}
+
+    /* aside .card{position:sticky;top:28px} */
+    .sidebar-section h3{font-size:14px;color:#0b4f8a;margin-bottom:8px}
+
+    footer{margin-top:18px;padding-top:12px;border-top:1px solid #eef6ff;color:#6b7280;font-size:13px;display:flex;justify-content:space-between}
+    @media (max-width:900px){
+        .grid{grid-template-columns:1fr; padding-bottom:12px}
+        aside .card{position:relative;top:0}
+        .top-actions{display:none}
+    }
+    </style>
+   
+    <div class="grid">
+        <main>
+            <section class="card hero">
+            
+            <h3 class="mb-3">Reforma Tributária do Consumo</h3>
+            <p class="text-justify" style="text-align: justify;">
+              
+              A transição para o Emissor Nacional da NFS-e é uma iniciativa fundamental impulsionada pela Reforma Tributária do Consumo no Brasil, buscando modernizar e simplificar as obrigações fiscais.  
+              Reunimos aqui nesta página as orientações e materiais para a transição do sistema municipal de emissão de Nota Fiscal de Serviço Eletrônica (NFS-e) para o padrão nacional.
+                Abaixo você encontra comunicados, manuais, ambiente de testes e links úteis para contribuintes, contadores e desenvolvedores.
+            </p>
+
+            <div class="notices">
+                <div class="notice mb-3 d-flex flex-column">
+                <p><strong>Atenção<br></strong> A data de vigência está prevista para <strong>1º de janeiro de 2026</strong>.</p>
+                <p>Todos os contribuintes deverão utilizar o Portal Nacional a partir da data prevista.</p>
+                <small>Empresas e profissionais devem verificar integração e adequação de seus sistemas de emissão.</small>
+                </div>
+                <div class="notice d-flex flex-column">
+                <strong>Ambiente de homologação</strong> <br>
+                Sistema disponível para testes de integração com a NFS-e Nacional.
+                <small>Recomendamos que contadores e desenvolvedores realizem testes antes da data de corte.</small>
+                <div class="row d-flex btn-homologacao">
+                  <a class="col mt-3 mb-1 btn btn-primary ms-2 me-1">
+                  APIs para os Contribuintes (Swagger)
+                </a>
+                <a class="col mt-3 mb-1 btn btn-primary ms-1 me-2" href="https://www.gov.br/nfse/pt-br/biblioteca/documentacao-tecnica/documentacao-atual/manual-municipios-emissor-publico-api-sistema-nacional-nfs-e-v1-2-out21025.pdf/view">
+                  Guia de APIs
+                </a>
+                </div>
+                </div>
+            </div>
+            </section>
+            <section class="card" id="documentos" style="margin-top:16px;">
+            <h3>Unificação nacional</h3>
+            <p style="margin-top:8px;color:#475569">O padrão nacional visa unificar leiautes, reduzir a complexidade e preparar o ambiente para a apuração da CBS (Contribuição sobre Bens e Serviços) e do IBS (Imposto sobre Bens e Serviços).</p>
+            </section>
+            <section class="card" id="documentos" style="margin-top:16px;">
+            <h3>Redução da burocracia</h3>
+            <p style="margin-top:8px;color:#475569">Compartilhamento de dados por meio de documentos fiscais eletrônicos e adoção do ADN (Ambiente de Dados Nacional) por todos os municípios.</p>
+            </section>
+            
+
+            <section class="card" style="margin-top:16px">
+            <h3>Sua ação é fundamental!</h3>
+
+            <div class="faq-item">
+                <div class="faq-q">O que muda para o contribuinte?</div>
+                <div class="faq-a">A forma de emissão passa a seguir um padrão nacional. Sistemas e contadores devem adaptar integrações e validar campos obrigatórios.</div>
+                <ul class="my-3">
+                  <li class="mb-2">
+                    <p><strong>Prepare seu software</strong></p>
+                    <p>Entre em contato com seu fornecedor o quanto antes para a adaptação ao novo padrão nacional e integração via APIs.</p>
+                  </li>
+                  <li class="mb-2">
+                    <p><strong>Familiarize-se com as regras</strong></p>
+                    <p>Fique atento aos novos códigos de tributação nacional e às regras de incidência de ISSQN para cada tipo de serviço.</p>
+                  </li>
+                  <li>
+                    <p><strong>Mantenha seu cadastro atualizado</strong></p>
+                    <p>As informações do seu cadastro junto ao município são usadas para validação das notas. Certifique-se de que estejam corretas.</p>
+                  </li>
+                </ul>
+            </div>
+
+            <div class="faq-item d-flex flex-column">
+                <div class="faq-q">Quem precisa se adequar?</div>
+                <div class="faq-a">Todas as empresas prestadoras de serviços estabelecidas no município, incluindo MEI quando aplicável.</div>
+                <div class="faq-a">Acesse o Ambiente Restrito de Produção para se familiarizar com o novo sistema. Disponível a partir de Setembro/2025.</div>
+                <a class="btn btn-primary my-3 mx-auto" href="">Acessar Teste</a>
+                
+            </div>
+            </section>
+        </main>
+
+        <aside>
+            <div class="card sidebar-section">
+            <h2>Links úteis</h2>
+            <div class="links-list">
+              
+            <a href="https://www.planalto.gov.br/ccivil_03/constituicao/emendas/emc/emc132.htm" target="_blank">EMENDA CONSTITUCIONAL</a>
+            <a href="https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp214.htm">LEI COMPLEMENTAR</a>
+            <h3>Portal web</h3>
+            <a href="https://www.producaorestrita.nfse.gov.br/EmissorNacional/Login?ReturnUrl=%2fEmissorNacional">Ambiente de Testes</a>
+            <a href="https://www.nfse.gov.br/EmissorNacional/Login?ReturnUrl=%2fEmissorNacional">Portal Naciona NFS-e</a>
+            <a href="https://www.gov.br/nfse/pt-br/biblioteca/documentacao-tecnica/documentacao-atual/manual-contribuintes-emissor-publico-api-sistema-nacional-nfs-e-v1-2-out2025.pdf/view">Manual para Emissão</a>            
+            <h3>Aplicativo Mobile</h3>
+            <a href="https://play.google.com/store/apps/details?id=br.gov.nfsemobileemissor&pcampaignid=web_share&pli=1">NFSe Mobile Android</a>
+            <a href="https://apps.apple.com/br/app/nfse-mobile/id6444701747">NFSe Mobile Android</a>
+            <h3>Desenvolvimento</h3>
+            <a href="https://www.nfse.gov.br/swagger/contribuintesissqn/">APIs de Produção</a>
+            <h3>Documentação</h3>
+            <a href="https://www.gov.br/nfse/pt-br/biblioteca/documentacao-tecnica">Documentação Técnica</a>
+            <a href="https://dfe-portal.svrs.rs.gov.br/DFE/ClassificacaoTributaria">Tabela CST/cClassTrib</a>
+            <a href="https://dfe-portal.svrs.rs.gov.br/DFE/TabelaCreditoPresumido">Tabela de crédito presumido</a>
+            <a href="https://portalunico.siscomex.gov.br/classif/#/sumario?perfil=publico">Tabela NCM-SH</a>
+            <a href="https://www.gov.br/mdic/pt-br/assuntos/sdic/comercio-e-servicos/nbs-nomenclatura-brasileira-de-servicos">Tabela NBS</a>
+            <a href="https://www.nfe.fazenda.gov.br/portal/exibirArquivo.aspx?conteudo=zjSr04nEi/w=">Download Informe Técnico</a>
+            <h3>Outros</h3>
+            <a href="https://www.gov.br/receitafederal/pt-br/acesso-a-informacao/acoes-e-programas/programas-e-atividades/reforma-consumo">Receita Federal</a>
+            <a href="https://campanhas.serpro.gov.br/reforma-tributaria/">SERPRO</a>
+            </div>
+            </div>
+        </aside>
+
+  </div>
+</section>
+
+
+<script>
+  document.getElementById('s-index').classList.add('s-nav-active');
+</script>
+{% endblock %}
+{% block footer %}
+
+{% endblock %}

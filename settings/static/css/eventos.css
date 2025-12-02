@@ -1,0 +1,101 @@
+.owl-nav {
+  display: none;
+}
+@media (min-width: 1000px) {
+  .banner_destaque {
+    margin: 10px 20px !important;
+  }
+  .banner_destaque img {
+    width: 80vw !important;
+    height: 15vw !important;
+  }
+}
+
+@media (min-width: 601px) and (max-width: 992px) {
+  .owl-item .item img {
+    height: 300px !important;
+    width: 500px !important;
+  }
+  .evento_teste {
+    display: block !important;
+  }
+  .evento_teste h1 {
+    font-size: 16px;
+    color: black;
+  }
+  #mainBlock {
+    margin: 0px !important;
+    padding-right: 0px !important;
+    padding-left: 0px !important;
+    width: 100vw;
+  }
+  #mainBlock .container,
+  #mainBlock .container div {
+    padding: 0px !important;
+  }
+  .evento_teste2 {
+    display: block !important;
+    margin: 0px !important;
+    padding: 0px !important;
+  }
+  .banner_destaque {
+    width: 80vw !important;
+  }
+  .banner_destaque img {
+    width: 80vw !important;
+    height: 35vw !important;
+  }
+  .evento_teste2 div div {
+    margin: 0px !important;
+    padding: 0px !important;
+    width: 80vw;
+  }
+  .logo {
+    width: 80vw !important;
+  }
+}
+
+@media (min-width: 320px) and (max-width: 600px) {
+  .owl-item .item img {
+    height: 200px !important;
+    width: 300px !important;
+  }
+  .evento_teste {
+    display: block !important;
+  }
+  .evento_teste h1 {
+    font-size: 16px;
+    color: black;
+  }
+  #mainBlock {
+    margin: 0px !important;
+    padding-right: 0px !important;
+    padding-left: 0px !important;
+    width: 100vw;
+  }
+  #mainBlock .container,
+  #mainBlock .container div {
+    padding: 0px !important;
+    margin-left: 4px !important;
+  }
+  .evento_teste2 {
+    display: block !important;
+    margin: 0px !important;
+    padding: 0px !important;
+  }
+  .banner_destaque {
+    width: 80vw !important;
+  }
+  .banner_destaque img {
+    width: 80vw !important;
+    height: 35vw !important;
+  }
+  .evento_teste2 div div {
+    margin: 0px !important;
+    padding: 0px !important;
+    width: 80vw;
+  }
+  .logo {
+    width: 80vw !important;
+  }
+}

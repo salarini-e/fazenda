@@ -1,0 +1,514 @@
+{% extends 'template_administrativo.html' %}
+{% load static %}
+{% load bootstrap5 %}
+
+{% block title %}Editar Turma {{ turma.id }} - {{ turma.curso.nome }}{% endblock %}
+
+{% block nav_turmas_active %}active{% endblock %}
+
+{% block page_icon %}fas fa-edit{% endblock %}
+{% block page_title %}Editar Turma{{ turma.id }}{% endblock %}
+{% block page_subtitle %}Modificar informações da turma {{ turma.curso.nome }}{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'adm_turmas_listar' %}">Turmas</a></li>
+<li class="breadcrumb-item"><a href="{% url 'adm_turma_visualizar' turma.id %}">Turma {{ turma.id }}</a></li>
+<li class="breadcrumb-item active" aria-current="page">Editar</li>
+{% endblock %}
+
+{% block content_title %}
+<i class="fas fa-edit me-2"></i>
+Editar Turma
+{% endblock %}
+
+{% block content_actions %}
+<a href="{% url 'adm_turma_visualizar' turma.id %}" class="btn-admin btn-secondary">
+  <i class="fas fa-arrow-left"></i>
+  Voltar
+</a>
+<button type="submit" form="turmaForm" class="btn-admin btn-success">
+  <i class="fas fa-save"></i>
+  Salvar Alterações
+</button>
+{% endblock %}
+
+{% block content_body %}
+<!-- Status Alert -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="alert alert-info d-flex align-items-center">
+      <i class="fas fa-info-circle fa-2x me-3"></i>
+      <div>
+        <h6 class="mb-1">Atenção ao Editar Status da Turma</h6>
+        <p class="mb-0">
+          Se você alterar o status para "Ativa", todos os candidatos e selecionados serão automaticamente 
+          realocados para outras turmas disponíveis.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Current Turma Info Card -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0" style="background: linear-gradient(135deg, #f8fafc, #e2e8f0); border-radius: 16px;">
+      <div class="card-body">
+        <h6 class="card-title text-secondary fw-bold mb-3">
+          <i class="fas fa-info me-2"></i>
+          Informações Atuais
+        </h6>
+        <div class="row">
+          <div class="col-md-4">
+            <div class="info-item">
+              <small class="text-muted">Curso:</small>
+              <div class="fw-bold">{{ turma.curso.nome }}</div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="info-item">
+              <small class="text-muted">Status Atual:</small>
+              <div>
+                <span class="badge 
+                  {% if turma.status == 'ati' %}bg-success
+                  {% elif turma.status == 'pre' %}bg-warning
+                  {% elif turma.status == 'enc' %}bg-dark
+                  {% elif turma.status == 'acc' %}bg-info
+                  {% else %}bg-secondary
+                  {% endif %}">
+                  {% if turma.status == 'pre' %}Pré-inscrição
+                  {% elif turma.status == 'ati' %}Ativa
+                  {% elif turma.status == 'agu' %}Aguardando
+                  {% elif turma.status == 'acc' %}Ativa e Aceitando
+                  {% elif turma.status == 'enc' %}Encerrada
+                  {% endif %}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="info-item">
+              <small class="text-muted">Alunos Matriculados:</small>
+              <div class="fw-bold">{{ turma.matricula_set.count }} de {{ turma.quantidade_permitido }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Form -->
+<div class="admin-content-card">
+  <div class="content-card-header">
+    <h5>
+      <i class="fas fa-form me-2"></i>
+      Formulário de Edição
+    </h5>
+  </div>
+  <div class="content-card-body">
+    <form method="POST" id="turmaForm" class="needs-validation" novalidate>
+      {% csrf_token %}
+      
+      <!-- Basic Information -->
+      <div class="form-section mb-5">
+        <h6 class="section-title">
+          <i class="fas fa-info-circle me-2"></i>
+          Informações Básicas
+        </h6>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group-modern">
+              <label class="form-label-modern" for="{{ form.curso.id_for_label }}">
+                <i class="fas fa-graduation-cap me-1"></i>
+                Curso *
+              </label>
+              {% bootstrap_field form.curso show_label=False field_class="form-control-modern" %}
+              {% if form.curso.help_text %}
+                <small class="form-text text-muted">{{ form.curso.help_text }}</small>
+              {% endif %}
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group-modern">
+              <label class="form-label-modern" for="{{ form.status.id_for_label }}">
+                <i class="fas fa-signal me-1"></i>
+                Status *
+              </label>
+              {% bootstrap_field form.status show_label=False field_class="form-control-modern" %}
+              {% if form.status.help_text %}
+                <small class="form-text text-muted">{{ form.status.help_text }}</small>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dates and Capacity -->
+      <div class="form-section mb-5">
+        <h6 class="section-title">
+          <i class="fas fa-calendar me-2"></i>
+          Datas e Capacidade
+        </h6>
+        <div class="row">
+          <div class="col-md-4">
+            <div class="form-group-modern">
+              <label class="form-label-modern" for="{{ form.data_inicio.id_for_label }}">
+                <i class="fas fa-play me-1"></i>
+                Data de Início *
+              </label>
+              {% bootstrap_field form.data_inicio show_label=False field_class="form-control-modern" %}
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group-modern">
+              <label class="form-label-modern" for="{{ form.data_final.id_for_label }}">
+                <i class="fas fa-stop me-1"></i>
+                Data de Término
+              </label>
+              {% bootstrap_field form.data_final show_label=False field_class="form-control-modern" %}
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group-modern">
+              <label class="form-label-modern" for="{{ form.quantidade_permitido.id_for_label }}">
+                <i class="fas fa-users me-1"></i>
+                Máximo de Alunos *
+              </label>
+              {% bootstrap_field form.quantidade_permitido show_label=False field_class="form-control-modern" %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Age Restrictions -->
+      <div class="form-section mb-5">
+        <h6 class="section-title">
+          <i class="fas fa-child me-2"></i>
+          Faixa Etária
+        </h6>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group-modern">
+              <label class="form-label-modern" for="{{ form.idade_minima.id_for_label }}">
+                <i class="fas fa-arrow-up me-1"></i>
+                Idade Mínima
+              </label>
+              {% bootstrap_field form.idade_minima show_label=False field_class="form-control-modern" %}
+              <small class="form-text text-muted">Deixe em branco para não ter limite mínimo</small>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group-modern">
+              <label class="form-label-modern" for="{{ form.idade_maxima.id_for_label }}">
+                <i class="fas fa-arrow-down me-1"></i>
+                Idade Máxima
+              </label>
+              {% bootstrap_field form.idade_maxima show_label=False field_class="form-control-modern" %}
+              <small class="form-text text-muted">Deixe em branco para não ter limite máximo</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Location and Instructors -->
+      <div class="form-section mb-5">
+        <h6 class="section-title">
+          <i class="fas fa-map-marker-alt me-2"></i>
+          Local e Instrutores
+        </h6>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group-modern">
+              <label class="form-label-modern" for="{{ form.local.id_for_label }}">
+                <i class="fas fa-building me-1"></i>
+                Local *
+              </label>
+              {% bootstrap_field form.local show_label=False field_class="form-control-modern" %}
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group-modern">
+              <label class="form-label-modern" for="{{ form.instrutores.id_for_label }}">
+                <i class="fas fa-chalkboard-teacher me-1"></i>
+                Instrutores
+              </label>
+              {% bootstrap_field form.instrutores show_label=False field_class="form-control-modern" %}
+              <small class="form-text text-muted">Segure Ctrl para selecionar múltiplos instrutores</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Description -->
+      {% if form.descricao %}
+      <div class="form-section mb-5">
+        <h6 class="section-title">
+          <i class="fas fa-align-left me-2"></i>
+          Descrição Adicional
+        </h6>
+        <div class="form-group-modern">
+          <label class="form-label-modern" for="{{ form.descricao.id_for_label }}">
+            <i class="fas fa-edit me-1"></i>
+            Descrição
+          </label>
+          {% bootstrap_field form.descricao show_label=False field_class="form-control-modern" %}
+          <small class="form-text text-muted">Informações adicionais sobre a turma</small>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Form Actions -->
+      <div class="form-actions d-flex justify-content-between">
+        <div>
+          <a href="{% url 'adm_turma_visualizar' turma.id %}" class="btn btn-outline-secondary">
+            <i class="fas fa-times me-1"></i>
+            Cancelar
+          </a>
+        </div>
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-outline-primary" onclick="previewChanges()">
+            <i class="fas fa-eye me-1"></i>
+            Pré-visualizar
+          </button>
+          <button type="submit" class="btn btn-success">
+            <i class="fas fa-save me-1"></i>
+            Salvar Alterações
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Preview Modal -->
+<div class="modal fade" id="previewModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">
+          <i class="fas fa-eye me-2"></i>
+          Pré-visualização das Alterações
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div id="previewContent">
+          <!-- Preview content will be inserted here -->
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+        <button type="button" class="btn btn-success" onclick="submitForm()">
+          <i class="fas fa-save me-1"></i>
+          Confirmar Alterações
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.form-section {
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  padding: 1.5rem;
+  background: #fdfdfe;
+}
+
+.section-title {
+  color: var(--primary-color);
+  font-weight: 600;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.form-actions {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-top: 2rem;
+}
+
+.info-item {
+  padding: 0.5rem 0;
+}
+
+.info-item small {
+  display: block;
+  font-weight: 500;
+}
+
+.preview-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.preview-item:last-child {
+  border-bottom: none;
+}
+
+.preview-label {
+  font-weight: 600;
+  color: #6c757d;
+}
+
+.preview-value {
+  color: #2c3e50;
+  text-align: right;
+}
+
+.preview-changed {
+  background: #fff3cd;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 600;
+  color: #856404;
+}
+</style>
+{% endblock %}
+
+{% block admin_javascript %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const form = document.getElementById('turmaForm');
+    
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            // Show first invalid field
+            const firstInvalid = form.querySelector(':invalid');
+            if (firstInvalid) {
+                firstInvalid.focus();
+                firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+        
+        form.classList.add('was-validated');
+    });
+    
+    // Date validation
+    const dataInicio = document.querySelector('[name="data_inicio"]');
+    const dataFinal = document.querySelector('[name="data_final"]');
+    
+    if (dataInicio && dataFinal) {
+        function validateDates() {
+            if (dataInicio.value && dataFinal.value) {
+                const inicio = new Date(dataInicio.value);
+                const final = new Date(dataFinal.value);
+                
+                if (final <= inicio) {
+                    dataFinal.setCustomValidity('A data final deve ser posterior à data de início');
+                } else {
+                    dataFinal.setCustomValidity('');
+                }
+            }
+        }
+        
+        dataInicio.addEventListener('change', validateDates);
+        dataFinal.addEventListener('change', validateDates);
+    }
+    
+    // Age validation
+    const idadeMinima = document.querySelector('[name="idade_minima"]');
+    const idadeMaxima = document.querySelector('[name="idade_maxima"]');
+    
+    if (idadeMinima && idadeMaxima) {
+        function validateAges() {
+            if (idadeMinima.value && idadeMaxima.value) {
+                const minima = parseInt(idadeMinima.value);
+                const maxima = parseInt(idadeMaxima.value);
+                
+                if (maxima <= minima) {
+                    idadeMaxima.setCustomValidity('A idade máxima deve ser maior que a mínima');
+                } else {
+                    idadeMaxima.setCustomValidity('');
+                }
+            }
+        }
+        
+        idadeMinima.addEventListener('change', validateAges);
+        idadeMaxima.addEventListener('change', validateAges);
+    }
+    
+    // Status change warning
+    const statusField = document.querySelector('[name="status"]');
+    if (statusField) {
+        const originalStatus = statusField.value;
+        
+        statusField.addEventListener('change', function() {
+            if (originalStatus !== 'ati' && this.value === 'ati') {
+                if (!confirm('Atenção: Alterar para "Ativa" realocará todos os candidatos e selecionados. Continuar?')) {
+                    this.value = originalStatus;
+                }
+            }
+        });
+    }
+    
+    console.log('🎓 Formulário de edição de turma carregado com sucesso!');
+});
+
+function previewChanges() {
+    const form = document.getElementById('turmaForm');
+    const formData = new FormData(form);
+    const previewContent = document.getElementById('previewContent');
+    
+    // Current values (you would get these from the server)
+    const currentValues = {
+        'curso': '{{ turma.curso.nome }}',
+        'status': '{% if turma.status == "pre" %}Pré-inscrição{% elif turma.status == "ati" %}Ativa{% elif turma.status == "agu" %}Aguardando{% elif turma.status == "acc" %}Ativa e Aceitando{% elif turma.status == "enc" %}Encerrada{% endif %}',
+        'data_inicio': '{{ turma.data_inicio|date:"d/m/Y" }}',
+        'data_final': '{{ turma.data_final|date:"d/m/Y"|default:"Não definida" }}',
+        'quantidade_permitido': '{{ turma.quantidade_permitido }}',
+        'idade_minima': '{{ turma.idade_minima|default:"Não definida" }}',
+        'idade_maxima': '{{ turma.idade_maxima|default:"Não definida" }}',
+        'local': '{{ turma.local.nome }}'
+    };
+    
+    let previewHtml = '<div class="preview-container">';
+    
+    // Compare form values with current values
+    for (const [key, currentValue] of Object.entries(currentValues)) {
+        const field = form.querySelector(`[name="${key}"]`);
+        if (field) {
+            let newValue = field.value;
+            
+            // Handle select fields
+            if (field.tagName === 'SELECT') {
+                const selectedOption = field.options[field.selectedIndex];
+                newValue = selectedOption ? selectedOption.text : newValue;
+            }
+            
+            const isChanged = newValue !== currentValue.toString();
+            
+            previewHtml += `
+                <div class="preview-item">
+                    <span class="preview-label">${field.labels[0]?.textContent || key}:</span>
+                    <span class="preview-value ${isChanged ? 'preview-changed' : ''}">
+                        ${newValue || 'Não definido'}
+                        ${isChanged ? ' (Alterado)' : ''}
+                    </span>
+                </div>
+            `;
+        }
+    }
+    
+    previewHtml += '</div>';
+    previewContent.innerHTML = previewHtml;
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('previewModal'));
+    modal.show();
+}
+
+function submitForm() {
+    document.getElementById('turmaForm').submit();
+}
+</script>
+{% endblock %}

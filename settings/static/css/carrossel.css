@@ -1,0 +1,26 @@
+.carousel {
+    display: flex;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+  }
+  .carousel-item {
+    flex: 0 0 25%;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+  .carousel-control {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 10px;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: none;
+    cursor: pointer;
+  }
+  .carousel-control-left {
+    left: 0;
+  }
+  .carousel-control-right {
+    right: 0;
+  }

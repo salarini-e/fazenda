@@ -1,0 +1,554 @@
+{% extends 'template_administrativo.html' %}
+{% load static %}
+{% load custom %}
+{% load custom %}
+{% load custom %}
+
+{% block title %}Aulas - Turma {{ turma.id }} - {{ turma.curso.nome }}{% endblock %}
+
+{% block nav_turmas_active %}active{% endblock %}
+
+{% block page_icon %}fas fa-calendar-alt{% endblock %}
+{% block page_title %}Aulas da Turma {{ turma.id }}{% endblock %}
+{% block page_subtitle %}{{ turma.curso.nome }}{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'adm_turmas_listar' %}">Turmas</a></li>
+<li class="breadcrumb-item"><a href="{% url 'adm_turma_visualizar' turma.id %}">Turma {{ turma.id }}</a></li>
+<li class="breadcrumb-item active" aria-current="page">Aulas</li>
+{% endblock %}
+
+{% block content_title %}
+<i class="fas fa-calendar-alt me-2"></i>
+Gerenciar Aulas
+{% endblock %}
+
+{% block content_actions %}
+<a href="{% url 'adm_turma_visualizar' turma.id %}" class="btn-admin btn-secondary">
+  <i class="fas fa-arrow-left"></i>
+  Voltar à Turma
+</a>
+<a href="{% url 'adm_aula_cadastrar' turma.id %}" class="btn-admin btn-success">
+  <i class="fas fa-plus"></i>
+  Nova Aula
+</a>
+{% endblock %}
+
+{% block content_body %}
+<!-- Turma Info Card -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0" style="background: linear-gradient(135deg, #e3f2fd, #bbdefb); border-radius: 16px;">
+      <div class="card-body">
+        <div class="row align-items-center">
+          <div class="col-md-8">
+            <h6 class="card-title text-primary fw-bold mb-2">
+              <i class="fas fa-graduation-cap me-2"></i>
+              Informações da Turma
+            </h6>
+            <div class="row">
+              <div class="col-md-4">
+                <small class="text-muted">Curso:</small>
+                <div class="fw-bold">{{ turma.curso.nome }}</div>
+              </div>
+              <div class="col-md-4">
+                <small class="text-muted">Status:</small>
+                <div>
+                  <span class="badge 
+                    {% if turma.status == 'ati' %}bg-success
+                    {% elif turma.status == 'pre' %}bg-warning
+                    {% elif turma.status == 'enc' %}bg-dark
+                    {% elif turma.status == 'acc' %}bg-info
+                    {% else %}bg-secondary
+                    {% endif %}">
+                    {% if turma.status == 'pre' %}Pré-inscrição
+                    {% elif turma.status == 'ati' %}Ativa
+                    {% elif turma.status == 'agu' %}Aguardando
+                    {% elif turma.status == 'acc' %}Ativa e Aceitando
+                    {% elif turma.status == 'enc' %}Encerrada
+                    {% endif %}
+                  </span>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <small class="text-muted">Alunos:</small>
+                <div class="fw-bold">{{ turma.matricula_set.count }} matriculados</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 text-end">
+            <div class="d-flex flex-column align-items-end">
+              <div class="mb-2">
+                <span class="badge bg-primary fs-6 p-2">
+                  <i class="fas fa-calendar me-1"></i>
+                  {{ aulas.count }} Aula{{ aulas.count|pluralize }}
+                </span>
+              </div>
+              <div class="d-flex gap-2">
+                <a href="{% url 'adm_turno_cadastrar' turma.id %}" class="btn btn-outline-primary btn-sm">
+                  <i class="fas fa-clock me-1"></i>
+                  Horários
+                </a>
+                <a href="{% url 'adm_turma_editar' turma.id %}" class="btn btn-outline-secondary btn-sm">
+                  <i class="fas fa-edit me-1"></i>
+                  Editar
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+  <div class="col-md-3">
+    <div class="card border-0" style="background: linear-gradient(135deg, #e8f5e8, #c8e6c9); border-radius: 16px;">
+      <div class="card-body text-center">
+        <i class="fas fa-calendar-check fa-2x text-success mb-2"></i>
+        <h4 class="text-success mb-0">{{ aulas.count }}</h4>
+        <small class="text-muted">Total de Aulas</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0" style="background: linear-gradient(135deg, #fff3e0, #ffe0b2); border-radius: 16px;">
+      <div class="card-body text-center">
+        <i class="fas fa-clock fa-2x text-warning mb-2"></i>
+        <h4 class="text-warning mb-0">
+          {% if aulas %}
+            {{ aulas|first.associacao_turma_turno.turno.carga_horaria|default:0 }}h
+          {% else %}
+            0h
+          {% endif %}
+        </h4>
+        <small class="text-muted">Carga Horária</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0" style="background: linear-gradient(135deg, #e3f2fd, #bbdefb); border-radius: 16px;">
+      <div class="card-body text-center">
+        <i class="fas fa-user-check fa-2x text-primary mb-2"></i>
+        <h4 class="text-primary mb-0">{{ total_presencas }}</h4>
+        <small class="text-muted">Presenças Registradas</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0" style="background: linear-gradient(135deg, #fce4ec, #f8bbd9); border-radius: 16px;">
+      <div class="card-body text-center">
+        <i class="fas fa-percentage fa-2x text-danger mb-2"></i>
+        <h4 class="text-danger mb-0">{{ taxa_presenca }}%</h4>
+        <small class="text-muted">Taxa de Presença</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Aulas List -->
+<div class="admin-content-card">
+  <div class="content-card-header">
+    <h5>
+      <i class="fas fa-list me-2"></i>
+      Lista de Aulas
+    </h5>
+    <div class="admin-actions">
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-primary btn-sm" onclick="toggleCalendarView()">
+          <i class="fas fa-calendar me-1"></i>
+          <span id="viewToggleText">Visão Calendário</span>
+        </button>
+        <button class="btn btn-outline-success btn-sm" onclick="exportAulas()">
+          <i class="fas fa-download me-1"></i>
+          Exportar
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="content-card-body">
+    {% if aulas %}
+      <!-- Search and Filter -->
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <input type="text" id="searchAulas" class="form-control" placeholder="Buscar por data, tema ou descrição...">
+        </div>
+        <div class="col-md-3">
+          <select id="filterStatus" class="form-control">
+            <option value="">Todos os Status</option>
+            <option value="agendada">Agendada</option>
+            <option value="realizada">Realizada</option>
+            <option value="cancelada">Cancelada</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <select id="sortOrder" class="form-control">
+            <option value="date-asc">Data (Mais Antiga)</option>
+            <option value="date-desc">Data (Mais Recente)</option>
+            <option value="name-asc">Tema (A-Z)</option>
+            <option value="name-desc">Tema (Z-A)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- List View -->
+      <div id="listView">
+        <div class="table-responsive">
+          <table class="table-modern">
+            <thead>
+              <tr>
+                <th>Data/Hora</th>
+                <th>Tema</th>
+                <th>Instrutor</th>
+                <th>Turno</th>
+                <th>Presença</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="aulasTableBody">
+              {% for aula in aulas %}
+              <tr data-search="{{ aula.data|date:'d/m/Y' }} {{ aula.tema|lower }}" 
+                  data-status="{% if aula.realizada %}realizada{% else %}agendada{% endif %}"
+                  data-date="{{ aula.data|date:'Y-m-d' }}">
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="date-icon me-2">
+                      <i class="fas fa-calendar-day text-primary"></i>
+                    </div>
+                    <div>
+                      <div class="fw-bold">{{ aula.data|date:"d/m/Y" }}</div>
+                      <small class="text-muted">
+                        {{ aula.associacao_turma_turno.turno.hora_inicio }} - 
+                        {{ aula.associacao_turma_turno.turno.hora_termino }}
+                      </small>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div>
+                    <div class="fw-bold">{{ aula.tema|default:"Aula Padrão" }}</div>
+                    {% if aula.descricao %}
+                      <small class="text-muted">{{ aula.descricao|truncatechars:50 }}</small>
+                    {% endif %}
+                  </div>
+                </td>
+                <td>
+                  {% if aula.associacao_turma_turno.turno.instrutor %}
+                    <div class="d-flex align-items-center">
+                      <div class="user-avatar-small me-2">
+                        <i class="fas fa-user"></i>
+                      </div>
+                      <span>{{ aula.associacao_turma_turno.turno.instrutor.nome }}</span>
+                    </div>
+                  {% else %}
+                    <span class="text-muted">Não definido</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <div class="turno-info">
+                    <div class="fw-bold">{{ aula.associacao_turma_turno.turno.periodo|title }}</div>
+                    <small class="text-muted">{{ aula.associacao_turma_turno.turno.dias_semana }}</small>
+                  </div>
+                </td>
+                <td>
+                  <div class="progress" style="height: 20px; width: 60px;">
+                    <div class="progress-bar 
+                      {% if aula.presencas_count == aula.total_alunos %}bg-success
+                      {% elif aula.percentual_presenca >= 70 %}bg-warning
+                      {% else %}bg-danger
+                      {% endif %}" 
+                      style="width: {{ aula.percentual_presenca }}%">
+                    </div>
+                  </div>
+                  <small class="text-muted">{{ aula.presencas_count }}/{{ aula.total_alunos }}</small>
+                </td>
+                <td>
+                  {% if aula.realizada %}
+                    <span class="badge bg-success">Realizada</span>
+                  {% elif aula.data < today %}
+                    <span class="badge bg-warning">Pendente</span>
+                  {% else %}
+                    <span class="badge bg-info">Agendada</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <div class="d-flex gap-1">
+                    <a href="{% url 'adm_aula_visualizar' turma.id aula.id %}" 
+                       class="table-action-btn btn-info" title="Ver detalhes">
+                      <i class="fas fa-eye"></i>
+                    </a>
+                    <button class="table-action-btn btn-warning" 
+                            onclick="editAula({{ aula.id }})" title="Editar">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="table-action-btn btn-danger" 
+                            onclick="deleteAula({{ aula.id }})" title="Excluir">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Calendar View (Hidden by default) -->
+      <div id="calendarView" style="display: none;">
+        <div id="calendar"></div>
+      </div>
+
+    {% else %}
+      <div class="empty-state">
+        <i class="fas fa-calendar-plus"></i>
+        <h3>Nenhuma aula cadastrada</h3>
+        <p>Esta turma ainda não possui aulas agendadas.</p>
+        <a href="{% url 'adm_aula_cadastrar' turma.id %}" class="btn-admin">
+          <i class="fas fa-plus me-1"></i>
+          Cadastrar Primeira Aula
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+.date-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(0, 123, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-avatar-small {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+}
+
+.turno-info {
+  min-width: 120px;
+}
+
+.progress {
+  border-radius: 10px;
+}
+
+.progress-bar {
+  border-radius: 10px;
+}
+
+#calendar {
+  height: 600px;
+  background: white;
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.fc-event {
+  border-radius: 6px;
+  border: none;
+  padding: 2px 6px;
+}
+
+.fc-event-realizada {
+  background-color: #28a745;
+}
+
+.fc-event-agendada {
+  background-color: #007bff;
+}
+
+.fc-event-pendente {
+  background-color: #ffc107;
+  color: #000;
+}
+</style>
+{% endblock %}
+
+{% block admin_javascript %}
+<!-- FullCalendar CSS and JS -->
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css' rel='stylesheet' />
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let isCalendarView = false;
+    let calendar;
+
+    // Search functionality
+    const searchInput = document.getElementById('searchAulas');
+    const filterStatus = document.getElementById('filterStatus');
+    const sortOrder = document.getElementById('sortOrder');
+    
+    function filterAndSortTable() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const statusFilter = filterStatus.value;
+        const sort = sortOrder.value;
+        
+        const rows = Array.from(document.querySelectorAll('#aulasTableBody tr'));
+        
+        // Filter rows
+        rows.forEach(row => {
+            const searchData = row.getAttribute('data-search');
+            const status = row.getAttribute('data-status');
+            
+            const matchesSearch = searchData.includes(searchTerm);
+            const matchesStatus = !statusFilter || status === statusFilter;
+            
+            row.style.display = matchesSearch && matchesStatus ? '' : 'none';
+        });
+        
+        // Sort visible rows
+        const visibleRows = rows.filter(row => row.style.display !== 'none');
+        const tableBody = document.getElementById('aulasTableBody');
+        
+        visibleRows.sort((a, b) => {
+            switch(sort) {
+                case 'date-asc':
+                    return new Date(a.getAttribute('data-date')) - new Date(b.getAttribute('data-date'));
+                case 'date-desc':
+                    return new Date(b.getAttribute('data-date')) - new Date(a.getAttribute('data-date'));
+                case 'name-asc':
+                    return a.querySelector('td:nth-child(2) .fw-bold').textContent.localeCompare(
+                           b.querySelector('td:nth-child(2) .fw-bold').textContent);
+                case 'name-desc':
+                    return b.querySelector('td:nth-child(2) .fw-bold').textContent.localeCompare(
+                           a.querySelector('td:nth-child(2) .fw-bold').textContent);
+                default:
+                    return 0;
+            }
+        });
+        
+        // Reorder rows
+        visibleRows.forEach(row => tableBody.appendChild(row));
+    }
+    
+    if (searchInput) searchInput.addEventListener('input', filterAndSortTable);
+    if (filterStatus) filterStatus.addEventListener('change', filterAndSortTable);
+    if (sortOrder) sortOrder.addEventListener('change', filterAndSortTable);
+    
+    // Initialize calendar
+    function initCalendar() {
+        const calendarEl = document.getElementById('calendar');
+        
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            locale: 'pt-br',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,listWeek'
+            },
+            events: [
+                {% for aula in aulas %}
+                {
+                    title: '{{ aula.tema|default:"Aula"|escapejs }}',
+                    start: '{{ aula.data|date:"Y-m-d" }}T{{ aula.associacao_turma_turno.turno.hora_inicio }}',
+                    end: '{{ aula.data|date:"Y-m-d" }}T{{ aula.associacao_turma_turno.turno.hora_termino }}',
+                    className: 'fc-event-{% if aula.realizada %}realizada{% elif aula.data < today %}pendente{% else %}agendada{% endif %}',
+                    url: '{% url "adm_aula_visualizar" turma.id aula.id %}',
+                    extendedProps: {
+                        aulaId: {{ aula.id }},
+                        instrutor: '{{ aula.associacao_turma_turno.turno.instrutor.nome|default:"Não definido"|escapejs }}',
+                        presencas: '{{ aula.presencas_count }}/{{ aula.total_alunos }}'
+                    }
+                },
+                {% endfor %}
+            ],
+            eventClick: function(info) {
+                info.jsEvent.preventDefault();
+                if (info.event.url) {
+                    window.location.href = info.event.url;
+                }
+            },
+            eventDidMount: function(info) {
+                // Add tooltip
+                info.el.title = `${info.event.title}\nInstrutor: ${info.event.extendedProps.instrutor}\nPresença: ${info.event.extendedProps.presencas}`;
+            }
+        });
+        
+        calendar.render();
+    }
+    
+    // View toggle
+    window.toggleCalendarView = function() {
+        const listView = document.getElementById('listView');
+        const calendarView = document.getElementById('calendarView');
+        const toggleText = document.getElementById('viewToggleText');
+        
+        if (isCalendarView) {
+            listView.style.display = 'block';
+            calendarView.style.display = 'none';
+            toggleText.textContent = 'Visão Calendário';
+            isCalendarView = false;
+        } else {
+            listView.style.display = 'none';
+            calendarView.style.display = 'block';
+            toggleText.textContent = 'Visão Lista';
+            
+            if (!calendar) {
+                initCalendar();
+            } else {
+                calendar.render();
+            }
+            isCalendarView = true;
+        }
+    };
+    
+    // Export functionality
+    window.exportAulas = function() {
+        const rows = document.querySelectorAll('#aulasTableBody tr[style=""]');
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "Data,Tema,Instrutor,Turno,Status\n";
+        
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            const data = cells[0].querySelector('.fw-bold').textContent;
+            const tema = cells[1].querySelector('.fw-bold').textContent;
+            const instrutor = cells[2].textContent.trim();
+            const turno = cells[3].querySelector('.fw-bold').textContent;
+            const status = cells[5].querySelector('.badge').textContent;
+            
+            csvContent += `"${data}","${tema}","${instrutor}","${turno}","${status}"\n`;
+        });
+        
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `aulas_turma_${{'{{ turma.id }}'}}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+    
+    // Edit and delete functions
+    window.editAula = function(aulaId) {
+        // This would open an edit modal or redirect to edit page
+        alert(`Editar aula ${aulaId} - Funcionalidade a ser implementada`);
+    };
+    
+    window.deleteAula = function(aulaId) {
+        if (confirm('Tem certeza que deseja excluir esta aula?')) {
+            // This would make an AJAX request to delete the aula
+            alert(`Excluir aula ${aulaId} - Funcionalidade a ser implementada`);
+        }
+    };
+    
+    console.log('📅 Página de aulas carregada com sucesso!');
+});
+</script>
+{% endblock %}

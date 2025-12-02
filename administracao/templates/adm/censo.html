@@ -1,0 +1,93 @@
+{% extends 'template_new.html' %}
+{% load bootstrap5 %}
+{% block title %}Desenvolve NF - Bem-Estar Animal - Censo{% endblock %}
+{% block css %}{% endblock %}
+{% block nav %}
+{% include 'nav_bemestaranimal.html' %}
+{% endblock %}
+{% block main %}
+<div class="container">
+  <div class="row d-flex mb-3">
+    <div class="col">
+      <h2 class="m-0">Censo</h2>
+    </div>
+    <div class="col d-flex flex-row-reverse">
+      <a href="{% url 'administrativo' %}" class="btn btn-outline-primary mx-2"><i class="fa-solid fa-rotate-left"></i>Voltar</a>
+    </div>
+  </div>
+  <h4>Total de tutores cadastrados: {{tutores}}</h4>
+  <div class="main-card mb-3 mt-3 card">
+    <div id="piechart" style="width: 900px; height: 500px;"></div>
+  </div>
+  <div class="main-card mb-3 card">
+    <div id="columnchart_values" style="width: 900px; height: 500px;"></div>
+  </div>
+  <table class="table">
+    <thead>
+      <th class="text-center">Tutores</th>
+      <th class="text-center">Animais Errantes</th>
+      <th class="text-center">Animais para adoção</th>
+      <th class="text-center">Animais c/ tutor</th>
+    </thead>
+    <tbody>
+      <td class="text-center">{{tutores}}</td>
+      <td class="text-center">{{errantes}}</td>
+      <td class="text-center">{{adocao}}</td>
+      <td class="text-center">{{animais_tutor}}</td>
+    </tbody>
+  </table>
+</div>
+</div>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+  google.charts.load('current', { 'packages': ['corechart'] });
+  google.charts.setOnLoadCallback(drawChart);
+
+  function drawChart() {
+
+    var data = google.visualization.arrayToDataTable([
+      ['Animais', 'Quantidade'],
+      {% for c in castrados %}
+  ['{{c.tipo}}', {{ c.quantidade }}],
+    {% endfor %}
+      ]);
+
+  var options = {
+    title: 'Quantidade de animais c/ tutores castrados e não castrados'
+  };
+
+  var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+  chart.draw(data, options);
+
+
+
+  var data = google.visualization.arrayToDataTable([
+    ["Animais", "Quantidade", { role: "style" }],
+    {% for a in animais %}
+    ["{{a.tipo}}", {{a.quantidade}}, "{{a.color}}"],
+    {% endfor %}
+  ]);
+
+  var view = new google.visualization.DataView(data);
+  view.setColumns([0, 1,
+    {
+      calc: "stringify",
+      sourceColumn: 1,
+      type: "string",
+      role: "annotation"
+    },
+    2]);
+
+  var options = {
+    title: "Quantidade de animais por situação",
+    width: 600,
+    height: 400,
+    bar: { groupWidth: "95%" },
+    legend: { position: "none" },
+  };
+  var chart = new google.visualization.ColumnChart(document.getElementById("columnchart_values"));
+  chart.draw(view, options);
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends 'base_admin_page.html' %}
+{% load bootstrap5 %}
+
+{% block title %}EDITAR INSTITUIÇÃO - CURSOS LIVRES{% endblock %}
+
+<!-- Configurações da página -->
+{% with page_title="Editar Instituição" page_subtitle="Atualizar informações da instituição" page_icon="fas fa-building" show_back_btn=True back_url="adm_instituicoes_listar" show_dashboard_btn=True show_breadcrumb=True show_navigation=True %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item">
+  <a href="{% url 'adm_instituicoes_listar' %}">Instituições</a>
+</li>
+<li class="breadcrumb-item active" aria-current="page">Editar</li>
+{% endblock %}
+
+{% block nav_items %}
+<div class="nav-item">
+  <a href="{% url 'adm_cadastrar_instituicao' %}" class="nav-link">
+    <i class="fa-solid fa-plus me-2"></i>Nova Instituição
+  </a>
+</div>
+<div class="nav-item">
+  <a href="{% url 'adm_instituicoes_listar' %}" class="nav-link active">
+    <i class="fa-regular fa-file-lines me-2"></i>Listar/Editar Instituições
+  </a>
+</div>
+{% endblock %}
+
+{% block card_content %}
+<form method="POST" class="row g-3">
+  {% csrf_token %}
+  
+  <div class="col-12">
+    {% bootstrap_form form %}
+  </div>
+  
+  <div class="col-12">
+    <hr>
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-success">
+        <i class="fas fa-save me-2"></i>
+        Salvar Alterações
+      </button>
+      <a href="{% url 'adm_instituicoes_listar' %}" class="btn btn-secondary">
+        <i class="fas fa-times me-2"></i>
+        Cancelar
+      </a>
+    </div>
+  </div>
+</form>
+{% endblock %}
+
+{% endwith %}

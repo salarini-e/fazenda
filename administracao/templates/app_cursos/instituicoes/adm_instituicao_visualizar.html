@@ -1,0 +1,166 @@
+{% extends 'template_administrativo.html' %}
+{% load static %}
+
+{% block title %}{{ instituicao.nome }} - Visualizar Instituição{% endblock %}
+
+{% block nav_instituicoes_active %}active{% endblock %}
+
+{% block page_icon %}fas fa-university{% endblock %}
+{% block page_title %}{{ instituicao.nome }}{% endblock %}
+{% block page_subtitle %}Detalhes da instituição e cursos oferecidos{% endblock %}
+
+{% block content_actions %}
+<a href="{% url 'adm_instituicoes_listar' %}" class="btn-admin btn-secondary">
+  <i class="fas fa-arrow-left"></i>
+  <span>Voltar às Instituições</span>
+</a>
+<a href="{% url 'adm_instituicoes_editar' instituicao.id %}" class="btn-admin btn-warning">
+  <i class="fas fa-edit"></i>
+  <span>Editar Instituição</span>
+</a>
+{% endblock %}
+
+{% block admin_content %}
+<div class="admin-table">
+  <!-- Card com informações da Instituição -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
+    <div class="card-header" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); color: white; border-radius: 16px 16px 0 0;">
+      <h5 class="mb-0 d-flex align-items-center">
+        <i class="fas fa-university me-3"></i>
+        Informações da Instituição
+      </h5>
+    </div>
+    <div class="card-body p-4">
+      <div class="row">
+        <div class="col-md-6">
+          <table class="table table-borderless">
+            <tr>
+              <th width="30%">Nome:</th>
+              <td><strong>{{ instituicao.nome }}</strong></td>
+            </tr>
+                                <tr>
+                                    <th>Sigla:</th>
+                                    <td><span class="badge bg-info">{{ instituicao.sigla }}</span></td>
+                                </tr>
+                                <tr>
+                                    <th>Local:</th>
+                                    <td>
+                                        {% if instituicao.local %}
+                                            <a href="{% url 'adm_local_visualizar' instituicao.local.id %}" class="text-decoration-none">
+                                                <i class="fas fa-map-marker-alt"></i> {{ instituicao.local.nome }}
+                                            </a>
+                                        {% else %}
+                                            <span class="text-muted">Não informado</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Estatísticas</h6>
+                            <div class="row">
+                                <div class="col-4">
+                                    <div class="card bg-light text-center">
+                                        <div class="card-body">
+                                            <h4 class="text-primary">{{ total_cursos }}</h4>
+                                            <small class="text-muted">Total de Cursos</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="card bg-light text-center">
+                                        <div class="card-body">
+                                            <h4 class="text-success">{{ cursos_ativos }}</h4>
+                                            <small class="text-muted">Cursos Ativos</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="card bg-light text-center">
+                                        <div class="card-body">
+                                            <h4 class="text-warning">{{ total_turmas }}</h4>
+                                            <small class="text-muted">Total de Turmas</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if cursos %}
+                        <hr>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="text-muted mb-0">Cursos desta Instituição</h6>
+                            <a href="{% url 'adm_cursos_cadastrar' %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-plus"></i> Novo Curso
+                            </a>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Categoria</th>
+                                        <th>Carga Horária</th>
+                                        <th>Turmas</th>
+                                        <th>Status</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for curso in cursos %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ curso.nome }}</strong>
+                                                <br>
+                                                <small class="text-muted">{{ curso.sigla }}</small>
+                                            </td>
+                                            <td>
+                                                <span class="badge" style="background-color: {{ curso.categoria.cor }};">
+                                                    {{ curso.categoria.nome }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                {{ curso.carga_horaria }}{% if curso.tipo_carga_horaria == 'h' %}h{% else %}min{% endif %}
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">{{ curso.turma_set.count }}</span>
+                                            </td>
+                                            <td>
+                                                {% if curso.ativo %}
+                                                    <span class="badge bg-success">Ativo</span>
+                                                {% else %}
+                                                    <span class="badge bg-danger">Inativo</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <a href="{% url 'adm_curso_visualizar' curso.id %}" 
+                                                   class="btn btn-sm btn-outline-primary" 
+                                                   title="Visualizar curso">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{% url 'adm_curso_editar' curso.id %}" 
+                                                   class="btn btn-sm btn-outline-warning" 
+                                                   title="Editar curso">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info text-center">
+                            <i class="fas fa-info-circle"></i>
+                            Nenhum curso cadastrado nesta instituição.
+                            <br>
+                            <a href="{% url 'adm_cursos_cadastrar' %}" class="btn btn-primary btn-sm mt-2">
+                                <i class="fas fa-plus"></i> Cadastrar Curso
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+</div>
+{% endblock %}

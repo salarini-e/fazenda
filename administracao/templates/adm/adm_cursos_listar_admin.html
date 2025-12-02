@@ -1,0 +1,542 @@
+{% extends 'template_administrativo.html' %}
+{% load static %}
+
+{% block title %}Cursos - Administração{% endblock %}
+
+{% block nav_cursos_active %}active{% endblock %}
+
+{% block page_icon %}fas fa-graduation-cap{% endblock %}
+{% block page_title %}Gerenciar Cursos{% endblock %}
+{% block page_subtitle %}Administre todos os cursos oferecidos pela instituição{% endblock %}
+{% block page_header_icon %}fas fa-graduation-cap{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'administrativo2' %}">Painel</a></li>
+<li class="breadcrumb-item active" aria-current="page">Cursos</li>
+{% endblock %}
+
+{% block content_title %}Lista de Cursos{% endblock %}
+
+{% block content_actions %}
+<a href="{% url 'administrativo2' %}" class="btn-admin btn-secondary">
+  <i class="fas fa-arrow-left me-2"></i>Voltar ao Painel
+</a>
+<a href="{% url 'adm_cursos_cadastrar' %}" class="btn-admin">
+  <i class="fas fa-plus me-2"></i>Novo Curso
+</a>
+{% endblock %}
+
+{% block content_body %}
+<!-- Filtros -->
+<div class="filters-section mb-4">
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="filter-group">
+        <label class="filter-label">
+          <i class="fas fa-filter me-2"></i>Filtrar por Status
+        </label>
+        <select class="form-select" id="statusFilter">
+          <option value="">Todos os status</option>
+          <option value="ativo">Ativo</option>
+          <option value="inativo">Inativo</option>
+          <option value="rascunho">Rascunho</option>
+        </select>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="filter-group">
+        <label class="filter-label">
+          <i class="fas fa-tags me-2"></i>Filtrar por Categoria
+        </label>
+        <select class="form-select" id="categoryFilter">
+          <option value="">Todas as categorias</option>
+          {% for categoria in categorias %}
+          <option value="{{ categoria.id }}" data-color="{{ categoria.cor|default:'#6366f1' }}" data-icon="{{ categoria.icone|default:'fas fa-tag' }}">
+            {{ categoria.nome }} ({{ categoria.curso_set.count }} curso{{ categoria.curso_set.count|pluralize:",s" }})
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="filter-group">
+        <label class="filter-label">
+          <i class="fas fa-search me-2"></i>Buscar
+        </label>
+        <input type="text" class="form-control" id="searchFilter" placeholder="Digite o nome do curso...">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="table-responsive">
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th><i class="fas fa-graduation-cap me-2"></i>Curso</th>
+        <th><i class="fas fa-tag me-2"></i>Categoria</th>
+        <th><i class="fas fa-clock me-2"></i>Duração</th>
+        <th><i class="fas fa-users me-2"></i>Turmas</th>
+        <th><i class="fas fa-toggle-on me-2"></i>Status</th>
+        <th class="text-center"><i class="fas fa-cogs me-2"></i>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for curso in cursos %}
+      <tr data-status="{{ curso.status|default:'ativo' }}" data-category="{{ curso.categoria.id|default:'' }}">
+        <td>
+          <div class="d-flex align-items-center">
+            <div class="me-3">
+              {% if curso.banner %}
+                <img src="{{ curso.banner.url }}" alt="{{ curso.nome }}" 
+                     class="course-image">
+              {% else %}
+                <div class="icon-circle bg-primary">
+                  <i class="fas fa-graduation-cap"></i>
+                </div>
+              {% endif %}
+            </div>
+            <div>
+              <div class="fw-bold">{{ curso.nome }}</div>
+              {% if curso.descricao %}
+                <small class="text-muted">{{ curso.descricao|truncatechars:60 }}</small>
+              {% endif %}
+              {% if curso.modalidade %}
+                <div class="mt-1">
+                  <span class="badge bg-info">{{ curso.modalidade }}</span>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </td>
+        <td>
+          {% if curso.categoria %}
+            <div class="d-flex align-items-center">
+              <div class="category-color" style="background: {{ curso.categoria.cor|default:'#6366f1' }};"></div>
+              <span>{{ curso.categoria.nome }}</span>
+            </div>
+          {% else %}
+            <span class="text-muted">
+              <i class="fas fa-minus me-1"></i>
+              Sem categoria
+            </span>
+          {% endif %}
+        </td>
+        <td>
+          {% if curso.carga_horaria %}
+            <span class="badge bg-primary">
+              <i class="fas fa-clock me-1"></i>
+              {{ curso.carga_horaria }}h
+            </span>
+          {% else %}
+            <span class="text-muted">
+              <i class="fas fa-question me-1"></i>
+              Não definida
+            </span>
+          {% endif %}
+        </td>
+        <td>
+          {% if curso.turma_set.count > 0 %}
+            <span class="badge bg-success">
+              <i class="fas fa-users me-1"></i>
+              {{ curso.turma_set.count }} turma{{ curso.turma_set.count|pluralize:",s" }}
+            </span>
+          {% else %}
+            <span class="badge bg-warning">
+              <i class="fas fa-exclamation me-1"></i>
+              Sem turmas
+            </span>
+          {% endif %}
+        </td>
+        <td>
+          {% if curso.ativo %}
+            <span class="status-badge status-active">
+              <i class="fas fa-check-circle"></i>
+              Ativo
+            </span>
+          {% else %}
+            <span class="status-badge status-inactive">
+              <i class="fas fa-times-circle"></i>
+              Inativo
+            </span>
+          {% endif %}
+        </td>
+        <td class="text-center">
+          <div class="btn-group" role="group" aria-label="Ações">
+            <a href="{% url 'adm_curso_detalhes' curso.id %}" 
+               class="table-action-btn btn-sm btn-outline-info" 
+               title="Ver detalhes">
+              <i class="fas fa-eye"></i>
+            </a>
+            <a href="{% url 'adm_curso_editar' curso.id %}" 
+               class="table-action-btn btn-sm btn-outline-primary" 
+               title="Editar curso">
+              <i class="fas fa-edit"></i>
+            </a>
+            <a href="{% url 'excluir_curso' curso.id %}" 
+               class="table-action-btn btn-sm btn-outline-danger" 
+               title="Excluir curso"
+               onclick="return confirm('⚠️ Tem certeza que deseja excluir o curso &quot;{{ curso.nome }}&quot;?\n\n{% if curso.turma_set.count > 0 %}Este curso possui {{ curso.turma_set.count }} turma(s) ativa(s).{% endif %}\n\nEsta ação não pode ser desfeita.')">>
+              <i class="fas fa-trash"></i>
+            </a>
+          </div>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="6" class="text-center py-5">
+          <div class="empty-state">
+            <div class="empty-state-icon">
+              <i class="fas fa-graduation-cap"></i>
+            </div>
+            <h5 class="mt-3">Nenhum curso cadastrado</h5>
+            <p class="text-muted">Comece cadastrando o primeiro curso para oferecer aos seus alunos.</p>
+            <a href="{% url 'adm_cursos_cadastrar' %}" class="btn btn-primary">
+              <i class="fas fa-plus me-2"></i>Cadastrar Primeiro Curso
+            </a>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+
+{% block additional_content %}
+<!-- Statistics Cards -->
+{% if cursos %}
+<div class="container-fluid mt-4">
+  <div class="row g-3">
+    <div class="col-md-3">
+      <div class="card bg-primary bg-gradient text-white">
+        <div class="card-body text-center">
+          <i class="fas fa-graduation-cap fa-2x mb-2"></i>
+          <h4 class="mb-0">{{ cursos|length }}</h4>
+          <small>{{ cursos|length|pluralize:"Curso,Cursos" }} cadastrado{{ cursos|length|pluralize:",s" }}</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-success bg-gradient text-white">
+        <div class="card-body text-center">
+          <i class="fas fa-check-circle fa-2x mb-2"></i>
+          <h4 class="mb-0">
+            {% with ativos=0 %}
+              {% for curso in cursos %}
+                {% if curso.ativo %}
+                  {% widthratio 1 1 1 as one %}
+                  {{ ativos|add:one }}
+                {% endif %}
+              {% endfor %}
+            {% endwith %}
+          </h4>
+          <small>Cursos ativos</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-warning bg-gradient text-white">
+        <div class="card-body text-center">
+          <i class="fas fa-users fa-2x mb-2"></i>
+          <h4 class="mb-0">
+            {% with total_turmas=0 %}
+              {% for curso in cursos %}
+                {% widthratio curso.turma_set.count 1 1 as turmas %}
+                {{ total_turmas|add:turmas }}
+              {% endfor %}
+            {% endwith %}
+          </h4>
+          <small>Turmas criadas</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card bg-info bg-gradient text-white">
+        <div class="card-body text-center">
+          <i class="fas fa-clock fa-2x mb-2"></i>
+          <h4 class="mb-0">
+            {% with total_horas=0 %}
+              {% for curso in cursos %}
+                {% if curso.carga_horaria %}
+                  {% widthratio curso.carga_horaria 1 1 as horas %}
+                  {{ total_horas|add:horas }}
+                {% endif %}
+              {% endfor %}
+            {% endwith %}
+          </h4>
+          <small>Horas de conteúdo</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+
+<style>
+.filters-section {
+  background: rgba(248, 249, 250, 0.8);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.filter-group {
+  margin-bottom: 0;
+}
+
+.filter-label {
+  display: block;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+/* Estilização do select de categorias */
+#categoryFilter {
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+#categoryFilter:focus {
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+  border-color: #8b5cf6;
+}
+
+#categoryFilter option[data-color] {
+  padding: 8px 12px;
+  margin: 2px 0;
+}
+
+/* Estilo especial para quando uma categoria está selecionada */
+#categoryFilter.has-category {
+  background: linear-gradient(90deg, var(--selected-color, #f8fafc) 0%, #f8fafc 100%);
+}
+
+/* Tooltip para categorias */
+.category-option-preview {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.course-image {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.icon-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.category-color {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  margin-right: 0.5rem;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: 2px solid transparent;
+}
+
+.status-active {
+  background: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+  border-color: rgba(34, 197, 94, 0.2);
+}
+
+.status-inactive {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.empty-state {
+  padding: 3rem 1rem;
+}
+
+.empty-state-icon {
+  font-size: 4rem;
+  color: #6c757d;
+  opacity: 0.5;
+}
+
+.table-action-btn {
+  padding: 0.375rem 0.75rem;
+  margin: 0 0.125rem;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.table-action-btn:hover {
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+/* Animações */
+.card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.table tbody tr {
+  transition: all 0.2s ease;
+}
+
+.table tbody tr:hover {
+  transform: translateX(3px);
+}
+
+@media (max-width: 768px) {
+  .filters-section .row {
+    gap: 1rem;
+  }
+  
+  .btn-group {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .table-action-btn {
+    justify-content: center;
+    width: 100%;
+  }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Sistema de filtros
+    const statusFilter = document.getElementById('statusFilter');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const searchFilter = document.getElementById('searchFilter');
+    const tableRows = document.querySelectorAll('.table tbody tr[data-status]');
+
+    function applyFilters() {
+        const statusValue = statusFilter.value.toLowerCase();
+        const categoryValue = categoryFilter.value;
+        const searchValue = searchFilter.value.toLowerCase();
+
+        tableRows.forEach(row => {
+            const rowStatus = row.getAttribute('data-status').toLowerCase();
+            const rowCategory = row.getAttribute('data-category');
+            const rowText = row.textContent.toLowerCase();
+
+            const statusMatch = !statusValue || rowStatus.includes(statusValue);
+            const categoryMatch = !categoryValue || rowCategory === categoryValue;
+            const searchMatch = !searchValue || rowText.includes(searchValue);
+
+            if (statusMatch && categoryMatch && searchMatch) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Atualizar contador de resultados
+        const visibleRows = Array.from(tableRows).filter(row => row.style.display !== 'none');
+        console.log(`📊 Mostrando ${visibleRows.length} de ${tableRows.length} cursos`);
+    }
+
+    // Event listeners para filtros
+    if (statusFilter) statusFilter.addEventListener('change', applyFilters);
+    if (categoryFilter) categoryFilter.addEventListener('change', applyFilters);
+    if (searchFilter) searchFilter.addEventListener('input', applyFilters);
+
+    // Melhorar visualização do select de categorias
+    const categorySelect = document.getElementById('categoryFilter');
+    if (categorySelect) {
+        // Função para atualizar visual do select baseado na seleção
+        function updateCategorySelectStyle() {
+            const selectedOption = categorySelect.options[categorySelect.selectedIndex];
+            const color = selectedOption.getAttribute('data-color');
+            
+            if (color && categorySelect.value) {
+                categorySelect.style.borderLeftColor = color;
+                categorySelect.style.borderLeftWidth = '4px';
+                categorySelect.style.borderLeftStyle = 'solid';
+                categorySelect.style.setProperty('--selected-color', color + '20');
+                categorySelect.classList.add('has-category');
+            } else {
+                categorySelect.style.borderLeft = '';
+                categorySelect.style.removeProperty('--selected-color');
+                categorySelect.classList.remove('has-category');
+            }
+        }
+        
+        // Aplicar quando mudar a seleção
+        categorySelect.addEventListener('change', updateCategorySelectStyle);
+        
+        // Aplicar na inicialização se já houver valor selecionado
+        updateCategorySelectStyle();
+        
+        // Melhorar a apresentação das opções (quando suportado pelo navegador)
+        if ('showPicker' in HTMLSelectElement.prototype) {
+            // Adicionar indicadores visuais para browsers modernos
+            const style = document.createElement('style');
+            style.textContent = `
+                #categoryFilter option[data-color] {
+                    background: linear-gradient(90deg, var(--option-color, transparent) 0%, var(--option-color, transparent) 8px, white 8px);
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Aplicar cores individuais às opções
+            const options = categorySelect.querySelectorAll('option[data-color]');
+            options.forEach(option => {
+                const color = option.getAttribute('data-color');
+                option.style.setProperty('--option-color', color);
+            });
+        }
+    }
+
+    // Inicializar tooltips
+    document.querySelectorAll('[title]').forEach(function(element) {
+        if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+            new bootstrap.Tooltip(element);
+        }
+    });
+
+    // Animação das estatísticas
+    const statCards = document.querySelectorAll('.col-md-3 .card');
+    statCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, 200 + (index * 100));
+    });
+
+    console.log('🎓 Página de Cursos carregada com sucesso!');
+});
+</script>
+{% endblock %}

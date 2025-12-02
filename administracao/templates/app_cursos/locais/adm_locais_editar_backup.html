@@ -1,0 +1,116 @@
+{% extends 'template_new.html' %}
+{% load bootstrap5 %}
+{% load static%}
+{% block title %}BEM VINDO - CURSOS LIVRES{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/administrativo.css' %}">
+
+{% endblock %}
+{% block administrativo %}fw-bold{% endblock %}
+{% block main %}
+<div class="row">
+    <div class="col d-flex py-5"> 
+        <div class="row w-100">
+            <div class="col-10 pb-4 m-auto bg-white">
+                             
+                <div class="row">
+                    <div class="col text-dark px-4 pt-4">
+                       <div class="row">
+                        <div class="col">
+                          <h1 class="text-uppercase">
+                            Painel -> Locais
+                          </h1>
+                        </div>
+                        <div class="col d-flex">
+                            <a href="{% url 'administrativo2' %}" class="btn btn-dark ms-auto my-auto">
+                              PAINEL
+                            </a>
+                        </div>
+                       </div>
+                        <div class="row px-2 pt-2 d-flex">
+                            <div class="col px-0 painel">
+                                <a href="{% url 'cadastrar_local' %}"><i class="fa-solid fa-plus me-3"></i>NOVO LOCAL</a>
+                                <a href="{% url 'adm_locais_listar' %}" class="ativo"><i class="fa-regular fa-file-lines me-3"></i>LISTAR/EDITAR LOCAIS</a>
+                            </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-12 pt-4">
+                            <div class="row">
+                              <div class="col d-flex flex-row-reverse">
+                                <div>
+                                  <a class="ms-auto btn btn-outline-dark" href="{% url 'adm_locais_listar' %}">
+                                    <i class="fas fa-undo-alt me-2"></i> Voltar
+                                  </a>
+                                  <a class="ms-auto btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#excluir">
+                                    <i class="fa-solid fa-trash-can"></i> Apagar
+                                  </a>
+                                </div>
+                              </div>
+                            </div>
+                            <form class="row px-2" method="POST">
+                              <div class="col-12">
+                                <div class="w-100 h-100">
+                                  {% csrf_token %}
+                                  {% bootstrap_form form %}
+                                </div>
+                              </div>                              
+                              
+                              <button class="btn btn-outline-primary mt-3">
+                                  Editar
+                              </button>
+                          </form>
+                          </div>                          
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>    
+    </div>
+</div>
+
+
+  <div class="modal fade" id="excluir" aria-hidden="true" aria-labelledby="excluirLabel" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-danger border-0">
+          <h5 class="modal-title text-dark text-center" id="excluirLabel">ATENÇÃO</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-dark border-0 pt-5">            
+            <p class="text-center"><b>Tem certeza que deseja excluir este registro?</b></p>
+        </div>
+        <div class="modal-footer border-0">
+          <a href="{% url 'adm_locais_excluir' local.id %}" class="btn btn-danger">Sim, tenho certeza.</a>
+        </div>
+      </div>
+    </div>
+  </div> 
+  <script>
+  
+  function icpf(v){
+        v=v.replace(/\D/g,"")                    //Remove tudo o que nao e digito
+        v=v.replace(/(\d{3})(\d)/,"$1.$2")       //Coloca um ponto entre o segundo e terceiro digitos
+        v=v.replace(/(\d{3})(\d)/,"$1.$2")       //Coloca um ponto entre o quinto e o sexto digitos
+        v=v.replace(/(\d{3})(\d)/,"$1-$2")       //Coloca um ponto entre o quinto e o sexto digitos
+        // v=v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, "$1.$2.$3/$4-$5")
+        return v
+    }
+    function icelular(v){
+        v=v.replace(/\D/g,"")                 //Remove tudo o que nao e digito
+        v=v.replace(/^(\d\d)(\d)/g,"($1) $2") //Coloca parenteses em volta dos dois primeiros digitos
+        v=v.replace(/(\d{5})(\d)/,"$1-$2")    //Coloca hifen entre o quarto e o quinto digitos
+        return v
+    }
+    function mascara(o,f){
+        v_obj=o
+        v_fun=f
+        setTimeout("execmascara()",1)
+    }            
+    function execmascara(){
+        v_obj.value=v_fun(v_obj.value)
+    }
+
+
+   
+  </script>
+{% endblock %}

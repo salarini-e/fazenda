@@ -1,0 +1,45 @@
+{% extends 'template_new.html' %}
+{% load bootstrap5 %}
+{% block title %}Desenvolve NF - Bem-Estar Animal - Censo{% endblock %}
+{% block css %}{% endblock %}
+{% block nav %}
+{% include 'nav_bemestaranimal.html' %}
+{% endblock %}
+{% block main %}
+<div class="container">
+<div class="row">
+    <div class="col">
+        <h2>Listar tutores</h2>
+        <p>Total de tutores: {{qntd}}</p>
+        <table class=" pt-5 table table-hover">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Telefone</th>
+                    <th>Data de nascimento</th>
+                    <th>Endereço</th>
+                    <th>Bairro</th>
+                    <th>Tipo de moradia</th>
+                    <th>Qntd. animais</th>
+                    <th class="text-center">Visualizar animais</th>
+                </tr>
+            </thead>
+            {% for tutor in tutores %}
+                <tr>
+                    <td>{{tutor.pessoa.nome}}</td>
+                    <td>{{tutor.pessoa.telefone}}</td>
+                    <td>{{tutor.pessoa.dt_nascimento}}</td>
+                    <td>{{tutor.pessoa.endereco}}</td>
+                    <td>{{tutor.pessoa.bairro}}</td>
+                    <td>{{tutor.tipo_de_moradia}}</td>
+                    <td class="text-center">{{tutor.num}}</td>
+                    <td class="text-center"><a href="{% url 'listar_animais_tutor' tutor.id %}"><i class="fa-solid fa-eye"></i></a></td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+</div>
+<script>
+</script>
+{% endblock %}

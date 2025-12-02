@@ -1,0 +1,76 @@
+{% extends 'template_administrativo.html' %}
+{% load bootstrap5 %}
+{% load static %}
+
+{% block title %}{% if CADASTRAR == 'NOVO' %}Nova Categoria{% else %}Editar Categoria{% endif %} - Administração{% endblock %}
+
+{% block nav_categorias_active %}active{% endblock %}
+
+{% block page_icon %}fas fa-tags{% endblock %}
+{% block page_title %}{% if CADASTRAR == 'NOVO' %}Nova Categoria{% else %}Editar Categoria{% endif %}{% endblock %}
+{% block page_subtitle %}{% if CADASTRAR == 'NOVO' %}Cadastre uma nova categoria de cursos{% else %}Edite as informações da categoria{% endif %}{% endblock %}
+{% block page_header_icon %}fas fa-tags{% endblock %}
+
+{% block content_actions %}
+<a href="{% url 'adm_categorias_listar' %}" class="btn-admin btn-secondary">
+  <i class="fas fa-arrow-left"></i>
+  <span>Voltar à Lista</span>
+</a>
+{% endblock %}
+
+{% block admin_content %}
+<div class="card border-0 shadow-sm" style="border-radius: 16px; overflow: hidden;">
+  <div class="card-header" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); color: white; padding: 2rem;">
+    <h4 class="mb-0" style="font-weight: 600;">
+      <i class="fas fa-{% if CADASTRAR == 'NOVO' %}plus{% else %}edit{% endif %} me-2"></i>
+      Informações da Categoria
+    </h4>
+  </div>
+  <div class="card-body" style="padding: 2rem;">
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      
+      <div class="django-bootstrap5">
+        {% bootstrap_form form %}
+      </div>
+      
+      <div class="d-flex justify-content-between align-items-center mt-4 pt-3" style="border-top: 1px solid var(--gray-200);">
+        <a href="{% url 'adm_categorias_listar' %}" class="btn btn-outline-secondary">
+          <i class="fas fa-arrow-left me-2"></i>Voltar à Lista
+        </a>
+        <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); border: none;">
+          <i class="fas fa-save me-2"></i>{{CADASTRAR}} Categoria
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block admin_javascript %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Form validation enhancement
+  document.querySelector('form').addEventListener('submit', function(e) {
+    const requiredFields = document.querySelectorAll('[required]');
+    let hasError = false;
+    
+    requiredFields.forEach(field => {
+      if (!field.value.trim()) {
+        field.classList.add('is-invalid');
+        hasError = true;
+      } else {
+        field.classList.remove('is-invalid');
+      }
+    });
+    
+    if (hasError) {
+      e.preventDefault();
+      alert('Por favor, preencha todos os campos obrigatórios.');
+    }
+  });
+
+  console.log('🏷️ Formulário de Categoria carregado com sucesso!');
+});
+</script>
+{% endblock %}

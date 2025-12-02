@@ -1,0 +1,235 @@
+{% extends 'template_administrativo.html' %}
+{% load static %}
+
+{% block title %}Excluir Local - Administração{% endblock %}
+
+{% block nav_locais_active %}active{% endblock %}
+
+{% block page_icon %}fas fa-trash{% endblock %}
+{% block page_title %}Confirmar Exclusão{% endblock %}
+{% block page_subtitle %}Você está prestes a excluir o local "{{ local.nome }}"{% endblock %}
+{% block page_header_icon %}fas fa-exclamation-triangle{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'administrativo2' %}">Painel</a></li>
+<li class="breadcrumb-item"><a href="{% url 'adm_locais_listar' %}">Locais</a></li>
+<li class="breadcrumb-item active" aria-current="page">Excluir: {{ local.nome }}</li>
+{% endblock %}
+
+{% block content_title %}Confirmar Exclusão do Local{% endblock %}
+
+{% block content_actions %}
+<a href="{% url 'adm_locais_listar' %}" class="btn-admin btn-secondary">
+  <i class="fas fa-arrow-left"></i>
+  <span>Voltar à Lista</span>
+</a>
+{% endblock %}
+
+{% block content_body %}
+<div class="danger-zone">
+  <div class="warning-banner">
+    <i class="fas fa-exclamation-triangle"></i>
+    <div>
+      <h3>⚠️ Atenção: Esta ação não pode ser desfeita!</h3>
+      <p>Ao excluir este local, todas as informações relacionadas serão perdidas permanentemente.</p>
+    </div>
+  </div>
+
+  <div class="local-info-card">
+    <div class="local-header">
+      <div class="local-icon">
+        <i class="fas fa-building"></i>
+      </div>
+      <div class="local-details">
+        <h2>{{ local.nome }}</h2>
+        {% if local.descricao %}
+          <p class="description">{{ local.descricao }}</p>
+        {% endif %}
+        <div class="meta-info">
+          {% if local.endereco %}
+            <span class="meta-item">
+              <i class="fas fa-map-marker-alt"></i>
+              {{ local.endereco }}
+            </span>
+          {% endif %}
+          {% if local.capacidade %}
+            <span class="meta-item">
+              <i class="fas fa-users"></i>
+              {{ local.capacidade }} pessoas
+            </span>
+          {% endif %}
+          {% if local.created_at %}
+            <span class="meta-item">
+              <i class="fas fa-calendar-plus"></i>
+              Criado em {{ local.created_at|date:"d/m/Y" }}
+            </span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="impact-analysis">
+    <h3><i class="fas fa-chart-line me-2"></i>Análise de Impacto</h3>
+    <div class="impact-grid">
+      <div class="impact-card">
+        <i class="fas fa-graduation-cap"></i>
+        <div>
+          <h4>0</h4>
+          <p>Cursos vinculados</p>
+          <small>Serão desvinculados</small>
+        </div>
+      </div>
+      <div class="impact-card">
+        <i class="fas fa-calendar-alt"></i>
+        <div>
+          <h4>0</h4>
+          <p>Eventos futuros</p>
+          <small>Serão cancelados</small>
+        </div>
+      </div>
+      <div class="impact-card">
+        <i class="fas fa-users"></i>
+        <div>
+          <h4>0</h4>
+          <p>Inscrições ativas</p>
+          <small>Serão afetadas</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="confirmation-section">
+    <h3><i class="fas fa-check-circle me-2"></i>Confirmação</h3>
+    <p>Para confirmar a exclusão, digite <strong>"{{ local.nome }}"</strong> no campo abaixo:</p>
+    
+    <form method="POST" id="delete-form" class="confirmation-form">
+      {% csrf_token %}
+      <div class="form-group">
+        <input type="text" id="confirmation-input" class="form-control" 
+               placeholder="Digite o nome do local para confirmar" required>
+        <div class="form-feedback" id="confirmation-feedback"></div>
+      </div>
+      
+      <div class="form-actions">
+        <a href="{% url 'adm_locais_listar' %}" class="btn-admin btn-secondary">
+          <i class="fas fa-times"></i>
+          Cancelar
+        </a>
+        <button type="submit" id="confirm-delete-btn" class="btn-admin btn-danger" disabled>
+          <i class="fas fa-trash"></i>
+          Confirmar Exclusão
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="alternatives">
+    <h3><i class="fas fa-lightbulb me-2"></i>Alternativas</h3>
+    <div class="alternative-options">
+      <a href="{% url 'adm_locais_editar' local.id %}" class="alternative-card">
+        <i class="fas fa-edit"></i>
+        <div>
+          <h4>Editar Local</h4>
+          <p>Modifique as informações do local em vez de excluí-lo</p>
+        </div>
+        <i class="fas fa-arrow-right"></i>
+      </a>
+      
+      <div class="alternative-card disabled">
+        <i class="fas fa-archive"></i>
+        <div>
+          <h4>Arquivar Local</h4>
+          <p>Manter o local mas marcá-lo como inativo (em breve)</p>
+        </div>
+        <i class="fas fa-lock"></i>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block admin_javascript %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const localName = '{{ local.nome }}';
+    const confirmationInput = document.getElementById('confirmation-input');
+    const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+    const confirmationFeedback = document.getElementById('confirmation-feedback');
+    const deleteForm = document.getElementById('delete-form');
+    
+    // Validação em tempo real
+    confirmationInput.addEventListener('input', function() {
+        const inputValue = this.value.trim();
+        
+        if (inputValue === localName) {
+            confirmDeleteBtn.disabled = false;
+            confirmDeleteBtn.classList.add('enabled');
+            confirmationFeedback.innerHTML = '<i class="fas fa-check text-success"></i> Nome confirmado';
+            confirmationFeedback.className = 'form-feedback success';
+        } else if (inputValue.length > 0) {
+            confirmDeleteBtn.disabled = true;
+            confirmDeleteBtn.classList.remove('enabled');
+            confirmationFeedback.innerHTML = '<i class="fas fa-times text-danger"></i> Nome não confere';
+            confirmationFeedback.className = 'form-feedback error';
+        } else {
+            confirmDeleteBtn.disabled = true;
+            confirmDeleteBtn.classList.remove('enabled');
+            confirmationFeedback.innerHTML = '';
+            confirmationFeedback.className = 'form-feedback';
+        }
+    });
+    
+    // Confirmação final
+    deleteForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const finalConfirmation = confirm(
+            '🗑️ ÚLTIMA CONFIRMAÇÃO\n\n' +
+            'Tem absoluta certeza que deseja excluir o local "' + localName + '"?\n\n' +
+            'Esta ação é IRREVERSÍVEL e pode causar problemas em:\n' +
+            '• Cursos vinculados a este local\n' +
+            '• Eventos agendados\n' +
+            '• Inscrições de alunos\n\n' +
+            'Clique em "OK" apenas se tiver certeza absoluta.'
+        );
+        
+        if (finalConfirmation) {
+            // Mostrar loading
+            confirmDeleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Excluindo...';
+            confirmDeleteBtn.disabled = true;
+            
+            // Submeter o formulário
+            this.submit();
+        }
+    });
+    
+    // Animações de entrada
+    const dangerZone = document.querySelector('.danger-zone');
+    dangerZone.style.opacity = '0';
+    dangerZone.style.transform = 'translateY(20px)';
+    dangerZone.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    
+    setTimeout(() => {
+        dangerZone.style.opacity = '1';
+        dangerZone.style.transform = 'translateY(0)';
+    }, 200);
+    
+    // Destacar elementos importantes com animação
+    const warningBanner = document.querySelector('.warning-banner');
+    setInterval(() => {
+        warningBanner.style.transform = 'scale(1.02)';
+        setTimeout(() => {
+            warningBanner.style.transform = 'scale(1)';
+        }, 200);
+    }, 3000);
+    
+    // Foco no campo de confirmação
+    setTimeout(() => {
+        confirmationInput.focus();
+    }, 1000);
+    
+    console.log('🗑️ Página de confirmação de exclusão carregada!');
+});
+</script>
+{% endblock %}

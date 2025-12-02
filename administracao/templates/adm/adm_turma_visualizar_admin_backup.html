@@ -1,0 +1,1374 @@
+{% extends 'template_administrativo.html' %}
+{% load static %}
+{% load custom %}
+{% load extras %}
+
+{% block title %}Turma {{ turma.id }} - {{ turma.curso.nome }}{% endblock %}
+
+{% block nav_turmas_active %}active{% endblock %}
+
+{% block page_icon %}fas fa-users{% endblock %}
+{% block page_title %}Turma {{ turma.id }}{% endblock %}
+{% block page_subtitle %}{{ turma.curso.nome }}{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'adm_turmas_listar' %}">Turmas</a></li>
+<li class="breadcrumb-item active" aria-current="page">Turma {{ turma.id }}</li>
+{% endblock %}
+
+{% block content_title %}
+{% if is_cheio %}
+<span class="text-danger">
+  <i class="fas fa-exclamation-triangle me-2"></i>
+  Turma Cheia
+</span>
+{% else %}
+Detalhes da Turma
+{% endif %}
+{% endblock %}
+
+{% block content_actions %}
+<a href="{% url 'adm_turmas_listar' %}" class="btn-admin btn-secondary">
+  <i class="fas fa-arrow-left"></i>
+  Voltar
+</a>
+<a href="{% url 'adm_turma_editar' turma.id %}" class="btn-admin">
+  <i class="fas fa-edit"></i>
+  Editar
+</a>
+{% if turma.status == 'enc' %}
+<a href="{% url 'gerar_certificados' turma.id %}" class="btn-admin btn-success">
+  <i class="fas fa-certificate"></i>
+  Gerar Certificados
+</a>
+{% endif %}
+{% if realocar %}
+<a href="{% url 'adm_turma_realocar' turma.id %}" class="btn-admin btn-warning">
+  <i class="fas fa-user-plus"></i>
+  Realocar Alunos
+</a>
+{% endif %}
+{% endblock %}
+
+{% block content_body %}
+<!-- Status Card -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="alert 
+      {% if turma.status == 'ati' %}alert-success
+      {% elif turma.status == 'pre' %}alert-warning
+      {% elif turma.status == 'enc' %}alert-dark
+      {% elif turma.status == 'acc' %}alert-info
+      {% else %}alert-secondary
+      {% endif %} 
+      d-flex align-items-center">
+      <i class="fas 
+        {% if turma.status == 'ati' %}fa-play-circle
+        {% elif turma.status == 'pre' %}fa-clock
+        {% elif turma.status == 'enc' %}fa-stop-circle
+        {% elif turma.status == 'acc' %}fa-user-plus
+        {% else %}fa-pause-circle
+        {% endif %} 
+        fa-2x me-3"></i>
+      <div>
+        <h5 class="mb-1">
+          Status: 
+          {% if turma.status == 'pre' %}Pré-inscrição
+          {% elif turma.status == 'ati' %}Ativa
+          {% elif turma.status == 'agu' %}Aguardando
+          {% elif turma.status == 'acc' %}Ativa e Aceitando Candidatos
+          {% elif turma.status == 'enc' %}Encerrada
+          {% endif %}
+        </h5>
+        <p class="mb-0">
+          {% if is_cheio %}
+            <span class="text-danger fw-bold">⚠️ Turma lotada - {{ qnt_alunos }}/{{ turma.quantidade_permitido }} alunos</span>
+          {% else %}
+            {{ qnt_alunos }}/{{ turma.quantidade_permitido }} alunos matriculados
+          {% endif %}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+  <div class="col-md-3">
+    <div class="card border-0" style="background: linear-gradient(135deg, #e3f2fd, #bbdefb); border-radius: 16px;">
+      <div class="card-body text-center">
+        <i class="fas fa-user-graduate fa-2x text-primary mb-2"></i>
+        <h4 class="text-primary mb-0">{{ qnt_alunos }}</h4>
+        <small class="text-muted">Alunos Matriculados</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0" style="background: linear-gradient(135deg, #fff3e0, #ffe0b2); border-radius: 16px;">
+      <div class="card-body text-center">
+        <i class="fas fa-hourglass-half fa-2x text-warning mb-2"></i>
+        <h4 class="text-warning mb-0">{{ qnt_alunos_espera }}</h4>
+        <small class="text-muted">Em Lista de Espera</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0" style="background: linear-gradient(135deg, #e8f5e8, #c8e6c9); border-radius: 16px;">
+      <div class="card-body text-center">
+        <i class="fas fa-chalkboard fa-2x text-success mb-2"></i>
+        <h4 class="text-success mb-0">{{ total_aulas }}</h4>
+        <small class="text-muted">Total de Aulas</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0" style="background: linear-gradient(135deg, #fce4ec, #f8bbd9); border-radius: 16px;">
+      <div class="card-body text-center">
+        <i class="fas fa-percentage fa-2x text-danger mb-2"></i>
+        <h4 class="text-danger mb-0">
+          {% if turma.quantidade_permitido > 0 %}
+            {{ qnt_alunos|mul:100|div:turma.quantidade_permitido|floatformat:0 }}%
+          {% else %}
+            0%
+          {% endif %}
+        </h4>
+        <small class="text-muted">Taxa de Ocupação</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Actions -->
+{% if turma.status == 'ati' or turma.status == 'acc' %}
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0" style="background: linear-gradient(135deg, #f3e5f5, #e1bee7); border-radius: 16px;">
+      <div class="card-body">
+        <h6 class="card-title text-purple fw-bold mb-3">
+          <i class="fas fa-bolt me-2"></i>
+          Ações Rápidas
+        </h6>
+        <div class="d-flex gap-3 flex-wrap">
+          <a href="{% url 'adm_aulas_listar' turma.id %}" class="btn btn-outline-primary btn-sm">
+            <i class="fas fa-calendar-alt me-1"></i>
+            Gerenciar Aulas
+          </a>
+          <a href="{% url 'adm_turno_cadastrar' turma.id %}" class="btn btn-outline-info btn-sm">
+            <i class="fas fa-clock me-1"></i>
+            Configurar Horários
+          </a>
+          {% if is_cheio and matriculas_selecionados or is_cheio and matriculas_candidatos %}
+          <a href="{% url 'adm_turma_realocar' turma.id %}" class="btn btn-outline-warning btn-sm">
+            <i class="fas fa-exchange-alt me-1"></i>
+            Realocar Candidatos
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Turma Details -->
+<div class="row">
+  <div class="col-lg-8">
+    <!-- Course Information -->
+    <div class="admin-content-card mb-4">
+      <div class="content-card-header">
+        <h5>
+          <i class="fas fa-info-circle me-2"></i>
+          Informações do Curso
+        </h5>
+      </div>
+      <div class="content-card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="info-item mb-3">
+              <label class="info-label">Curso:</label>
+              <span class="info-value">{{ turma.curso.nome }}</span>
+            </div>
+            <div class="info-item mb-3">
+              <label class="info-label">Código da Turma:</label>
+              <span class="info-value badge bg-primary">{{ turma.id }}</span>
+            </div>
+            <div class="info-item mb-3">
+              <label class="info-label">Categoria:</label>
+              <span class="info-value">{{ turma.curso.categoria.nome }}</span>
+            </div>
+            <div class="info-item mb-3">
+              <label class="info-label">Local:</label>
+              <span class="info-value">
+                <i class="fas fa-map-marker-alt text-danger me-1"></i>
+                {{ turma.local }}
+              </span>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="info-item mb-3">
+              <label class="info-label">Data de Início:</label>
+              <span class="info-value">{{ turma.data_inicio|date:"d/m/Y" }}</span>
+            </div>
+            <div class="info-item mb-3">
+              <label class="info-label">Data de Término:</label>
+              <span class="info-value">{{ turma.data_final|date:"d/m/Y" }}</span>
+            </div>
+            <div class="info-item mb-3">
+              <label class="info-label">Faixa Etária:</label>
+              <span class="info-value">
+                {% if turma.idade_minima and turma.idade_maxima %}
+                  {{ turma.idade_minima }} até {{ turma.idade_maxima }} anos
+                {% elif turma.idade_minima %}
+                  {{ turma.idade_minima }}+ anos
+                {% elif turma.idade_maxima %}
+                  Até {{ turma.idade_maxima }} anos
+                {% else %}
+                  Livre
+                {% endif %}
+              </span>
+            </div>
+            <div class="info-item mb-3">
+              <label class="info-label">Capacidade:</label>
+              <span class="info-value">{{ turma.quantidade_permitido }} alunos</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Instructors -->
+        <div class="row mt-3">
+          <div class="col-12">
+            <label class="info-label">Instrutores:</label>
+            <div class="d-flex flex-wrap gap-2 mt-2">
+              {% for instrutor in turma.instrutores.all %}
+                <a href="{% url 'adm_professores_editar' instrutor.id %}" 
+                   class="badge bg-success text-decoration-none fs-6 p-2">
+                  <i class="fas fa-user-tie me-1"></i>
+                  {{ instrutor.nome }}
+                </a>
+              {% empty %}
+                <span class="text-muted">Nenhum instrutor cadastrado</span>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Schedule -->
+        <div class="row mt-3">
+          <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <label class="info-label">Horários:</label>
+              <button class="btn btn-outline-primary btn-sm" onclick="abrirModalTurno()">
+                <i class="fas fa-plus me-1"></i>
+                {% if turma.turnos.all %}Adicionar Horário{% else %}Configurar Horários{% endif %}
+              </button>
+            </div>
+            <div class="mt-2">
+              {% for turno in turma.turnos.all %}
+                <div class="schedule-item">
+                  <div class="row align-items-center">
+                    <div class="col-md-8">
+                      <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-clock text-primary me-2"></i>
+                        <strong>{{ turno.periodo|title }}</strong>
+                      </div>
+                      <div class="row">
+                        <div class="col-sm-6">
+                          <small class="text-muted">Horário:</small>
+                          <div>{{ turno.hora_inicio }} - {{ turno.hora_termino }}</div>
+                        </div>
+                        <div class="col-sm-6">
+                          <small class="text-muted">Dias:</small>
+                          <div>{{ turno.dias_semana|default:"Não definido" }}</div>
+                        </div>
+                      </div>
+                      {% if turno.instrutor %}
+                        <div class="mt-2">
+                          <small class="text-muted">Instrutor:</small>
+                          <div>
+                            <i class="fas fa-user me-1"></i>
+                            {{ turno.instrutor.nome }}
+                          </div>
+                        </div>
+                      {% endif %}
+                    </div>
+                    <div class="col-md-4 text-end">
+                      <div class="schedule-actions d-flex flex-column gap-2">
+                        <button class="btn btn-outline-warning btn-sm" onclick="abrirModalTurno({{ turno.id }})">
+                          <i class="fas fa-edit me-1"></i>
+                          Editar
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm" 
+                                onclick="excluirTurno({{ turno.id }})">
+                          <i class="fas fa-trash me-1"></i>
+                          Excluir
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% empty %}
+                <div class="empty-schedule-state text-center py-4">
+                  <div class="mb-3">
+                    <i class="fas fa-clock fa-3x text-muted"></i>
+                  </div>
+                  <h6 class="text-muted mb-2">Nenhum horário configurado</h6>
+                  <p class="text-muted mb-3">Configure os horários de funcionamento desta turma para que os alunos possam visualizar quando as aulas acontecem.</p>
+                  <button class="btn btn-primary" onclick="abrirModalTurno()">
+                    <i class="fas fa-plus me-2"></i>
+                    Configurar Primeiro Horário
+                  </button>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar with additional info -->
+  <div class="col-lg-4">
+    <div class="admin-content-card">
+      <div class="content-card-header">
+        <h6>
+          <i class="fas fa-chart-pie me-2"></i>
+          Resumo da Turma
+        </h6>
+      </div>
+      <div class="content-card-body">
+        <!-- Progress Bar -->
+        <div class="mb-3">
+          <label class="info-label small">Ocupação da Turma</label>
+          <div class="progress" style="height: 10px;">
+            {% with percentage=qnt_alunos|mul:100|div:turma.quantidade_permitido %}
+            <div class="progress-bar 
+              {% if percentage >= 90 %}bg-danger
+              {% elif percentage >= 70 %}bg-warning
+              {% else %}bg-success
+              {% endif %}" 
+              style="width: {{ percentage|floatformat:0 }}%"></div>
+            {% endwith %}
+          </div>
+          <small class="text-muted">{{ qnt_alunos }} de {{ turma.quantidade_permitido }} vagas preenchidas</small>
+        </div>
+
+        <!-- Status Timeline -->
+        <div class="timeline-container">
+          <div class="timeline-item {% if turma.status == 'pre' %}active{% endif %}">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <small class="text-muted">Pré-inscrição</small>
+            </div>
+          </div>
+          <div class="timeline-item {% if turma.status == 'ati' or turma.status == 'acc' %}active{% endif %}">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <small class="text-muted">Em andamento</small>
+            </div>
+          </div>
+          <div class="timeline-item {% if turma.status == 'enc' %}active{% endif %}">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <small class="text-muted">Encerrada</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Students Table -->
+<div class="admin-content-card mt-4">
+  <div class="content-card-header">
+    <h5>
+      <i class="fas fa-user-graduate me-2"></i>
+      Alunos Matriculados ({{ qnt_alunos }})
+    </h5>
+  </div>
+  <div class="content-card-body">
+    {% if matriculas_alunos %}
+      <div class="table-responsive">
+        <table class="table-modern">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Matrícula</th>
+              <th>Contato</th>
+              <th>Email</th>
+              <th>Idade</th>
+              <th>Data Matrícula</th>
+              <th>Frequência</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for matricula_aluno in matriculas_alunos %}
+            <tr data-search="{{ matricula_aluno.aluno.pessoa.nome|lower }}">
+              <td>
+                <div class="d-flex align-items-center">
+                  <div class="user-avatar-small me-2">
+                    <i class="fas fa-user"></i>
+                  </div>
+                  <div>
+                    <div class="fw-bold">{{ matricula_aluno.aluno.pessoa.nome }}</div>
+                    <small class="text-muted">ID: {{ matricula_aluno.aluno.id }}</small>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="badge bg-info">{{ matricula_aluno.matricula }}</span>
+              </td>
+              <td>
+                {% if matricula_aluno.aluno.pessoa.telefone %}
+                <a href="https://api.whatsapp.com/send?phone=55{{ matricula_aluno.aluno.pessoa.telefone }}" 
+                   target="_blank" class="text-success text-decoration-none">
+                  <i class="fab fa-whatsapp me-1"></i>
+                  {{ matricula_aluno.aluno.pessoa.telefone }}
+                </a>
+                {% else %}
+                <span class="text-muted">N/A</span>
+                {% endif %}
+              </td>
+              <td>{{ matricula_aluno.aluno.pessoa.email|truncatechars:20 }}</td>
+              <td>{{ matricula_aluno.aluno.pessoa.dt_nascimento|idade }} anos</td>
+              <td>{{ matricula_aluno.matricula.dt_inclusao|date:"d/m/Y" }}</td>
+              <td>
+                <span class="badge 
+                  {% with freq=matricula_aluno.frequencia|cut:'%'|floatformat:0 %}
+                    {% if freq >= 75 %}bg-success
+                    {% elif freq >= 50 %}bg-warning
+                    {% else %}bg-danger
+                    {% endif %}
+                  {% endwith %}">
+                  {{ matricula_aluno.frequencia }}
+                </span>
+              </td>
+              <td>
+                <a href="{% url 'adm_aluno_visualizar' matricula_aluno.aluno.id %}" 
+                   class="table-action-btn btn-info" title="Ver perfil">
+                  <i class="fas fa-eye"></i>
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <i class="fas fa-user-graduate"></i>
+        <h3>Nenhum aluno matriculado</h3>
+        <p>Esta turma ainda não possui alunos matriculados.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Selected Students (if pre-registration or accepting candidates) -->
+{% if turma.status == 'pre' or turma.status == 'acc' %}
+{% if matriculas_selecionados %}
+<div class="admin-content-card mt-4">
+  <div class="content-card-header">
+    <h5>
+      <i class="fas fa-user-check me-2"></i>
+      Alunos Selecionados ({{ matriculas_selecionados.count }})
+    </h5>
+  </div>
+  <div class="content-card-body">
+    <div class="table-responsive">
+      <table class="table-modern">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Matrícula</th>
+            <th>Contato</th>
+            <th>Email</th>
+            <th>Idade</th>
+            <th>Data Seleção</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for matricula in matriculas_selecionados %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center">
+                <div class="user-avatar-small me-2 bg-warning">
+                  <i class="fas fa-user"></i>
+                </div>
+                <div>
+                  <div class="fw-bold">{{ matricula.aluno.pessoa.nome }}</div>
+                  <small class="text-muted">ID: {{ matricula.aluno.id }}</small>
+                </div>
+              </div>
+            </td>
+            <td>
+              <a href="{% url 'adm_turma_visualizar_selecionado' matricula.matricula %}" 
+                 class="badge bg-warning text-decoration-none">
+                {{ matricula.matricula }}
+              </a>
+            </td>
+            <td>
+              {% if matricula.aluno.pessoa.celular %}
+              <a href="https://api.whatsapp.com/send?phone=55{{ matricula.aluno.pessoa.celular }}" 
+                 target="_blank" class="text-success text-decoration-none">
+                <i class="fab fa-whatsapp me-1"></i>
+                {{ matricula.aluno.pessoa.celular }}
+              </a>
+              {% else %}
+              <span class="text-muted">N/A</span>
+              {% endif %}
+            </td>
+            <td>{{ matricula.aluno.pessoa.email|truncatechars:20 }}</td>
+            <td>{{ matricula.aluno.pessoa.dt_nascimento|bg_idade }} anos</td>
+            <td>{{ matricula.aluno.dt_inclusao|date:"d/m/Y" }}</td>
+            <td>
+              <a href="{% url 'adm_aluno_visualizar' matricula.aluno.id %}" 
+                 class="table-action-btn btn-info" title="Ver perfil">
+                <i class="fas fa-eye"></i>
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Candidates -->
+{% if matriculas_candidatos %}
+<div class="admin-content-card mt-4">
+  <div class="content-card-header">
+    <h5>
+      <i class="fas fa-user-clock me-2"></i>
+      Candidatos ({{ matriculas_candidatos.count }})
+    </h5>
+    <div class="admin-actions">
+      <button type="button" class="btn-admin btn-success" onclick="selectAllCandidates()">
+        <i class="fas fa-check-double"></i>
+        Selecionar Todos
+      </button>
+      <button type="submit" form="candidatesForm" class="btn-admin btn-warning">
+        <i class="fas fa-user-plus"></i>
+        Promover Selecionados
+      </button>
+    </div>
+  </div>
+  <div class="content-card-body">
+    <form method="POST" id="candidatesForm">
+      {% csrf_token %}
+      <div class="table-responsive">
+        <table class="table-modern">
+          <thead>
+            <tr>
+              <th width="50">
+                <input type="checkbox" id="selectAllCandidates" class="form-check-input">
+              </th>
+              <th>Nome</th>
+              <th>Matrícula</th>
+              <th>Contato</th>
+              <th>Email</th>
+              <th>Idade</th>
+              <th>Data Candidatura</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for matricula in matriculas_candidatos %}
+            <tr>
+              <td>
+                <input type="checkbox" name="candidatos_selecionados" 
+                       value="{{ matricula.matricula }}" class="form-check-input candidate-checkbox">
+              </td>
+              <td>
+                <div class="d-flex align-items-center">
+                  <div class="user-avatar-small me-2 bg-secondary">
+                    <i class="fas fa-user"></i>
+                  </div>
+                  <div>
+                    <div class="fw-bold">{{ matricula.aluno.pessoa.nome }}</div>
+                    <small class="text-muted">ID: {{ matricula.aluno.id }}</small>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="badge bg-secondary">{{ matricula.matricula }}</span>
+              </td>
+              <td>
+                {% if matricula.aluno.pessoa.telefone %}
+                <a href="https://api.whatsapp.com/send?phone=55{{ matricula.aluno.pessoa.telefone }}" 
+                   target="_blank" class="text-success text-decoration-none">
+                  <i class="fab fa-whatsapp me-1"></i>
+                  {{ matricula.aluno.pessoa.telefone }}
+                </a>
+                {% else %}
+                <span class="text-muted">N/A</span>
+                {% endif %}
+              </td>
+              <td>{{ matricula.aluno.pessoa.email|truncatechars:20 }}</td>
+              <td>{{ matricula.aluno.pessoa.dt_nascimento|bg_idade }} anos</td>
+              <td>{{ matricula.dt_inclusao|date:"d/m/Y" }}</td>
+              <td>
+                <a href="{% url 'adm_aluno_visualizar' matricula.aluno.id %}" 
+                   class="table-action-btn btn-info" title="Ver perfil">
+                  <i class="fas fa-eye"></i>
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </form>
+  </div>
+</div>
+{% endif %}
+{% endif %}
+
+<style>
+.info-item {
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 0.5rem;
+}
+
+.info-label {
+  font-weight: 600;
+  color: #6c757d;
+  font-size: 0.9rem;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.info-value {
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.user-avatar-small {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+
+.timeline-container {
+  position: relative;
+  padding-left: 20px;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 15px;
+}
+
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -20px;
+  top: 10px;
+  bottom: -15px;
+  width: 2px;
+  background: #e9ecef;
+}
+
+.timeline-item:last-child::before {
+  display: none;
+}
+
+.timeline-marker {
+  position: absolute;
+  left: -26px;
+  top: 5px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #e9ecef;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 2px #e9ecef;
+}
+
+.timeline-item.active .timeline-marker {
+  background: var(--primary-color);
+  box-shadow: 0 0 0 2px var(--primary-color);
+}
+
+.timeline-content {
+  padding-left: 10px;
+}
+
+.progress {
+  border-radius: 10px;
+  background-color: #f8f9fa;
+}
+
+.progress-bar {
+  border-radius: 10px;
+}
+
+/* Schedule Styles */
+.empty-schedule-state {
+  background: linear-gradient(135deg, #f8f9ff, #e6f3ff);
+  border-radius: 16px;
+  border: 2px dashed #ccc;
+  padding: 2rem;
+  margin: 1rem 0;
+}
+
+.empty-schedule-state i {
+  opacity: 0.5;
+}
+
+.schedule-item {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.schedule-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.schedule-actions {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.schedule-item:hover .schedule-actions {
+  opacity: 1;
+}
+</style>
+
+<!-- Modal de Cadastro de Turno -->
+<div class="modal fade" id="modalTurno" tabindex="-1" aria-labelledby="modalTurnoLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content" style="border-radius: 20px; border: none;">
+      <div class="modal-header" style="background: linear-gradient(135deg, #007bff, #0056b3); color: white; border-radius: 20px 20px 0 0;">
+        <h5 class="modal-title" id="modalTurnoLabel">
+          <i class="fas fa-clock me-2"></i>
+          <span id="modalTurnoTitulo">Cadastrar Novo Horário</span>
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+      </div>
+      <div class="modal-body" style="padding: 2rem;">
+        <form id="formTurno">
+          {% csrf_token %}
+          <input type="hidden" id="turnoId" name="turno_id">
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group-modern">
+                <label class="form-label-modern">
+                  <i class="fas fa-sun me-1"></i>
+                  Período
+                </label>
+                <select class="form-control-modern" id="periodo" name="periodo" required>
+                  <option value="">Selecione o período</option>
+                  <option value="manha">Manhã</option>
+                  <option value="tarde">Tarde</option>
+                  <option value="noite">Noite</option>
+                  <option value="integral">Integral</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group-modern">
+                <label class="form-label-modern">
+                  <i class="fas fa-calendar-week me-1"></i>
+                  Dias da Semana
+                </label>
+                <input type="text" class="form-control-modern" id="diasSemana" name="dias_semana" 
+                       placeholder="Ex: Segunda a Sexta" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group-modern">
+                <label class="form-label-modern">
+                  <i class="fas fa-clock me-1"></i>
+                  Hora de Início
+                </label>
+                <input type="time" class="form-control-modern" id="horaInicio" name="hora_inicio" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group-modern">
+                <label class="form-label-modern">
+                  <i class="fas fa-clock me-1"></i>
+                  Hora de Término
+                </label>
+                <input type="time" class="form-control-modern" id="horaTermino" name="hora_termino" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group-modern">
+                <label class="form-label-modern">
+                  <i class="fas fa-hourglass-half me-1"></i>
+                  Carga Horária (horas)
+                </label>
+                <input type="number" class="form-control-modern" id="cargaHoraria" name="carga_horaria" 
+                       min="1" max="12" step="0.5" placeholder="Ex: 4">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group-modern">
+                <label class="form-label-modern">
+                  <i class="fas fa-user-tie me-1"></i>
+                  Instrutor (Opcional)
+                </label>
+                <select class="form-control-modern" id="instrutor" name="instrutor">
+                  <option value="">Selecione um instrutor</option>
+                  <!-- Opções serão carregadas via JavaScript -->
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group-modern">
+            <label class="form-label-modern">
+              <i class="fas fa-info-circle me-1"></i>
+              Observações (Opcional)
+            </label>
+            <textarea class="form-control-modern" id="observacoes" name="observacoes" rows="3" 
+                      placeholder="Informações adicionais sobre este horário..."></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer" style="padding: 1.5rem 2rem; border-top: 1px solid #e9ecef;">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+          <i class="fas fa-times me-1"></i>
+          Cancelar
+        </button>
+        <button type="button" class="btn btn-primary" onclick="salvarTurno()" id="btnSalvarTurno">
+          <i class="fas fa-save me-1"></i>
+          <span id="btnSalvarTexto">Cadastrar Horário</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block admin_javascript %}
+<script>
+// Funções globais para o modal de turno
+function abrirModalTurno(turnoId = null) {
+    const modal = new bootstrap.Modal(document.getElementById('modalTurno'));
+    const form = document.getElementById('formTurno');
+    
+    // Reset form
+    form.reset();
+    document.getElementById('turnoId').value = turnoId || '';
+    
+    if (turnoId) {
+        // Edição - carregar dados do turno
+        document.getElementById('modalTurnoTitulo').textContent = 'Editar Horário';
+        document.getElementById('btnSalvarTexto').textContent = 'Atualizar Horário';
+        
+        // Carregar dados do turno via AJAX
+        carregarDadosTurno(turnoId);
+    } else {
+        // Cadastro novo
+        document.getElementById('modalTurnoTitulo').textContent = 'Cadastrar Novo Horário';
+        document.getElementById('btnSalvarTexto').textContent = 'Cadastrar Horário';
+    }
+    
+    // Carregar instrutores
+    carregarInstrutores();
+    
+    modal.show();
+}
+
+function carregarInstrutores() {
+    fetch('{% url "api_instrutores_listar" %}')
+        .then(response => response.json())
+        .then(data => {
+            const select = document.getElementById('instrutor');
+            select.innerHTML = '<option value="">Selecione um instrutor</option>';
+            
+            data.forEach(instrutor => {
+                const option = document.createElement('option');
+                option.value = instrutor.id;
+                option.textContent = instrutor.nome;
+                select.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao carregar instrutores:', error);
+        });
+}
+
+function carregarDadosTurno(turnoId) {
+    fetch(`{% url "api_turno_detalhar" 0 %}`.replace('0', turnoId))
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('periodo').value = data.periodo || '';
+            document.getElementById('diasSemana').value = data.dias_semana || '';
+            document.getElementById('horaInicio').value = data.hora_inicio || '';
+            document.getElementById('horaTermino').value = data.hora_termino || '';
+            document.getElementById('cargaHoraria').value = data.carga_horaria || '';
+            document.getElementById('instrutor').value = data.instrutor_id || '';
+            document.getElementById('observacoes').value = data.observacoes || '';
+        })
+        .catch(error => {
+            console.error('Erro ao carregar dados do turno:', error);
+        });
+}
+
+function salvarTurno() {
+    const form = document.getElementById('formTurno');
+    const formData = new FormData(form);
+    const turnoId = document.getElementById('turnoId').value;
+    
+    // Adicionar ID da turma
+    formData.append('turma_id', {{ turma.id }});
+    
+    // Validação básica
+    if (!formData.get('periodo') || !formData.get('hora_inicio') || !formData.get('hora_termino')) {
+        alert('Por favor, preencha todos os campos obrigatórios.');
+        return;
+    }
+    
+    // Validar horários
+    const horaInicio = formData.get('hora_inicio');
+    const horaTermino = formData.get('hora_termino');
+    
+    if (horaInicio >= horaTermino) {
+        alert('A hora de término deve ser posterior à hora de início.');
+        return;
+    }
+    
+    const btnSalvar = document.getElementById('btnSalvarTurno');
+    const btnTextoOriginal = btnSalvar.innerHTML;
+    
+    // Loading state
+    btnSalvar.disabled = true;
+    btnSalvar.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Salvando...';
+    
+    const url = turnoId ? 
+        `{% url "api_turno_atualizar" 0 %}`.replace('0', turnoId) : 
+        '{% url "api_turno_cadastrar" %}';
+    const method = 'POST';
+    
+    fetch(url, {
+        method: method,
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || '',
+        },
+        body: formData
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.json();
+        }
+        throw new Error('Erro ao salvar horário');
+    })
+    .then(data => {
+        // Fechar modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('modalTurno'));
+        modal.hide();
+        
+        // Mostrar sucesso
+        mostrarToast('Horário salvo com sucesso!', 'success');
+        
+        // Recarregar página para mostrar as mudanças
+        setTimeout(() => {
+            location.reload();
+        }, 1000);
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        mostrarToast('Erro ao salvar horário. Tente novamente.', 'error');
+    })
+    .finally(() => {
+        // Restore button
+        btnSalvar.disabled = false;
+        btnSalvar.innerHTML = btnTextoOriginal;
+    });
+}
+
+function excluirTurno(turnoId) {
+    if (confirm('Tem certeza que deseja excluir este horário? Esta ação não pode ser desfeita.')) {
+        fetch(`{% url "api_turno_excluir" 0 %}`.replace('0', turnoId), {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || '',
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('Erro ao excluir horário');
+        })
+        .then(data => {
+            mostrarToast(data.message || 'Horário excluído com sucesso!', 'success');
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            mostrarToast('Erro ao excluir horário. Tente novamente.', 'error');
+        });
+    }
+}
+
+function mostrarToast(mensagem, tipo = 'info') {
+    // Criar toast element
+    const toast = document.createElement('div');
+    toast.className = `toast align-items-center text-white bg-${tipo === 'success' ? 'success' : 'danger'} border-0`;
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
+    
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-${tipo === 'success' ? 'check' : 'exclamation-triangle'} me-2"></i>
+                ${mensagem}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+    
+    // Adicionar ao container de toasts
+    let toastContainer = document.getElementById('toastContainer');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.id = 'toastContainer';
+        toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+        toastContainer.style.zIndex = '9999';
+        document.body.appendChild(toastContainer);
+    }
+    
+    toastContainer.appendChild(toast);
+    
+    // Mostrar toast
+    const bsToast = new bootstrap.Toast(toast, { delay: 3000 });
+    bsToast.show();
+    
+    // Remover após esconder
+    toast.addEventListener('hidden.bs.toast', () => {
+        toast.remove();
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Select all candidates functionality
+    const selectAllCheckbox = document.getElementById('selectAllCandidates');
+    const candidateCheckboxes = document.querySelectorAll('.candidate-checkbox');
+    
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function() {
+            candidateCheckboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+        });
+        
+        // Update select all when individual checkboxes change
+        candidateCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const allChecked = Array.from(candidateCheckboxes).every(cb => cb.checked);
+                const someChecked = Array.from(candidateCheckboxes).some(cb => cb.checked);
+                
+                selectAllCheckbox.checked = allChecked;
+                selectAllCheckbox.indeterminate = someChecked && !allChecked;
+            });
+        });
+    }
+    
+    // Search functionality for students table
+    function setupTableSearch() {
+        const searchInput = document.createElement('input');
+        searchInput.type = 'text';
+        searchInput.placeholder = 'Buscar aluno...';
+        searchInput.className = 'form-control mb-3';
+        
+        const tableContainer = document.querySelector('.table-responsive');
+        if (tableContainer) {
+            tableContainer.parentNode.insertBefore(searchInput, tableContainer);
+            
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                const rows = document.querySelectorAll('[data-search]');
+                
+                rows.forEach(row => {
+                    const searchData = row.getAttribute('data-search');
+                    if (searchData.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        }
+    }
+    
+    setupTableSearch();
+    
+    // Smooth scroll to sections
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+    
+    console.log('🎓 Página de visualização de turma carregada com sucesso!');
+});
+
+function selectAllCandidates() {
+    const checkboxes = document.querySelectorAll('.candidate-checkbox');
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = !allChecked;
+    });
+    
+    // Update the main checkbox
+    const selectAllCheckbox = document.getElementById('selectAllCandidates');
+    if (selectAllCheckbox) {
+        selectAllCheckbox.checked = !allChecked;
+        selectAllCheckbox.indeterminate = false;
+    }
+}
+
+function excluirTurno(turnoId) {
+    if (confirm('Tem certeza que deseja excluir este horário? Esta ação não pode ser desfeita.')) {
+        fetch(`{% url "api_turno_excluir" 0 %}`.replace('0', turnoId), {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || '',
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('Erro ao excluir horário');
+        })
+        .then(data => {
+            mostrarToast(data.message || 'Horário excluído com sucesso!', 'success');
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            mostrarToast('Erro ao excluir horário. Tente novamente.', 'error');
+        });
+    }
+}
+</script>
+
+    console.log('🎓 Página de visualização de turma carregada com sucesso!');
+});
+
+function selectAllCandidates() {
+    const checkboxes = document.querySelectorAll('.candidate-checkbox');
+    const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+    
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = !allChecked;
+    });
+    
+    // Update the main checkbox
+    const selectAllCheckbox = document.getElementById('selectAllCandidates');
+    if (selectAllCheckbox) {
+        selectAllCheckbox.checked = !allChecked;
+        selectAllCheckbox.indeterminate = false;
+    }
+}
+</script>
+{% endblock %}
+        document.getElementById('btnSalvarTexto').textContent = 'Atualizar Horário';
+        
+        // Aqui você carregaria os dados do turno via AJAX
+        carregarDadosTurno(turnoId);
+    } else {
+        // Cadastro novo
+        document.getElementById('modalTurnoTitulo').textContent = 'Cadastrar Novo Horário';
+        document.getElementById('btnSalvarTexto').textContent = 'Cadastrar Horário';
+    }
+    
+    // Carregar instrutores
+    carregarInstrutores();
+    
+    modal.show();
+}
+
+function carregarInstrutores() {
+    fetch('{% url "api_instrutores_listar" %}')
+        .then(response => response.json())
+        .then(data => {
+            const select = document.getElementById('instrutor');
+            select.innerHTML = '<option value="">Selecione um instrutor</option>';
+            
+            data.forEach(instrutor => {
+                const option = document.createElement('option');
+                option.value = instrutor.id;
+                option.textContent = instrutor.nome;
+                select.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao carregar instrutores:', error);
+        });
+}
+
+function carregarDadosTurno(turnoId) {
+    fetch(`{% url "api_turno_detalhar" 0 %}`.replace('0', turnoId))
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('periodo').value = data.periodo || '';
+            document.getElementById('diasSemana').value = data.dias_semana || '';
+            document.getElementById('horaInicio').value = data.hora_inicio || '';
+            document.getElementById('horaTermino').value = data.hora_termino || '';
+            document.getElementById('cargaHoraria').value = data.carga_horaria || '';
+            document.getElementById('instrutor').value = data.instrutor_id || '';
+            document.getElementById('observacoes').value = data.observacoes || '';
+        })
+        .catch(error => {
+            console.error('Erro ao carregar dados do turno:', error);
+        });
+}
+
+function salvarTurno() {
+    const form = document.getElementById('formTurno');
+    const formData = new FormData(form);
+    const turnoId = document.getElementById('turnoId').value;
+    
+    // Adicionar ID da turma
+    formData.append('turma_id', {{ turma.id }});
+    
+    // Validação básica
+    if (!formData.get('periodo') || !formData.get('hora_inicio') || !formData.get('hora_termino')) {
+        alert('Por favor, preencha todos os campos obrigatórios.');
+        return;
+    }
+    
+    // Validar horários
+    const horaInicio = formData.get('hora_inicio');
+    const horaTermino = formData.get('hora_termino');
+    
+    if (horaInicio >= horaTermino) {
+        alert('A hora de término deve ser posterior à hora de início.');
+        return;
+    }
+    
+    const btnSalvar = document.getElementById('btnSalvarTurno');
+    const btnTextoOriginal = btnSalvar.innerHTML;
+    
+    // Loading state
+    btnSalvar.disabled = true;
+    btnSalvar.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Salvando...';
+    
+    const url = turnoId ? 
+        `{% url "api_turno_atualizar" 0 %}`.replace('0', turnoId) : 
+        '{% url "api_turno_cadastrar" %}';
+    const method = 'POST';
+    
+    fetch(url, {
+        method: method,
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || '',
+        },
+        body: formData
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.json();
+        }
+        throw new Error('Erro ao salvar horário');
+    })
+    .then(data => {
+        // Fechar modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('modalTurno'));
+        modal.hide();
+        
+        // Mostrar sucesso
+        mostrarToast('Horário salvo com sucesso!', 'success');
+        
+        // Recarregar página para mostrar as mudanças
+        setTimeout(() => {
+            location.reload();
+        }, 1000);
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        mostrarToast('Erro ao salvar horário. Tente novamente.', 'error');
+    })
+    .finally(() => {
+        // Restore button
+        btnSalvar.disabled = false;
+        btnSalvar.innerHTML = btnTextoOriginal;
+    });
+}
+
+function mostrarToast(mensagem, tipo = 'info') {
+    // Criar toast element
+    const toast = document.createElement('div');
+    toast.className = `toast align-items-center text-white bg-${tipo === 'success' ? 'success' : 'danger'} border-0`;
+    toast.setAttribute('role', 'alert');
+    toast.setAttribute('aria-live', 'assertive');
+    toast.setAttribute('aria-atomic', 'true');
+    
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-${tipo === 'success' ? 'check' : 'exclamation-triangle'} me-2"></i>
+                ${mensagem}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    `;
+    
+    // Adicionar ao container de toasts
+    let toastContainer = document.getElementById('toastContainer');
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.id = 'toastContainer';
+        toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
+        toastContainer.style.zIndex = '9999';
+        document.body.appendChild(toastContainer);
+    }
+    
+    toastContainer.appendChild(toast);
+    
+    // Mostrar toast
+    const bsToast = new bootstrap.Toast(toast, { delay: 3000 });
+    bsToast.show();
+    
+    // Remover após esconder
+    toast.addEventListener('hidden.bs.toast', () => {
+        toast.remove();
+    });
+}
+</script>
+{% endblock %}

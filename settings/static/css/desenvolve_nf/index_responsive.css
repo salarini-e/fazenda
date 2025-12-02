@@ -1,0 +1,323 @@
+/* Desktops e telas grandes */
+@media(min-width:1025px) and (max-width:1200px){
+
+}
+/* Telas pequenas e laptops*/
+@media(min-width:769px) and (max-width:1024px){
+  .nav-a{
+    padding-left: 0px !important;
+  }
+  .logo-2{
+    width: 100px;
+  }
+  .nv-social{
+    display: none !important;
+  }
+  .nv-login{
+    margin-left: 1.5em !important;
+  }
+  .text-f{
+    margin-left: 4em !important;
+  }
+}
+/* iPads e tablets*/
+@media(min-width:481px) and (max-width:768px){
+  .nav-a,
+  .logo-nf span,
+  .logo-nf .logo-1{
+    display:none;
+  }
+  #chatbase-bubble-button{
+    right: 2em !important;
+  }
+  .carrosel{
+    height: 500px;
+  }
+  .owl-stage-outer{
+    height: 400px;
+  }
+  .wrapper-1 div, .wrapper-2 div{
+    padding: 0px !important;
+  }
+  .text-f{
+    margin-left: 3em !important;
+    margin-right: 3em !important;
+  }
+}
+/* Celulares */
+@media(min-width:320px) and (max-width:480px){
+  .nav-a,
+  .logo-nf span,
+  .logo-nf .logo-1{
+    display:none;
+  }
+} 
+/*@media(min-width: 1368px){
+    #empregados_destaque .s-avatar{
+      width: 10vw !important;
+      height: 10vw !important;
+    }
+    #empregados_destaque .brasao{
+      width: 3vw !important;
+      height: 3vw !important;
+    }
+    .wrapper-1,
+    .wrapper-2 {
+      display: flex;
+    }
+    .wrapper-1 .item,
+    .wrapper-2 .item{
+      margin-left: 0px;
+    }
+}
+@media(min-width: 1001px) and (max-width: 1367px){
+    .logo-nf{
+      width: 500px;
+    }
+    .logo-1{
+      width: 60px;
+    }
+    .logo-2{
+      width: 100px;
+    }
+    .item img{
+      width: 800px !important;
+      height: 350px !important;
+    }
+    .owl-nav{
+      display: none;
+    }
+    .text-left{
+      font-size: 1.2rem;
+    }
+    .px-5{
+      padding-left: 0px !important;
+      padding-right: 0px !important;
+    }
+    .row{
+      display: flex;
+      flex-direction: column;
+    }
+    .col-5{
+      width: 100%;
+    }
+    .ps-5{
+      padding-left: 10px !important;
+      padding-right: 10px !important;
+    }
+    .pe-5{
+      padding-right: 0px !important;
+    }
+    #empregados_destaque{
+      display: flex !important;
+      flex-wrap: wrap;
+    }
+    #empregados_destaque .s-avatar{
+      width: 20vw !important;
+      height: 20vw !important;
+    }
+    #empregados_destaque .brasao{
+      width: 10vw !important;
+      height: 10vw !important;
+    }
+    .p-5{
+      padding: 0px !important;
+      padding-bottom: 50px !important;
+    }
+    .wrapper-1,
+    .wrapper-2 {
+      display: flex;
+      flex-direction: row;
+    }
+    .wrapper-1 .item,
+    .wrapper-2 .item{
+      margin-left: 40px;
+    }
+}
+@media(max-width: 1114px){
+    .btLogin{
+      padding: 0.5vw;
+    }
+}
+@media(max-width:1110px){
+    .menuMobile{
+        display: block;
+        margin-left: 50vw;
+    }
+    .nav-a li a{
+        display: none !important;
+    }
+    .navMob{
+        display: block;
+    }
+    .navMob a{
+        color: black;
+    }
+}
+@media(min-width: 601px) and (max-width:1000px){
+    .logo-nf{
+      width: 200px;
+    }
+    .logo-1{
+      display:none;
+    }
+    .logo-nf span{
+      display: none;
+    }
+    .logo-2{
+      width: 100px;
+    }
+    .item img{
+      width: 300px !important;
+      height: 200px !important;
+    }
+    .owl-nav{
+      display: none;
+    }
+    .text-left{
+      font-size: 1.2rem;
+    }
+    .px-5{
+      padding-left: 0px !important;
+      padding-right: 0px !important;
+    }
+    .row{
+      display: flex;
+      flex-direction: column;
+    }
+    .col-5{
+      width: 100%;
+    }
+    .ps-5{
+      padding-left: 10px !important;
+      padding-right: 10px !important;
+    }
+    .pe-5{
+      padding-right: 0px !important;
+    }
+    #empregados_destaque{
+      display: flex !important;
+      flex-wrap: wrap;
+    }
+    #empregados_destaque .s-avatar{
+      width: 30vw !important;
+      height: 30vw !important;
+    }
+    #empregados_destaque .brasao{
+      width: 20vw !important;
+      height: 20vw !important;
+    }
+    .p-5{
+      padding: 0px !important;
+      padding-bottom: 50px !important;
+    }
+    .wrapper-1,
+    .wrapper-2 {
+      display: flex;
+      flex-direction: row;
+    }
+    .wrapper-1 .item,
+    .wrapper-2 .item{
+      margin-left: 50px;
+    }
+}
+@media (max-width: 990px)
+{
+  .container-fluid .navbar-brand{
+    margin: auto;
+  }
+  #login-button{
+    margin: auto !important;
+  }
+  nav .navbar-toggler{
+    display: none !important;
+  }
+}
+@media(max-width: 760px){
+    .menuMobile{
+      margin-left: 30vw;
+    }
+}
+@media (max-width: 600px)
+{
+    .navbar>.container-fluid{
+        flex-wrap: nowrap;
+    }
+    .navbar-toggler{
+        margin: 30px auto;
+    }
+    .mobile-flex-column{
+        display: flex;
+        flex-direction: column;
+    }
+    .mobile-flex-column .col:last-child{
+        padding: 20px 40px;
+    }
+}
+@media(max-width: 542px){
+    .menuMobile{
+      margin-left: 20vw;
+    }
+}
+@media(max-width: 438px){
+    .menuMobile{
+      margin-left: 10vw;
+    }
+}
+@media(min-width: 320px) and (max-width:600px){
+    .logo-nf{
+      width: 200px;
+    }
+    .logo-1{
+      display:none !important;
+    }
+    .logo-nf span{
+      display: none !important;
+    }
+    .logo-2{
+      width: 100px;
+    }
+    .item img{
+      width: 300px !important;
+      height: 200px !important;
+    }
+    .owl-nav{
+      display: none;
+    }
+    .text-left{
+      font-size: 1.2rem;
+    }
+    .px-5{
+      padding-left: 0px !important;
+      padding-right: 0px !important;
+    }
+    .row{
+      display: flex;
+      flex-direction: column;
+    }
+    .col-5{
+      width: 100%;
+    }
+    .ps-5{
+      padding-left: 10px !important;
+      padding-right: 10px !important;
+    }
+    .pe-5{
+      padding-right: 0px !important;
+    }
+    #empregados_destaque{
+      display: block !important;
+    }
+    #empregados_destaque .s-avatar{
+      width: 100px !important;
+      height: 100px !important;
+    }
+    .p-5{
+      padding: 0px !important;
+      padding-bottom: 50px !important;
+    }
+    #empregados_destaque .brasao{
+      width: 100px !important;
+      height: 100px !important;
+    }
+}*/

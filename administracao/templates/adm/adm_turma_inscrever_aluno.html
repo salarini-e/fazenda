@@ -1,0 +1,224 @@
+{% extends 'template_administrativo.html' %}
+{% load bootstrap5 %}
+{% load static %}
+
+{% block title %}Inscrever Aluno - {{ turma }}{% endblock %}
+
+{% block nav_turmas_active %}active{% endblock %}
+
+{% block page_icon %}fas fa-user-plus{% endblock %}
+{% block page_title %}Inscrever Aluno{% endblock %}
+{% block page_subtitle %}Adicione um aluno à turma {{ turma }}{% endblock %}
+{% block page_header_icon %}fas fa-user-plus{% endblock %}
+
+{% block content_actions %}
+<a href="{% url 'adm_turma_visualizar' turma.id %}" class="btn-admin btn-secondary">
+  <i class="fas fa-arrow-left"></i>
+  <span>Voltar à Turma</span>
+</a>
+<a href="{% url 'adm_aluno_cadastro_completo' %}" class="btn-admin">
+  <i class="fas fa-user-plus"></i>
+  <span>Cadastrar Novo Aluno</span>
+</a>
+{% endblock %}
+
+{% block admin_content %}
+<div class="row">
+  <!-- Busca por CPF -->
+  <div class="col-md-6">
+    <div class="card border-0 shadow-sm" style="border-radius: 16px; overflow: hidden;">
+      <div class="card-header" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); color: white; padding: 2rem;">
+        <h4 class="mb-0" style="font-weight: 600;">
+          <i class="fas fa-search me-2"></i>
+          Buscar por CPF
+        </h4>
+        <p class="mb-0 mt-2 opacity-75">
+          Digite o CPF do aluno para inscrever na turma
+        </p>
+      </div>
+      <div class="card-body" style="padding: 2rem;">
+        <form method="POST">
+          {% csrf_token %}
+          
+          <div class="mb-3">
+            <label for="cpf" class="form-label" style="font-weight: 600; color: var(--gray-700);">
+              <i class="fas fa-id-card me-2"></i>
+              CPF do Aluno
+            </label>
+            <input type="text" class="form-control" id="cpf" name="cpf" 
+                   placeholder="000.000.000-00" 
+                   style="border: 2px solid var(--gray-200); border-radius: 8px; padding: 1rem;"
+                   required>
+            <div class="form-text">
+              <i class="fas fa-info-circle me-1"></i>
+              Digite apenas os números ou com pontuação
+            </div>
+          </div>
+          
+          <div class="alert alert-info" style="border-radius: 12px; border: none; background: linear-gradient(135deg, #e3f2fd, #bbdefb);">
+            <i class="fas fa-info-circle me-2"></i>
+            <strong>Informação:</strong> O aluno deve estar previamente cadastrado no sistema.
+          </div>
+          
+          <button type="submit" class="btn btn-primary w-100" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); border: none; padding: 1rem;">
+            <i class="fas fa-user-plus me-2"></i>
+            Inscrever Aluno
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lista de Alunos Disponíveis -->
+  <div class="col-md-6">
+    <div class="card border-0 shadow-sm" style="border-radius: 16px; overflow: hidden;">
+      <div class="card-header" style="background: linear-gradient(135deg, var(--secondary-color), #20c997); color: white; padding: 2rem;">
+        <h4 class="mb-0" style="font-weight: 600;">
+          <i class="fas fa-users me-2"></i>
+          Alunos Disponíveis
+        </h4>
+        <p class="mb-0 mt-2 opacity-75">
+          Clique em um aluno para inscrevê-lo rapidamente
+        </p>
+      </div>
+      <div class="card-body" style="padding: 1rem; max-height: 500px; overflow-y: auto;">
+        {% if alunos_disponiveis %}
+          <div class="search-container mb-3">
+            <input type="text" class="form-control" id="searchAlunos" 
+                   placeholder="Buscar alunos..." 
+                   style="border: 2px solid var(--gray-200); border-radius: 8px;">
+          </div>
+          
+          <div class="alunos-list">
+            {% for aluno in alunos_disponiveis %}
+            <div class="aluno-item" 
+                 data-search="{{ aluno.pessoa.nome|lower }} {{ aluno.pessoa.cpf }}"
+                 style="border: 1px solid var(--gray-200); border-radius: 12px; padding: 1rem; margin-bottom: 0.5rem; cursor: pointer; transition: all 0.2s ease;">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <strong style="color: var(--gray-800);">{{ aluno.pessoa.nome }}</strong>
+                  <div style="font-size: 0.85rem; color: var(--gray-600);">
+                    <i class="fas fa-id-card me-1"></i>
+                    {{ aluno.pessoa.cpf }}
+                  </div>
+                  {% if aluno.pessoa.email %}
+                  <div style="font-size: 0.8rem; color: var(--gray-500);">
+                    <i class="fas fa-envelope me-1"></i>
+                    {{ aluno.pessoa.email }}
+                  </div>
+                  {% endif %}
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-primary inscriber-btn" 
+                        data-cpf="{{ aluno.pessoa.cpf }}"
+                        style="border-radius: 8px;">
+                  <i class="fas fa-plus"></i>
+                </button>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-center py-4">
+            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">Todos os alunos já estão inscritos</h5>
+            <p class="text-muted">Não há alunos disponíveis para inscrição nesta turma.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Informações da Turma -->
+<div class="mt-4">
+  <div class="card border-0 shadow-sm" style="border-radius: 16px; overflow: hidden;">
+    <div class="card-header" style="background: linear-gradient(135deg, #f59e0b, #fbbf24); color: white; padding: 1.5rem;">
+      <h5 class="mb-0" style="font-weight: 600;">
+        <i class="fas fa-info-circle me-2"></i>
+        Informações da Turma
+      </h5>
+    </div>
+    <div class="card-body" style="padding: 1.5rem;">
+      <div class="row">
+        <div class="col-md-4">
+          <strong>Turma:</strong> {{ turma }}
+        </div>
+        <div class="col-md-4">
+          <strong>Curso:</strong> {{ turma.curso.nome }}
+        </div>
+        <div class="col-md-4">
+          <strong>Vagas:</strong> {{ turma.quantidade_permitido|default:"Ilimitadas" }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block admin_javascript %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Formatação de CPF
+  const cpfInput = document.getElementById('cpf');
+  if (cpfInput) {
+    cpfInput.addEventListener('input', function() {
+      let value = this.value.replace(/\D/g, '');
+      value = value.replace(/(\d{3})(\d)/, '$1.$2');
+      value = value.replace(/(\d{3})(\d)/, '$1.$2');
+      value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+      this.value = value;
+    });
+  }
+
+  // Busca de alunos
+  const searchInput = document.getElementById('searchAlunos');
+  const alunoItems = document.querySelectorAll('.aluno-item');
+  
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      const searchTerm = this.value.toLowerCase();
+      
+      alunoItems.forEach(item => {
+        const searchData = item.getAttribute('data-search');
+        if (searchData.includes(searchTerm)) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    });
+  }
+
+  // Inscrição rápida
+  document.querySelectorAll('.inscriber-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const cpf = this.getAttribute('data-cpf');
+      if (cpf) {
+        cpfInput.value = cpf;
+        // Auto-submit
+        if (confirm('Deseja inscrever este aluno na turma?')) {
+          document.querySelector('form').submit();
+        }
+      }
+    });
+  });
+
+  // Hover effect nos cards de alunos
+  alunoItems.forEach(item => {
+    item.addEventListener('mouseenter', function() {
+      this.style.backgroundColor = 'rgba(0, 102, 204, 0.05)';
+      this.style.borderColor = 'var(--primary-color)';
+      this.style.transform = 'translateY(-2px)';
+    });
+    
+    item.addEventListener('mouseleave', function() {
+      this.style.backgroundColor = '';
+      this.style.borderColor = 'var(--gray-200)';
+      this.style.transform = 'translateY(0)';
+    });
+  });
+
+  console.log('👥 Página de Inscrição de Aluno carregada com sucesso!');
+});
+</script>
+{% endblock %}

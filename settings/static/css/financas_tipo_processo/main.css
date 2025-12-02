@@ -1,0 +1,12 @@
+/* Reset */
+@import url(reset/reset.css);
+/* Layout */
+@import url();
+
+.opcoes_formulario .hidden_form {
+    display: none;
+}
+
+.opcoes_formulario .show_form {
+    display: block;
+}

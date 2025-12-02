@@ -1,0 +1,19 @@
+{% extends 'template_new.html' %}
+{% load bootstrap5 %}
+{% block title %}Desenvolve NF - Bem-Estar Animal - Censo{% endblock %}
+{% block css %}{% endblock %}
+{% block nav %}
+{% include 'nav_bemestaranimal.html' %}
+{% endblock %}
+{% block main %}
+
+<div class="container">
+    <div class="row pb-5">
+        <h4>Tokens gerados para todos os novos tutores com animais cadastrados.</h4>
+        <h5>Tokens gerados: {{tutor_animal}}</h5>
+        <h5>Tutores sem animais: {{tutor_s_animal}}</h5>
+    </div>
+</div>
+<script>
+</script>
+{% endblock %}

@@ -1,0 +1,328 @@
+{% extends 'template_new.html' %}
+{% load static %}
+
+{% block css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/administrativo.css' %}">
+{% endblock %}
+
+{% block administrativo %}fw-bold{% endblock %}
+
+{% block main %}
+<!-- Admin Page Header Component -->
+{% include 'includes/admin_page_header.html' with page_title=page_title|default:"Administração" page_subtitle=page_subtitle|default:"Painel administrativo do sistema" page_icon=page_icon|default:"fas fa-cog" show_back_btn=show_back_btn|default:False back_url=back_url show_dashboard_btn=show_dashboard_btn|default:True show_breadcrumb=show_breadcrumb|default:True show_refresh_btn=show_refresh_btn|default:False %}
+
+{% if show_breadcrumb %}
+{% block breadcrumb_items %}
+<li class="breadcrumb-item active" aria-current="page">{{ page_title|default:"Administração" }}</li>
+{% endblock %}
+{% endif %}
+
+<!-- Main Content Container -->
+<div class="admin-content-container">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12">
+        
+        <!-- Navigation Tabs (if needed) -->
+        {% block navigation_tabs %}
+        {% if show_navigation %}
+        <div class="admin-nav-tabs mb-4">
+          {% block nav_items %}
+          <!-- Override this block to add navigation items -->
+          {% endblock %}
+        </div>
+        {% endif %}
+        {% endblock %}
+        
+        <!-- Content Card -->
+        <div class="card shadow-sm">
+          {% block card_header %}
+          {% if card_title %}
+          <div class="card-header">
+            <h5 class="card-title mb-0">
+              {% if card_icon %}<i class="{{ card_icon }} me-2"></i>{% endif %}
+              {{ card_title }}
+            </h5>
+            {% if card_subtitle %}
+            <p class="card-subtitle text-muted mb-0">{{ card_subtitle }}</p>
+            {% endif %}
+          </div>
+          {% endif %}
+          {% endblock %}
+          
+          <div class="card-body">
+            {% block card_content %}
+            <!-- Main page content goes here -->
+            <p>Conteúdo da página vai aqui. Override o bloco 'card_content' para adicionar seu conteúdo.</p>
+            {% endblock %}
+          </div>
+          
+          {% block card_footer %}
+          {% if show_card_footer %}
+          <div class="card-footer">
+            {% block footer_content %}
+            <!-- Footer content goes here -->
+            {% endblock %}
+          </div>
+          {% endif %}
+          {% endblock %}
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Additional content outside card (if needed) -->
+{% block additional_content %}
+{% endblock %}
+
+<style>
+/* Admin Content Styling */
+.admin-content-container {
+  padding: 0;
+  margin-top: 0;
+}
+
+/* Navigation Tabs Styling */
+.admin-nav-tabs {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 2px solid #e2e8f0;
+  padding: 0 0 1rem 0;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.admin-nav-tabs .nav-item {
+  flex-shrink: 0;
+}
+
+.admin-nav-tabs .nav-item .nav-link {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #64748b;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.admin-nav-tabs .nav-item .nav-link:hover {
+  background-color: #f1f5f9;
+  color: #334155;
+  text-decoration: none;
+}
+
+.admin-nav-tabs .nav-item .nav-link.active {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  border-color: #3b82f6;
+}
+
+.admin-nav-tabs .nav-item .nav-link i {
+  font-size: 0.875rem;
+}
+
+/* Card Styling */
+.card {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-bottom: 1px solid #e2e8f0;
+  padding: 1.5rem 2rem;
+  border-radius: 12px 12px 0 0;
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+}
+
+.card-subtitle {
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.card-body {
+  padding: 2rem;
+}
+
+.card-footer {
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  padding: 1.5rem 2rem;
+  border-radius: 0 0 12px 12px;
+}
+
+/* Form Styling */
+.form-control, .form-select {
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  padding: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.1);
+}
+
+.form-label {
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+/* Button Styling */
+.btn {
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  border-color: #3b82f6;
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #10b981, #059669);
+  border-color: #10b981;
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  border-color: #ef4444;
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #6b7280, #4b5563);
+  border-color: #6b7280;
+}
+
+/* Table Styling */
+.table {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.table th {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.table td {
+  border-color: #e2e8f0;
+  vertical-align: middle;
+}
+
+.table-hover tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+/* Action buttons in tables */
+.table-action-btn {
+  padding: 0.375rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.table-action-btn:hover {
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+/* Alert Styling */
+.alert {
+  border-radius: 8px;
+  border: none;
+  padding: 1rem 1.25rem;
+}
+
+.alert-info {
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  color: #1e40af;
+}
+
+.alert-success {
+  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+  color: #065f46;
+}
+
+.alert-warning {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #92400e;
+}
+
+.alert-danger {
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
+  color: #991b1b;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .admin-nav-tabs {
+    gap: 0.25rem;
+  }
+  
+  .admin-nav-tabs .nav-item .nav-link {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+  
+  .card-header, .card-body, .card-footer {
+    padding: 1.5rem;
+  }
+  
+  .btn {
+    padding: 0.625rem 1.25rem;
+  }
+  
+  .admin-content-container .container-fluid {
+    padding: 0 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-nav-tabs {
+    flex-direction: column;
+  }
+  
+  .card-header, .card-body, .card-footer {
+    padding: 1rem;
+  }
+}
+
+/* Dark mode compatibility */
+@media (prefers-color-scheme: dark) {
+  /* Add dark mode styles if needed */
+}
+</style>
+
+{% endblock %}

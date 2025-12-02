@@ -1,0 +1,75 @@
+{% extends 'template_new.html' %}
+{% block title %}SSUBEA{% endblock %}
+{% block css %}{% endblock %}
+{% block nav %}
+{% include 'nav_bemestaranimal.html' %}
+{% endblock %}  
+{% block main %}
+{% load bootstrap5 %}
+<div class="container">
+    {% if messages %}
+    {% for message in messages %}
+    {% if message.tags == "success" %}
+    <div class="alert alert-success" role="alert">
+    {% else %}
+    <div class="alert alert-danger" role="alert">
+    {% endif %}
+        <b>{{message}}</b>
+      </div>
+    {% endfor %}
+    {% endif %}
+    <div class="row">
+        <div class="col">
+            <h2>Cadastrar animal errante</h2>
+            <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% bootstrap_form errante_form %}
+            {% bootstrap_form especie_form %} 
+            <button type="submit" class="btn btn-primary w-100 mb-3" id="send">Cadastrar</button>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    const especie = document.getElementById('id_nome_especie');
+    hide_parent(especie)
+    especie.value = "";
+
+
+
+    function yes_or_no_check(e){
+        if(e.target.value == 5 ){
+            setRequired(especie)
+            show_parent(especie)
+        }else{
+            removeRequired(especie)
+            hide_parent(especie)
+            especie.value = "";
+
+        }
+    }
+    function setRequired(...elements){
+        elements.forEach(e => {
+            e.setAttribute('required', '');
+        })
+    }
+    function removeRequired(...elements){
+        elements.forEach(e => {
+            e.removeAttribute('required');
+        })
+    }
+    function show_parent(e){
+            e.parentNode.style.display = "block";
+    }
+    function hide_parent(e){
+            e.parentNode.style.display = "none";
+    }
+    document.getElementById('id_tipo_1').addEventListener('change', yes_or_no_check);
+    document.getElementById('id_tipo_3').addEventListener('change', yes_or_no_check);
+    document.getElementById('id_tipo_4').addEventListener('change', yes_or_no_check);
+
+
+    hide_parent(document.getElementById('id_tipo_0').parentNode)
+    hide_parent(document.getElementById('id_tipo_2').parentNode)
+</script>
+{% endblock %}

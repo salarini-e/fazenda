@@ -1,0 +1,666 @@
+{% extends 'template_new.html' %}
+{% load static %}
+
+{% block css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* Admin Template Styles */
+  .admin-template-wrapper {
+    display: flex;
+    min-height: calc(100vh - 120px);
+    margin-top: 120px;
+    background: #f8f9fa;
+    font-family: 'Inter', sans-serif;
+  }
+
+  /* Dashboard Topbar Styles */
+  .dashboard-topbar {
+    background: white;
+    padding: 1.5rem 2rem;
+    /* box-shadow: 0 2px 15px rgba(0, 0, 0, 0.08); */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    /* margin-bottom: 2rem; */
+    /* border-radius: 20px; */
+  }
+
+  .topbar-left h1.page-title {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+  }
+
+  .dashboard-topbar .page-subtitle {
+    margin: 0;
+    color: #6c757d;
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+
+  .topbar-right {
+    display: flex;
+    align-items: center;
+  }
+
+  .quick-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn-action {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: none;
+    background: #f8f9fa;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .btn-action:hover {
+    background: #3498db;
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  .notification-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #e74c3c;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 10px;
+    min-width: 16px;
+    text-align: center;
+  }
+
+  /* Content Area */
+  .admin-content-area {
+    flex: 1;
+    margin-left: 280px;
+    /* padding: 2rem; */
+    transition: margin-left 0.3s ease;
+  }
+
+  .admin-content-area.sidebar-collapsed {
+    margin-left: 80px;
+  }
+
+  /* Page Header - Removed admin-page-header styles since we're using dashboard-topbar */
+
+  .page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    position: relative;
+    z-index: 2;
+  }
+
+  .page-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 0;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Breadcrumb */
+  .admin-breadcrumb {
+    background: white;
+    /* border-radius: 12px; */
+    padding: 0px 1.5rem 1rem 1.5rem;
+    margin-bottom: 2rem;
+    /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); */
+  }
+
+  .breadcrumb {
+    margin: 0;
+    background: transparent;
+    padding: 0;
+  }
+
+  .breadcrumb-item {
+    font-weight: 500;
+  }
+
+  .breadcrumb-item + .breadcrumb-item::before {
+    content: "→";
+    color: var(--gray-400);
+  }
+
+  .breadcrumb-item.active {
+    color: var(--primary-color);
+  }
+
+  /* Content Card */
+  .admin-content-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+  }
+
+  .content-card-header {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    display: flex;
+    justify-content: between;
+    align-items: center;
+  }
+
+  .content-card-body {
+    padding: 2rem;
+  }
+
+  /* Action Buttons */
+  .admin-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .btn-admin {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+  }
+
+  .btn-admin:hover {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 102, 204, 0.3);
+    color: white;
+    text-decoration: none;
+  }
+
+  .btn-admin.btn-secondary {
+    background: linear-gradient(135deg, var(--gray-600), var(--gray-700));
+  }
+
+  .btn-admin.btn-secondary:hover {
+    background: linear-gradient(135deg, var(--gray-700), var(--gray-800));
+  }
+
+  .btn-admin.btn-success {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+  }
+
+  .btn-admin.btn-danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+  }
+
+  .btn-admin.btn-warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+  }
+
+  /* Tables */
+  .admin-table {
+    background: white;
+    /* border-radius: 16px; */
+    overflow: hidden;
+    /* box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06); */
+    /* margin-top: 1.5rem; */
+  }
+
+  .table-modern {
+    margin: 0;
+    border: none;
+  }
+
+  .table-modern thead {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+  }
+
+  .table-modern th {
+    font-weight: 600;
+    border: none;
+    padding: 1.25rem 1rem;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    vertical-align: middle;
+  }
+
+  .table-modern td {
+    border: none;
+    padding: 1.25rem 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  }
+
+  .table-modern tbody tr:hover {
+    background-color: rgba(0, 102, 204, 0.05);
+  }
+
+  .table-modern tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* Action buttons in table */
+  .table-action-btn {
+    background: var(--secondary-color);
+    color: white;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    margin-right: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .table-action-btn:hover {
+    background: var(--secondary-dark);
+    color: white;
+    transform: translateY(-1px);
+    text-decoration: none;
+  }
+
+  .table-action-btn.btn-danger {
+    background: #ef4444;
+  }
+
+  .table-action-btn.btn-danger:hover {
+    background: #dc2626;
+  }
+
+  .table-action-btn.btn-warning {
+    background: #f59e0b;
+  }
+
+  .table-action-btn.btn-info {
+    background: #06b6d4;
+  }
+
+  /* Forms */
+  .admin-form {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  }
+
+  .form-group-modern {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-label-modern {
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  .form-control-modern {
+    border: 2px solid var(--gray-200);
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    width: 100%;
+  }
+
+  .form-control-modern:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+  }
+
+  /* Empty States */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--gray-600);
+  }
+
+  .empty-state i {
+    font-size: 4rem;
+    color: var(--gray-300);
+    margin-bottom: 1.5rem;
+  }
+
+  .empty-state h3 {
+    color: var(--gray-700);
+    margin-bottom: 0.5rem;
+  }
+
+  .empty-state p {
+    color: var(--gray-500);
+    margin-bottom: 2rem;
+  }
+
+  /* Loading States */
+  .loading-overlay {
+    position: relative;
+  }
+
+  .loading-overlay::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: inherit;
+  }
+
+  .loading-overlay::before {
+    content: '';
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--primary-color);
+    border-top: 3px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 10;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .admin-content-area {
+      margin-left: 0;
+      padding: 1rem;
+    }
+
+    .admin-content-area.sidebar-collapsed {
+      margin-left: 0;
+    }
+
+    .dashboard-topbar {
+      padding: 1.5rem;
+      /* border-radius: 16px; */
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .topbar-left h1.page-title {
+      font-size: 1.5rem;
+    }
+
+    .topbar-right {
+      width: 100%;
+      justify-content: flex-end;
+    }
+
+    .content-card-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .admin-actions {
+      width: 100%;
+    }
+
+    .btn-admin {
+      flex: 1;
+      justify-content: center;
+    }
+
+    .content-card-body {
+      padding: 1.5rem;
+    }
+
+    .table-responsive {
+      margin: 0 -1.5rem;
+    }
+  }
+
+  @keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+  }
+</style>
+{% block extra_css %}{% endblock %}
+{% endblock %}
+
+{% block nav %}
+{% include 'nav_cursos.html' %}
+{% endblock %}
+
+{% block main %}
+<div class="admin-template-wrapper">
+  <!-- Sidebar Menu -->
+  <div class="dashboard-sidebar" id="adminSidebar">
+    <div class="sidebar-header">
+      <div class="brand-logo">
+        <i class="fas fa-graduation-cap"></i>
+        <span>CEVEST Admin</span>
+      </div>
+      <button class="sidebar-toggle" id="adminSidebarToggle">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <h6 class="nav-section-title">Principal</h6>
+        <ul class="nav-menu">
+          <li class="nav-item">
+            <a href="{% url 'administrativo2' %}" class="nav-link">
+              <i class="fas fa-tachometer-alt"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      
+      <div class="nav-section">
+        <h6 class="nav-section-title">Configurações</h6>
+        <ul class="nav-menu">
+          <li class="nav-item {% block nav_locais_active %}{% endblock %}">
+            <a href="{% url 'adm_locais_listar' %}" class="nav-link">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>Locais</span>
+            </a>
+          </li>
+          <li class="nav-item {% block nav_instituicoes_active %}{% endblock %}">
+            <a href="{% url 'adm_instituicoes_listar' %}" class="nav-link">
+              <i class="fas fa-university"></i>
+              <span>Instituições</span>
+            </a>
+          </li>
+          <li class="nav-item {% block nav_categorias_active %}{% endblock %}">
+            <a href="{% url 'adm_categorias_listar' %}" class="nav-link">
+              <i class="fas fa-tags"></i>
+              <span>Categorias</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      
+      <div class="nav-section">
+        <h6 class="nav-section-title">Gestão Acadêmica</h6>
+        <ul class="nav-menu">
+          <li class="nav-item {% block nav_cursos_active %}{% endblock %}">
+            <a href="{% url 'adm_cursos_listar' %}" class="nav-link">
+              <i class="fas fa-book-open"></i>
+              <span>Cursos</span>
+            </a>
+          </li>
+          <li class="nav-item {% block nav_alunos_active %}{% endblock %}">
+            <a href="{% url 'adm_alunos_listar' %}" class="nav-link">
+              <i class="fas fa-user-graduate"></i>
+              <span>Alunos</span>
+            </a>
+          </li>
+          <li class="nav-item {% block nav_professores_active %}{% endblock %}">
+            <a href="{% url 'adm_professores_listar' %}" class="nav-link">
+              <i class="fas fa-chalkboard-teacher"></i>
+              <span>Instrutores</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      
+      <div class="nav-section">
+        <h6 class="nav-section-title">Atividades</h6>
+        <ul class="nav-menu">
+          <li class="nav-item {% block nav_turmas_active %}{% endblock %}">
+            <a href="{% url 'adm_turmas_listar' %}" class="nav-link">
+              <i class="fas fa-users"></i>
+              <span>Turmas</span>
+            </a>
+          </li>
+          <li class="nav-item {% block nav_eventos_active %}{% endblock %}">
+            <a href="#" class="nav-link" onclick="alert('Funcionalidade de eventos temporariamente indisponível')">
+              <i class="fas fa-calendar-check"></i>
+              <span>Eventos</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar">
+          <i class="fas fa-user"></i>
+        </div>
+        <div class="user-details">
+          <span class="user-name">{{ user.first_name|default:user.username }}</span>
+          <span class="user-role">Administrador</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Content Area -->
+  <div class="admin-content-area" id="adminContentArea">
+    
+    <!-- Page Header -->
+     <div class="dashboard-topbar mb-4">
+      <div class="topbar-left">
+        <h1 class="page-title">
+          <i class="{% block page_icon %}fas fa-cog{% endblock %} me-4"></i>
+          {% block page_title %}Administração{% endblock %}
+        </h1>
+        <p class="page-subtitle">{% block page_subtitle %}Painel administrativo do sistema{% endblock %}</p>
+      </div>
+      <div class="topbar-right">
+        <div class="admin-actions">
+          {% block content_actions %}{% endblock %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Breadcrumb -->
+    <!-- {% block breadcrumb %}
+    <div class="admin-breadcrumb">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{% url 'administrativo2' %}">Dashboard</a></li>
+          {% block breadcrumb_items %}
+          <li class="breadcrumb-item active" aria-current="page">Administração</li>
+          {% endblock %}
+        </ol>
+      </nav>
+    </div>
+    {% endblock %} -->
+
+    <!-- Content -->
+   <div class="py-4 px-5">
+     {% block admin_content %}
+    <div class="admin-content-card">      
+      <div class="content-card-body">
+        {% block content_body %}
+        <p>Conteúdo da página administrativa.</p>
+        {% endblock %}
+      </div> 
+    </div>
+    {% endblock %}
+
+   </div>
+  </div>
+</div>
+
+<!-- Mobile Overlay -->
+<div class="mobile-overlay" id="adminMobileOverlay"></div>
+{% endblock %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebarToggle = document.getElementById('adminSidebarToggle');
+    const sidebar = document.getElementById('adminSidebar');
+    const contentArea = document.getElementById('adminContentArea');
+    const mobileOverlay = document.getElementById('adminMobileOverlay');
+    
+    sidebarToggle.addEventListener('click', function() {
+        if (window.innerWidth <= 768) {
+            sidebar.classList.toggle('mobile-open');
+            mobileOverlay.classList.toggle('active');
+        } else {
+            sidebar.classList.toggle('collapsed');
+            contentArea.classList.toggle('sidebar-collapsed');
+        }
+    });
+
+    mobileOverlay.addEventListener('click', function() {
+        sidebar.classList.remove('mobile-open');
+        mobileOverlay.classList.remove('active');
+    });
+
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            sidebar.classList.remove('mobile-open');
+            mobileOverlay.classList.remove('active');
+        }
+    });
+
+    // Loading state helper
+    window.showLoading = function(element) {
+        element.classList.add('loading-overlay');
+    };
+
+    window.hideLoading = function(element) {
+        element.classList.remove('loading-overlay');
+    };
+});
+</script>
+
+{% block admin_javascript %}
+{% endblock %}
+
+</body>
+</html>

@@ -1,0 +1,243 @@
+{% extends 'template_administrativo.html' %}
+{% load static %}
+
+{% block title %}Instituições - Administração{% endblock %}
+
+{% block nav_instituicoes_active %}active{% endblock %}
+
+{% block page_icon %}fas fa-university{% endblock %}
+{% block page_title %}Gerenciar Instituições{% endblock %}
+{% block page_subtitle %}Administre as instituições parceiras e colaboradoras{% endblock %}
+{% block page_header_icon %}fas fa-university{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'administrativo2' %}">Painel</a></li>
+<li class="breadcrumb-item active" aria-current="page">Instituições</li>
+{% endblock %}
+
+{% block content_title %}Lista de Instituições{% endblock %}
+
+{% block content_actions %}
+<a href="{% url 'administrativo2' %}" class="btn-admin btn-secondary">
+  <i class="fas fa-arrow-left"></i>
+  <span>Voltar ao Painel</span>
+</a>
+<a href="{% url 'cadastrar_instituicao' %}" class="btn-admin">
+  <i class="fas fa-plus"></i>
+  <span>Nova Instituição</span>
+</a>
+{% endblock %}
+
+{% block content_body %}
+<div class="admin-table">
+  <table class="table table-modern">
+    <thead>
+      <tr>
+        <th><i class="fas fa-university me-2"></i>Nome da Instituição</th>
+        <th><i class="fas fa-info-circle me-2"></i>Tipo</th>
+        <th><i class="fas fa-map-marker-alt me-2"></i>Localização</th>
+        <th><i class="fas fa-phone me-2"></i>Contato</th>
+        <th class="text-center"><i class="fas fa-cogs me-2"></i>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for instituicao in instituicoes %}
+      <tr>
+        <td>
+          <div class="d-flex align-items-center">
+            <div class="me-3">
+              <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #10b981, #34d399); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white;">
+                <i class="fas fa-university"></i>
+              </div>
+            </div>
+            <div>
+              <strong style="color: var(--gray-800);">{{ instituicao.nome }}</strong>
+              {% if instituicao.sigla %}
+              <div style="font-size: 0.85rem; color: var(--gray-600);">{{ instituicao.sigla }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </td>
+        <td>
+          {% if instituicao.tipo %}
+            <span class="badge bg-info" style="font-size: 0.85rem;">
+              <i class="fas fa-tag me-1"></i>
+              {{ instituicao.tipo }}
+            </span>
+          {% else %}
+            <span class="text-muted">
+              <i class="fas fa-minus me-2"></i>
+              Não informado
+            </span>
+          {% endif %}
+        </td>
+        <td>
+          {% if instituicao.endereco %}
+            <div style="color: var(--gray-700);">
+              <i class="fas fa-map-marker-alt me-2 text-muted"></i>
+              {{ instituicao.endereco|truncatechars:40 }}
+            </div>
+          {% else %}
+            <span class="text-muted">
+              <i class="fas fa-minus me-2"></i>
+              Não informado
+            </span>
+          {% endif %}
+        </td>
+        <td>
+          {% if instituicao.telefone or instituicao.email %}
+            <div class="contact-info">
+              {% if instituicao.telefone %}
+                <div style="font-size: 0.85rem; color: var(--gray-600);">
+                  <i class="fas fa-phone me-1"></i>
+                  {{ instituicao.telefone }}
+                </div>
+              {% endif %}
+              {% if instituicao.email %}
+                <div style="font-size: 0.85rem; color: var(--gray-600);">
+                  <i class="fas fa-envelope me-1"></i>
+                  {{ instituicao.email|truncatechars:25 }}
+                </div>
+              {% endif %}
+            </div>
+          {% else %}
+            <span class="text-muted">
+              <i class="fas fa-minus me-2"></i>
+              Não informado
+            </span>
+          {% endif %}
+        </td>
+        <td class="text-center">
+          <div class="btn-group" role="group">
+            <a href="{% url 'adm_instituicoes_editar' instituicao.id %}" class="table-action-btn" title="Editar instituição">
+              <i class="fas fa-edit"></i>
+              Editar
+            </a>
+            <a href="{% url 'adm_instituicoes_excluir' instituicao.id %}" class="table-action-btn btn-danger" 
+               title="Excluir instituição"
+               onclick="return confirm('⚠️ Tem certeza que deseja excluir a instituição &quot;{{ instituicao.nome }}&quot;?\n\nEsta ação não pode ser desfeita.')">
+              <i class="fas fa-trash"></i>
+              Excluir
+            </a>
+          </div>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="5">
+          <div class="empty-state">
+            <i class="fas fa-university"></i>
+            <h3>Nenhuma instituição cadastrada</h3>
+            <p>Comece cadastrando a primeira instituição parceira ou colaboradora.</p>
+            <a href="{% url 'cadastrar_instituicao' %}" class="btn-admin">
+              <i class="fas fa-plus"></i>
+              Cadastrar Primeira Instituição
+            </a>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Statistics Cards -->
+{% if instituicoes %}
+<div class="row mt-4">
+  <div class="col-md-3">
+    <div class="card border-0" style="background: linear-gradient(135deg, #e0f2fe, #b3e5fc); border-radius: 16px;">
+      <div class="card-body text-center">
+        <i class="fas fa-university fa-2x text-info mb-2"></i>
+        <h4 class="text-info mb-0">{{ instituicoes|length }}</h4>
+        <small class="text-muted">{{ instituicoes|length|pluralize:"Instituição,Instituições" }} cadastrada{{ instituicoes|length|pluralize:",s" }}</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0" style="background: linear-gradient(135deg, #e8f5e8, #c8e6c8); border-radius: 16px;">
+      <div class="card-body text-center">
+        <i class="fas fa-handshake fa-2x text-success mb-2"></i>
+        <h4 class="text-success mb-0">
+          {% with parceiras=0 %}
+            {% for inst in instituicoes %}
+              {% if "parceira" in inst.tipo|lower or "parceiro" in inst.tipo|lower %}
+                {% widthratio 1 1 1 as one %}
+                {{ parceiras|add:one }}
+              {% endif %}
+            {% endfor %}
+          {% endwith %}
+        </h4>
+        <small class="text-muted">Parceiras ativas</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0" style="background: linear-gradient(135deg, #fff3e0, #ffe0b2); border-radius: 16px;">
+      <div class="card-body text-center">
+        <i class="fas fa-phone fa-2x text-warning mb-2"></i>
+        <h4 class="text-warning mb-0">
+          {% with com_contato=0 %}
+            {% for inst in instituicoes %}
+              {% if inst.telefone or inst.email %}
+                {% widthratio 1 1 1 as one %}
+                {{ com_contato|add:one }}
+              {% endif %}
+            {% endfor %}
+          {% endwith %}
+        </h4>
+        <small class="text-muted">Com contato</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0" style="background: linear-gradient(135deg, #fce4ec, #f8bbd9); border-radius: 16px;">
+      <div class="card-body text-center">
+        <i class="fas fa-chart-line fa-2x text-danger mb-2"></i>
+        <h4 class="text-danger mb-0">100%</h4>
+        <small class="text-muted">Taxa de colaboração</small>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block admin_javascript %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar tooltips do Bootstrap
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(element) {
+        new bootstrap.Tooltip(element);
+    });
+
+    // Animação suave para os cards de estatísticas
+    const statCards = document.querySelectorAll('.card');
+    statCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        
+        setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, 200 + (index * 100));
+    });
+
+    // Highlight da linha da tabela ao passar o mouse
+    document.querySelectorAll('.table-modern tbody tr').forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = 'rgba(16, 185, 129, 0.08)';
+            this.style.transform = 'translateX(5px)';
+            this.style.transition = 'all 0.2s ease';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = '';
+            this.style.transform = 'translateX(0)';
+        });
+    });
+
+    console.log('🏛️ Página de Instituições carregada com sucesso!');
+});
+</script>
+{% endblock %}

@@ -1,0 +1,572 @@
+{% extends 'template_administrativo.html' %}
+{% load static %}
+
+{% block title %}Turmas - Administração{% endblock %}
+
+{% block nav_turmas_active %}active{% endblock %}
+
+{% block page_icon %}fas fa-users{% endblock %}
+{% block page_title %}Gerenciar Turmas{% endblock %}
+{% block page_subtitle %}Administre todas as turmas e classes do sistema{% endblock %}
+{% block page_header_icon %}fas fa-users{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'administrativo2' %}">Painel</a></li>
+<li class="breadcrumb-item active" aria-current="page">Turmas</li>
+{% endblock %}
+
+{% block content_title %}Lista de Turmas{% endblock %}
+
+{% block content_actions %}
+<a href="{% url 'administrativo2' %}" class="btn-admin btn-secondary">
+  <i class="fas fa-arrow-left"></i>
+  <span>Voltar ao Painel</span>
+</a>
+<a href="{% url 'adm_turmas_cadastrar' %}" class="btn-admin">
+  <i class="fas fa-plus"></i>
+  <span>Nova Turma</span>
+</a>
+<!-- <a href="{% url 'adm_turmas_listar_encerradas' %}" class="btn-admin btn-info">
+  <i class="fas fa-archive"></i>
+  <span>Turmas Encerradas</span>
+</a> -->
+{% endblock %}
+
+{% block content_body %}
+<!-- Filtros e Busca -->
+<div class="filters-section mb-4">
+  <form method="GET" id="filterForm">
+    <div class="row">
+      <div class="col-md-4">
+        <div class="filter-group">
+          <label class="filter-label">
+            <i class="fas fa-search me-2"></i>Buscar Turma
+          </label>
+          <input type="text" class="form-control" id="searchFilter" name="search" 
+                 placeholder="Digite nome da turma ou curso..." value="{{ current_search }}">
+        </div>
+      </div>
+      <div class="col-md-2">
+        <div class="filter-group">
+          <label class="filter-label">
+            <i class="fas fa-filter me-2"></i>Status
+          </label>
+          <select class="form-control" id="statusFilter" name="status">
+            <option value="">Todos</option>
+            <option value="aguardando" {% if current_status == 'aguardando' %}selected{% endif %}>Aguardando</option>
+            <option value="em-andamento" {% if current_status == 'em-andamento' %}selected{% endif %}>Em Andamento</option>
+            <option value="concluida" {% if current_status == 'concluida' %}selected{% endif %}>Concluída</option>
+            <option value="cancelada" {% if current_status == 'cancelada' %}selected{% endif %}>Cancelada</option>
+          </select>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="filter-group">
+          <label class="filter-label">
+            <i class="fas fa-graduation-cap me-2"></i>Curso
+          </label>
+          <select class="form-control" id="cursoFilter" name="curso">
+            <option value="">Todos os cursos</option>
+            {% for curso in cursos %}
+            <option value="{{ curso.id }}" {% if current_curso == curso.id|stringformat:"s" %}selected{% endif %}>
+              {{ curso.nome }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="filter-group">
+          <label class="filter-label">
+            <i class="fas fa-chalkboard-teacher me-2"></i>Instrutor
+          </label>
+          <select class="form-control" id="instrutorFilter" name="instrutor">
+            <option value="">Todos os instrutores</option>
+            {% for professor in professores %}
+            <option value="{{ professor.id }}" {% if current_instrutor == professor.id|stringformat:"s" %}selected{% endif %}>
+              {{ professor.nome }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="row mt-3">
+      <div class="col-12 text-end">
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-filter me-2"></i>Aplicar Filtros
+        </button>
+        <a href="{% url 'adm_turmas_listar' %}" class="btn btn-outline-secondary ms-2">
+          <i class="fas fa-undo me-2"></i>Limpar Filtros
+        </a>
+      </div>
+    </div>
+  </form>
+  
+  <!-- Indicador de status atual dos filtros -->
+  {% if current_status %}
+  <div class="alert alert-info d-flex align-items-center mt-3" role="alert">
+    <i class="fas fa-info-circle me-2"></i>
+    <div>
+      {% if current_status == 'concluida' %}
+        <strong>Exibindo turmas concluídas.</strong> Use o filtro acima para voltar às turmas ativas.
+      {% elif current_status == 'aguardando' %}
+        <strong>Exibindo turmas aguardando.</strong> Turmas em processo de pré-inscrição.
+      {% elif current_status == 'em-andamento' %}
+        <strong>Exibindo turmas em andamento.</strong> Turmas ativas no momento.
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<div class="admin-table">
+  <table class="table table-modern">
+    <thead>
+      <tr>
+        <th><i class="fas fa-users me-2"></i>Turma ID</th>
+        <th><i class="fas fa-graduation-cap me-2"></i>Curso</th>
+        <th><i class="fas fa-chalkboard-teacher me-2"></i>Instrutor</th>
+        <th><i class="fas fa-calendar me-2"></i>Período</th>
+        <th><i class="fas fa-user-friends me-2"></i>Alunos</th>
+        <th><i class="fas fa-traffic-light me-2"></i>Status</th>
+        <th class="text-center"><i class="fas fa-cogs me-2"></i>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for turma in turmas %}
+      <tr data-search="{{ turma.nome|lower }} {{ turma.curso.nome|lower }}" 
+          data-curso="{{ turma.curso.id }}" 
+          data-instrutor="{% with primeiro_instrutor=turma.instrutores.first %}{% if primeiro_instrutor %}{{ primeiro_instrutor.id }}{% endif %}{% endwith %}"
+          data-status="{{ turma.status|default:'aguardando'|lower }}">
+        <td style="text-align: center;">
+          <div class="d-flex align-items-center">
+              <!-- <div class="me-3">
+                <div style="width: 45px; height: 45px; background: linear-gradient(135deg, #6366f1, #8b5cf6); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white;">
+                  <i class="fas fa-users"></i>
+                </div>
+              </div> -->
+            <div class="m-auto">
+              <strong style="color: var(--gray-800);">{{ turma.nome }}</strong>
+              {% if turma.descricao %}
+              <div style="font-size: 0.85rem; color: var(--gray-600);">{{ turma.descricao|truncatechars:50 }}</div>
+              {% endif %}
+              <div style="font-size: 0.8rem ;">
+                <i class="fas fa-hashtag"></i>{{ turma.id }}
+              </div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="d-flex align-items-center">
+            {% if turma.curso.banner %}
+              <img src="{{ turma.curso.banner.url }}" alt="{{ turma.curso.nome }}" 
+                   style="width: 30px; height: 30px; object-fit: cover; border-radius: 6px; margin-right: 0.5rem;">
+            {% endif %}
+            <div>
+              <strong style="color: var(--gray-700);">{{ turma.curso.nome }}</strong>
+              {% if turma.curso.categoria %}
+                <div style="font-size: 0.8rem; color: var(--gray-500);">
+                  <i class="fas fa-tag me-1"></i>{{ turma.curso.categoria.nome }}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </td>
+        <td>
+          {% with primeiro_instrutor=turma.instrutores.first %}
+          {% if primeiro_instrutor %}
+            <div class="d-flex align-items-center">
+              <div style="width: 30px; height: 30px; background: #f59e0b; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; margin-right: 0.5rem;">
+                <i class="fas fa-user" style="font-size: 0.8rem;"></i>
+              </div>
+              <div>
+                <strong style="color: var(--gray-700); font-size: 0.9rem;">{{ primeiro_instrutor.nome|truncatechars:20 }}</strong>
+                {% if turma.instrutores.count > 1 %}
+                  <div style="font-size: 0.75rem; color: var(--gray-500);">+{{ turma.instrutores.count|add:"-1" }} outro{{ turma.instrutores.count|add:"-1"|pluralize:",s" }}</div>
+                {% endif %}
+              </div>
+            </div>
+          {% else %}
+            <span class="text-muted">
+              <i class="fas fa-user-slash me-2"></i>
+              Não atribuído
+            </span>
+          {% endif %}
+          {% endwith %}
+        </td>
+        <td>
+          <div class="date-info">
+            {% if turma.data_inicio %}
+              <div style="font-size: 0.85rem; color: var(--gray-600);">
+                <i class="fas fa-play me-1 text-success"></i>
+                {{ turma.data_inicio|date:"d/m/Y" }}
+              </div>
+            {% endif %}
+            {% if turma.data_fim %}
+              <div style="font-size: 0.85rem; color: var(--gray-600);">
+                <i class="fas fa-stop me-1 text-danger"></i>
+                {{ turma.data_fim|date:"d/m/Y" }}
+              </div>
+            {% endif %}
+            {% if not turma.data_inicio and not turma.data_fim %}
+              <span class="text-muted">
+                <i class="fas fa-calendar-times me-2"></i>
+                Não definido
+              </span>
+            {% endif %}
+          </div>
+        </td>
+        <td>
+          <div class="students-info">
+            <span class="badge bg-primary" style="font-size: 0.85rem;">
+              <i class="fas fa-user-friends me-1"></i>
+              {{ turma.alunos.count }}/{{ turma.vagas|default:"∞" }}
+            </span>
+            {% if turma.vagas and turma.alunos.count >= turma.vagas %}
+              <span class="badge bg-danger" style="font-size: 0.75rem; margin-left: 0.25rem;">
+                <i class="fas fa-exclamation me-1"></i>
+                Lotada
+              </span>
+            {% elif turma.vagas and turma.alunos.count >= turma.vagas|floatformat:0|add:"-5" %}
+              <span class="badge bg-warning" style="font-size: 0.75rem; margin-left: 0.25rem;">
+                <i class="fas fa-exclamation-triangle me-1"></i>
+                Quase lotada
+              </span>
+            {% endif %}
+          </div>
+        </td>
+        <td>
+          {% if turma.status == 'aguardando' or not turma.status %}
+            <span class="status-badge status-waiting">
+              <i class="fas fa-clock"></i>
+              Aguardando
+            </span>
+          {% elif turma.status == 'em-andamento' %}
+            <span class="status-badge status-active">
+              <i class="fas fa-play"></i>
+              Em Andamento
+            </span>
+          {% elif turma.status == 'concluida' %}
+            <span class="status-badge status-completed">
+              <i class="fas fa-check-circle"></i>
+              Concluída
+            </span>
+          {% elif turma.status == 'cancelada' %}
+            <span class="status-badge status-cancelled">
+              <i class="fas fa-times-circle"></i>
+              Cancelada
+            </span>
+          {% else %}
+            <span class="status-badge status-unknown">
+              <i class="fas fa-question"></i>
+              {{ turma.status|default:"Indefinido" }}
+            </span>
+          {% endif %}
+        </td>
+        <td class="text-center">
+          <div class="btn-group" role="group">
+            <a href="{% url 'adm_turma_visualizar' turma.id %}" class="table-action-btn btn-info" title="Ver detalhes">
+              <i class="fas fa-eye"></i>
+              Detalhes
+            </a>
+            <a href="{% url 'adm_turma_editar' turma.id %}" class="table-action-btn" title="Editar turma">
+              <i class="fas fa-edit"></i>
+              Editar
+            </a>
+            <a href="{% url 'adm_turma_excluir' turma.id %}" class="table-action-btn btn-danger" 
+               title="Excluir turma"
+               onclick="return confirm('⚠️ Tem certeza que deseja excluir a turma &quot;{{ turma.nome }}&quot;?\n\n{% if turma.alunos.count > 0 %}Esta turma possui {{ turma.alunos.count }} aluno(s) matriculado(s).{% endif %}\n\nEsta ação não pode ser desfeita.')">
+              <i class="fas fa-trash"></i>
+              Excluir
+            </a>
+          </div>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="7">
+          <div class="empty-state">
+            <i class="fas fa-users"></i>
+            <h3>Nenhuma turma cadastrada</h3>
+            <p>Comece cadastrando a primeira turma para organizar seus cursos.</p>
+            <a href="{% url 'adm_turmas_cadastrar' %}" class="btn-admin">
+              <i class="fas fa-plus"></i>
+              Cadastrar Primeira Turma
+            </a>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Statistics Cards -->
+{% if turmas %}
+<div class="row mt-4">
+  <div class="col-md-3">
+    <div class="card border-0" style="background: linear-gradient(135deg, #f3e8ff, #ddd6fe); border-radius: 16px;">
+      <div class="card-body text-center">
+        <i class="fas fa-users fa-2x" style="color: #8b5cf6;" class="mb-2"></i>
+        <h4 style="color: #8b5cf6;" class="mb-0">{{ turmas|length }}</h4>
+        <small class="text-muted">{{ turmas|length|pluralize:"Turma,Turmas" }} ativa{{ turmas|length|pluralize:",s" }}</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0" style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); border-radius: 16px;">
+      <div class="card-body text-center">
+        <i class="fas fa-user-friends fa-2x text-primary mb-2"></i>
+        <h4 class="text-primary mb-0">
+          {% with total_alunos=0 %}
+            {% for turma in turmas %}
+              {% widthratio turma.alunos.count 1 1 as alunos %}
+              {{ total_alunos|add:alunos }}
+            {% endfor %}
+          {% endwith %}
+        </h4>
+        <small class="text-muted">Alunos matriculados</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0" style="background: linear-gradient(135deg, #d1fae5, #a7f3d0); border-radius: 16px;">
+      <div class="card-body text-center">
+        <i class="fas fa-play fa-2x text-success mb-2"></i>
+        <h4 class="text-success mb-0">
+          {% with em_andamento=0 %}
+            {% for turma in turmas %}
+              {% if turma.status == 'em-andamento' %}
+                {% widthratio 1 1 1 as one %}
+                {{ em_andamento|add:one }}
+              {% endif %}
+            {% endfor %}
+          {% endwith %}
+        </h4>
+        <small class="text-muted">Em andamento</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0" style="background: linear-gradient(135deg, #fef3c7, #fde68a); border-radius: 16px;">
+      <div class="card-body text-center">
+        <i class="fas fa-clock fa-2x text-warning mb-2"></i>
+        <h4 class="text-warning mb-0">
+          {% with aguardando=0 %}
+            {% for turma in turmas %}
+              {% if turma.status == 'aguardando' or not turma.status %}
+                {% widthratio 1 1 1 as one %}
+                {{ aguardando|add:one }}
+              {% endif %}
+            {% endfor %}
+          {% endwith %}
+        </h4>
+        <small class="text-muted">Aguardando início</small>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block admin_javascript %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Elementos dos filtros
+    const searchFilter = document.getElementById('searchFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    const cursoFilter = document.getElementById('cursoFilter');
+    const instrutorFilter = document.getElementById('instrutorFilter');
+    const filterForm = document.getElementById('filterForm');
+    const tableRows = document.querySelectorAll('.table-modern tbody tr[data-search]');
+
+    // Filtros que requerem recarregamento da página
+    const reloadRequiredStatuses = ['concluida'];
+
+    function applyFilters() {
+        const searchValue = searchFilter.value.toLowerCase();
+        const statusValue = statusFilter.value.toLowerCase();
+        const cursoValue = cursoFilter.value;
+        const instrutorValue = instrutorFilter.value;
+
+        // Se o status requer recarregamento, submeter o form
+        if (reloadRequiredStatuses.includes(statusValue)) {
+            filterForm.submit();
+            return;
+        }
+
+        // Aplicar filtros via JavaScript para os outros casos
+        tableRows.forEach(row => {
+            const searchData = row.getAttribute('data-search');
+            const rowStatus = row.getAttribute('data-status');
+            const rowCurso = row.getAttribute('data-curso');
+            const rowInstrutor = row.getAttribute('data-instrutor');
+
+            const searchMatch = !searchValue || searchData.includes(searchValue);
+            const statusMatch = !statusValue || rowStatus.includes(statusValue);
+            const cursoMatch = !cursoValue || rowCurso === cursoValue;
+            const instrutorMatch = !instrutorValue || rowInstrutor === instrutorValue;
+
+            if (searchMatch && statusMatch && cursoMatch && instrutorMatch) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Atualizar contador de resultados
+        updateResultsCounter();
+    }
+
+    function updateResultsCounter() {
+        const visibleRows = document.querySelectorAll('.table-modern tbody tr[data-search]:not([style*="display: none"])');
+        const totalRows = tableRows.length;
+        
+        // Criar ou atualizar contador se não existir
+        let counter = document.getElementById('resultsCounter');
+        if (!counter) {
+            counter = document.createElement('div');
+            counter.id = 'resultsCounter';
+            counter.className = 'text-muted mb-2';
+            const table = document.querySelector('.admin-table');
+            table.parentNode.insertBefore(counter, table);
+        }
+        
+        counter.innerHTML = `<i class="fas fa-info-circle me-1"></i>Mostrando ${visibleRows.length} de ${totalRows} turma${totalRows !== 1 ? 's' : ''}`;
+    }
+
+    // Event listeners
+    searchFilter.addEventListener('input', function() {
+        // Delay para evitar muitas execuções
+        clearTimeout(this.searchTimeout);
+        this.searchTimeout = setTimeout(applyFilters, 300);
+    });
+    
+    statusFilter.addEventListener('change', applyFilters);
+    cursoFilter.addEventListener('change', applyFilters);
+    instrutorFilter.addEventListener('change', applyFilters);
+
+    // Auto-submit form quando mudar para status que requer reload
+    statusFilter.addEventListener('change', function() {
+        if (reloadRequiredStatuses.includes(this.value)) {
+            // Adicionar loading state
+            const button = document.querySelector('button[type="submit"]');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Carregando...';
+            button.disabled = true;
+            
+            // Submit form
+            filterForm.submit();
+        }
+    });
+
+    // Inicializar contador na carga da página
+    updateResultsCounter();
+
+    // Inicializar tooltips do Bootstrap
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(element) {
+        new bootstrap.Tooltip(element);
+    });
+
+    // Animação suave para os cards de estatísticas
+    const statCards = document.querySelectorAll('.card');
+    statCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        
+        setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, 200 + (index * 100));
+    });
+
+    // Highlight da linha da tabela ao passar o mouse
+    document.querySelectorAll('.table-modern tbody tr').forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = 'rgba(139, 92, 246, 0.08)';
+            this.style.transform = 'translateX(5px)';
+            this.style.transition = 'all 0.2s ease';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = '';
+            this.style.transform = 'translateX(0)';
+        });
+    });
+
+    console.log('👥 Página de Turmas carregada com sucesso!');
+});
+</script>
+
+<style>
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: 2px solid transparent;
+}
+
+.status-waiting {
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+.status-active {
+  background: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+  border-color: rgba(34, 197, 94, 0.2);
+}
+
+.status-completed {
+  background: rgba(59, 130, 246, 0.1);
+  color: #2563eb;
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+.status-cancelled {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.status-unknown {
+  background: rgba(156, 163, 175, 0.1);
+  color: #6b7280;
+  border-color: rgba(156, 163, 175, 0.2);
+}
+
+.date-info {
+  font-size: 0.85rem;
+}
+
+.students-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  align-items: flex-start;
+}
+
+@media (max-width: 768px) {
+  .btn-group {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .table-action-btn {
+    justify-content: center;
+    width: 100%;
+  }
+  
+  .students-info {
+    align-items: center;
+  }
+}
+</style>
+{% endblock %}

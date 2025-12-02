@@ -1,0 +1,565 @@
+{% extends 'template_administrativo.html' %}
+{% load static %}
+
+{% block title %}{{ aluno.pessoa.nome }} - Perfil do Aluno{% endblock %}
+
+{% block nav_alunos_active %}active{% endblock %}
+
+{% block page_icon %}fas fa-user-graduate{% endblock %}
+{% block page_title %}{{ aluno.pessoa.nome }}{% endblock %}
+{% block page_subtitle %}Perfil completo e histórico acadêmico do aluno{% endblock %}
+{% block page_header_icon %}fas fa-user-graduate{% endblock %}
+
+{% block content_actions %}
+<a href="{% url 'adm_alunos_listar' %}" class="btn-admin btn-secondary">
+  <i class="fas fa-arrow-left"></i>
+  <span>Voltar à Lista</span>
+</a>
+<a href="{% url 'adm_aluno_inscrever_turma' aluno.id %}" class="btn-admin btn-success">
+  <i class="fas fa-plus-circle"></i>
+  <span>Inscrever em Turma</span>
+</a>
+<a href="#" class="btn-admin">
+  <i class="fas fa-edit"></i>
+  <span>Editar Aluno</span>
+</a>
+{% endblock %}
+
+{% block admin_content %}
+<!-- Informações Pessoais -->
+<div class="row">
+  <div class="col-md-8">
+    <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px; overflow: hidden;">
+      <div class="card-header" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); color: white; padding: 2rem;">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <h4 class="mb-1" style="font-weight: 600;">
+              <i class="fas fa-user me-2"></i>
+              Informações Pessoais
+            </h4>
+            <p class="mb-0 opacity-75">Dados pessoais e de contato do aluno</p>
+          </div>
+          {% if aluno.pessoa.foto %}
+          <div style="width: 80px; height: 80px; border-radius: 50%; overflow: hidden; border: 3px solid rgba(255,255,255,0.2);">
+            <img src="{{ aluno.pessoa.foto.url }}" alt="{{ aluno.pessoa.nome }}" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+          {% else %}
+          <div style="width: 80px; height: 80px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem;">
+            <i class="fas fa-user"></i>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      <div class="card-body" style="padding: 2rem;">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="info-item mb-3">
+              <label class="info-label">
+                <i class="fas fa-user me-2 text-primary"></i>
+                Nome Completo
+              </label>
+              <div class="info-value">{{ aluno.pessoa.nome }}</div>
+            </div>
+            
+            <div class="info-item mb-3">
+              <label class="info-label">
+                <i class="fas fa-id-card me-2 text-primary"></i>
+                CPF
+              </label>
+              <div class="info-value">
+                {% if aluno.pessoa.cpf %}
+                  <code class="bg-light px-2 py-1 rounded">{{ aluno.pessoa.cpf }}</code>
+                {% else %}
+                  <span class="text-muted">Não informado</span>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="info-item mb-3">
+              <label class="info-label">
+                <i class="fas fa-birthday-cake me-2 text-primary"></i>
+                Data de Nascimento
+              </label>
+              <div class="info-value">
+                {% if aluno.pessoa.dt_nascimento %}
+                  {{ aluno.pessoa.dt_nascimento|date:"d/m/Y" }}
+                  <small class="text-muted">
+                    ({{ aluno.pessoa.dt_nascimento|timesince }} atrás)
+                  </small>
+                {% else %}
+                  <span class="text-muted">Não informada</span>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="info-item mb-3">
+              <label class="info-label">
+                <i class="fas fa-briefcase me-2 text-primary"></i>
+                Profissão
+              </label>
+              <div class="info-value">
+                {% if aluno.profissão and aluno.profissão != 'Não informado' %}
+                  {{ aluno.profissão }}
+                {% else %}
+                  <span class="text-muted">Não informada</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="info-item mb-3">
+              <label class="info-label">
+                <i class="fas fa-envelope me-2 text-primary"></i>
+                E-mail
+              </label>
+              <div class="info-value">
+                {% if aluno.pessoa.email %}
+                  <a href="mailto:{{ aluno.pessoa.email }}" class="text-decoration-none">
+                    {{ aluno.pessoa.email }}
+                  </a>
+                {% else %}
+                  <span class="text-muted">Não informado</span>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="info-item mb-3">
+              <label class="info-label">
+                <i class="fas fa-phone me-2 text-primary"></i>
+                Telefone
+              </label>
+              <div class="info-value">
+                {% if aluno.pessoa.numero %}
+                  <a href="tel:{{ aluno.pessoa.numero }}" class="text-decoration-none">
+                    {{ aluno.pessoa.numero }}
+                  </a>
+                {% else %}
+                  <span class="text-muted">Não informado</span>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="info-item mb-3">
+              <label class="info-label">
+                <i class="fas fa-graduation-cap me-2 text-primary"></i>
+                Escolaridade
+              </label>
+              <div class="info-value">
+                {% if aluno.escolaridade %}
+                  <span class="badge bg-info text-white" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+                    {{ aluno.get_escolaridade_display }}
+                  </span>
+                {% else %}
+                  <span class="text-muted">Não informada</span>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="info-item mb-3">
+              <label class="info-label">
+                <i class="fas fa-calendar-plus me-2 text-primary"></i>
+                Data de Cadastro
+              </label>
+              <div class="info-value">
+                {% if aluno.dt_inclusao %}
+                  {{ aluno.dt_inclusao|date:"d/m/Y H:i" }}
+                {% else %}
+                  <span class="text-muted">Não disponível</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {% if aluno.pessoa.endereco %}
+        <div class="mt-4">
+          <label class="info-label">
+            <i class="fas fa-map-marker-alt me-2 text-primary"></i>
+            Endereço
+          </label>
+          <div class="info-value">
+            <div class="p-3 rounded" style="background: #f8f9fa; border-left: 4px solid var(--primary-color);">
+              {{ aluno.pessoa.endereco }}
+              {% if aluno.pessoa.bairro %}, {{ aluno.pessoa.bairro }}{% endif %}
+              {% if aluno.pessoa.cep %}<br><small class="text-muted">CEP: {{ aluno.pessoa.cep }}</small>{% endif %}
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Estatísticas Rápidas -->
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px; background: linear-gradient(135deg, #e3f2fd, #bbdefb);">
+      <div class="card-body text-center" style="padding: 2rem;">
+        <i class="fas fa-graduation-cap fa-3x text-primary mb-3"></i>
+        <h3 class="text-primary mb-2">{{ aluno.inscricao_set.count }}</h3>
+        <p class="text-muted mb-0">{{ aluno.inscricao_set.count|pluralize:"Curso,Cursos" }} inscrito{{ aluno.inscricao_set.count|pluralize:",s" }}</p>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px; background: linear-gradient(135deg, #e8f5e8, #c8e6c8);">
+      <div class="card-body text-center" style="padding: 2rem;">
+        <i class="fas fa-certificate fa-3x text-success mb-3"></i>
+        <h3 class="text-success mb-2">0</h3>
+        <p class="text-muted mb-0">Certificados emitidos</p>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px; background: linear-gradient(135deg, #fff3e0, #ffe0b2);">
+      <div class="card-body text-center" style="padding: 2rem;">
+        <i class="fas fa-clock fa-3x text-warning mb-3"></i>
+        <h3 class="text-warning mb-2">0h</h3>
+        <p class="text-muted mb-0">Horas de estudo</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Histórico de Cursos -->
+<div class="card border-0 shadow-sm" style="border-radius: 16px; overflow: hidden;">
+  <div class="card-header" style="background: linear-gradient(135deg, var(--secondary-color), #20c997); color: white; padding: 2rem;">
+    <div class="d-flex justify-content-between align-items-center">
+      <div>
+        <h4 class="mb-1" style="font-weight: 600;">
+          <i class="fas fa-book me-2"></i>
+          Histórico Acadêmico
+        </h4>
+        <p class="mb-0 opacity-75">Cursos e atividades do aluno</p>
+      </div>
+    </div>
+  </div>
+  <div class="card-body" style="padding: 2rem;">
+    {% if matriculas %}
+    <div class="admin-table">
+      <table class="table table-modern">
+        <thead>
+          <tr>
+            <th><i class="fas fa-graduation-cap me-2"></i>Curso</th>
+            <th><i class="fas fa-users me-2"></i>Turma</th>
+            <th><i class="fas fa-calendar me-2"></i>Período</th>
+            <th><i class="fas fa-traffic-light me-2"></i>Status</th>
+            <th><i class="fas fa-star me-2"></i>Nota</th>
+            <th class="text-center"><i class="fas fa-cogs me-2"></i>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for matricula in matriculas %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center">
+                <div class="me-3">
+                  <div style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white;">
+                    <i class="fas fa-book"></i>
+                  </div>
+                </div>
+                <div>
+                  <strong style="color: var(--gray-800);">{{ matricula.turma.curso.nome }}</strong>
+                  {% if matricula.turma.curso.categoria %}
+                  <div style="font-size: 0.85rem; color: var(--gray-600);">
+                    <i class="{{ matricula.turma.curso.categoria.icone }} me-1"></i>
+                    {{ matricula.turma.curso.categoria.nome }}
+                  </div>
+                  {% endif %}
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="badge bg-info" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+                {{ matricula.turma.nome|default:matricula.turma }}
+              </span>
+            </td>
+            <td>
+              <div style="color: var(--gray-700);">
+                {% if matricula.turma.data_inicio %}
+                  <div style="font-size: 0.9rem;">
+                    <i class="fas fa-play me-1 text-success"></i>
+                    {{ matricula.turma.data_inicio|date:"d/m/Y" }}
+                  </div>
+                {% endif %}
+                {% if matricula.turma.data_final %}
+                  <div style="font-size: 0.9rem;">
+                    <i class="fas fa-stop me-1 text-danger"></i>
+                    {{ matricula.turma.data_final|date:"d/m/Y" }}
+                  </div>
+                {% endif %}
+              </div>
+            </td>
+            <td>
+              {% if matricula.status == 'ativo' %}
+                <span class="badge bg-success" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+                  <i class="fas fa-play me-1"></i>
+                  Ativo
+                </span>
+              {% elif matricula.status == 'concluido' %}
+                <span class="badge bg-primary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+                  <i class="fas fa-check me-1"></i>
+                  Concluído
+                </span>
+              {% elif matricula.status == 'cancelado' %}
+                <span class="badge bg-danger" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+                  <i class="fas fa-times me-1"></i>
+                  Cancelado
+                </span>
+              {% else %}
+                <span class="badge bg-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+                  <i class="fas fa-question me-1"></i>
+                  Indefinido
+                </span>
+              {% endif %}
+            </td>
+            <td>
+              {% if matricula.nota_final %}
+                <div class="text-center">
+                  <span class="badge {% if matricula.nota_final >= 7 %}bg-success{% elif matricula.nota_final >= 5 %}bg-warning{% else %}bg-danger{% endif %}" 
+                        style="font-size: 1rem; padding: 0.5rem 1rem; border-radius: 50%;">
+                    {{ matricula.nota_final }}
+                  </span>
+                </div>
+              {% else %}
+                <div class="text-center text-muted">
+                  <i class="fas fa-minus"></i>
+                </div>
+              {% endif %}
+            </td>
+            <td class="text-center">
+              <div class="btn-group" role="group">
+                <a href="#" class="table-action-btn btn-info" title="Ver detalhes">
+                  <i class="fas fa-eye"></i>
+                  Ver
+                </a>
+                {% if matricula.status == 'concluido' %}
+                <a href="#" class="table-action-btn btn-success" title="Emitir certificado">
+                  <i class="fas fa-certificate"></i>
+                  Certificado
+                </a>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state text-center py-5">
+      <i class="fas fa-book fa-3x text-muted mb-3"></i>
+      <h4 class="text-muted">Nenhum curso encontrado</h4>
+      <p class="text-muted">Este aluno ainda não se inscreveu em nenhum curso.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Informações do Responsável (se houver) -->
+{% if responsavel %}
+<div class="card border-0 shadow-sm mt-4" style="border-radius: 16px; overflow: hidden;">
+  <div class="card-header" style="background: linear-gradient(135deg, #f59e0b, #fbbf24); color: white; padding: 2rem;">
+    <h4 class="mb-0" style="font-weight: 600;">
+      <i class="fas fa-user-friends me-2"></i>
+      Responsável
+    </h4>
+  </div>
+  <div class="card-body" style="padding: 2rem;">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="info-item mb-3">
+          <label class="info-label">
+            <i class="fas fa-user me-2 text-warning"></i>
+            Nome
+          </label>
+          <div class="info-value">{{ responsavel.nome }}</div>
+        </div>
+        
+        <div class="info-item mb-3">
+          <label class="info-label">
+            <i class="fas fa-id-card me-2 text-warning"></i>
+            CPF
+          </label>
+          <div class="info-value">
+            {% if responsavel.cpf %}
+              <code class="bg-light px-2 py-1 rounded">{{ responsavel.cpf }}</code>
+            {% else %}
+              <span class="text-muted">Não informado</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="info-item mb-3">
+          <label class="info-label">
+            <i class="fas fa-envelope me-2 text-warning"></i>
+            E-mail
+          </label>
+          <div class="info-value">
+            {% if responsavel.email %}
+              <a href="mailto:{{ responsavel.email }}" class="text-decoration-none">
+                {{ responsavel.email }}
+              </a>
+            {% else %}
+              <span class="text-muted">Não informado</span>
+            {% endif %}
+          </div>
+        </div>
+        
+        <div class="info-item mb-3">
+          <label class="info-label">
+            <i class="fas fa-phone me-2 text-warning"></i>
+            Telefone
+          </label>
+          <div class="info-value">
+            {% if responsavel.celular %}
+              <a href="tel:{{ responsavel.celular }}" class="text-decoration-none">
+                {{ responsavel.celular }}
+              </a>
+            {% else %}
+              <span class="text-muted">Não informado</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block admin_javascript %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar tooltips do Bootstrap
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(element) {
+        new bootstrap.Tooltip(element);
+    });
+
+    // Animação suave para os cards
+    const cards = document.querySelectorAll('.card');
+    cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        
+        setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, 200 + (index * 100));
+    });
+
+    // Highlight da linha da tabela ao passar o mouse
+    document.querySelectorAll('.table-modern tbody tr').forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = 'rgba(32, 201, 151, 0.08)';
+            this.style.transform = 'translateX(5px)';
+            this.style.transition = 'all 0.2s ease';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = '';
+            this.style.transform = 'translateX(0)';
+        });
+    });
+
+    console.log('🎓 Página do Perfil do Aluno carregada com sucesso!');
+});
+</script>
+
+<style>
+.info-item {
+  margin-bottom: 1.5rem;
+}
+
+.info-label {
+  font-weight: 600;
+  color: var(--gray-700);
+  font-size: 0.9rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.info-value {
+  font-size: 1rem;
+  color: var(--gray-800);
+  line-height: 1.5;
+}
+
+.admin-table .table-modern {
+  margin-bottom: 0;
+}
+
+.admin-table .table-modern thead th {
+  background: rgba(0, 102, 204, 0.05);
+  color: var(--gray-700);
+  font-weight: 600;
+  border: none;
+  padding: 1rem;
+}
+
+.admin-table .table-modern tbody td {
+  border: none;
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+.admin-table .table-modern tbody tr {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.table-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--gray-300);
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--gray-700);
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  background: white;
+}
+
+.table-action-btn:hover {
+  background: var(--gray-50);
+  color: var(--gray-800);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.table-action-btn.btn-info {
+  border-color: #17a2b8;
+  color: #17a2b8;
+}
+
+.table-action-btn.btn-info:hover {
+  background: #17a2b8;
+  color: white;
+}
+
+.table-action-btn.btn-success {
+  border-color: #28a745;
+  color: #28a745;
+}
+
+.table-action-btn.btn-success:hover {
+  background: #28a745;
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .btn-group {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .table-action-btn {
+    justify-content: center;
+    width: 100%;
+  }
+}
+</style>
+{% endblock %}

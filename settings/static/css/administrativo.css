@@ -1,0 +1,41 @@
+.bg{
+    background-color: #104a74;
+}
+.painel{
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+.painel a{
+    padding: 20px 0px;
+    width: 100%;
+    background-color: #24364F;
+    border: 0.5px solid white;    
+    text-decoration: none;
+    text-align: center;
+    font-size: 14pt;
+    color: white;
+}
+
+.painel .ativo{
+    background-color: #104a74;
+}
+
+.painel a:hover{
+    background-color: #104a74;
+}
+.modaladm{
+    
+    --shadow-color: 0deg 0% 63%;
+    --shadow-elevation-medium:
+    0.3px 0.2px 0.4px hsl(var(--shadow-color) / 0.36),
+    1.1px 0.7px 1.5px -0.8px hsl(var(--shadow-color) / 0.36),
+    2.7px 1.6px 3.5px -1.7px hsl(var(--shadow-color) / 0.36),
+    6.7px 4px 8.8px -2.5px hsl(var(--shadow-color) / 0.36);
+    background-color: #fff;
+    width: 450px;
+    color: rgb(0, 0, 0);
+    border: 0.5px solid rgb(180, 180, 180);
+    border-radius: 5px;
+    box-shadow: var(--shadow-elevation-medium);
+}

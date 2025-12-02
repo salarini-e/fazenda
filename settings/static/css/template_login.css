@@ -1,0 +1,94 @@
+html, body{
+    min-height: 100%;    
+}
+:root{
+    --main-color: white;
+}
+
+.logo{
+    max-height: 100px;
+}
+main{
+    background-color: var(--main-color);
+    background-image: url(/static/images/bg.png);
+    background-size: cover;
+    color: white;
+}
+footer{
+    background-color: white;
+}
+@media (max-width: 600px)
+{
+    /* .navbar>.container-fluid{
+        flex-wrap: nowrap;
+    } */
+    .navbar-toggler{
+        margin: 30px auto;
+    }
+    .mobile-flex-column{
+        display: flex;
+        flex-direction: column;
+    }
+    .mobile-flex-column .col:last-child{
+        padding: 20px 40px;
+    }
+}
+
+.btn{
+    border-radius: 0 !important;
+}
+input{
+    border-radius: 0 !important;
+}
+
+.nav-item{
+    margin-left: 50px;
+}
+
+.bg-black{
+    background-color: black;
+    color: white;
+}
+
+footer h5{
+    text-transform: uppercase;
+}
+footer a{
+    text-decoration: none;
+    color: white;
+}
+
+h1{
+    font-family: 'Roboto', sans-serif;
+    
+}
+.text-justify{
+    text-align: justify;
+}
+
+.bg-main{
+    background-color: #547DCD;
+}
+
+#dropdownMenuPerfil:focus{
+    box-shadow:none !important;
+}
+#menu-perfil{
+    border-radius: 0;
+    width: 200px;
+    padding: 8px 10px;
+}
+
+#menu-perfil:before{    
+        content: '';
+        position: absolute;
+        width: 15px;
+        height: 15px;
+        right: 13px;
+        top: -8px;
+        background: #ffffff;
+        border-top: 1px solid black;
+        border-left: 1px solid black;
+        border-color: rgba(0,0,0,.15);
+        -webkit-transform: rotate(45deg);    
+}

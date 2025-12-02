@@ -1,0 +1,124 @@
+{% extends 'template_administrativo.html' %}
+{% load static %}
+
+{% block title %}Adicionar Disciplina - {{ curso.nome }}{% endblock %}
+
+{% block nav_cursos_active %}active{% endblock %}
+
+{% block page_icon %}fas fa-book-open{% endblock %}
+{% block page_title %}Adicionar Disciplina{% endblock %}
+{% block page_subtitle %}Adicione uma nova disciplina ao curso {{ curso.nome }}{% endblock %}
+
+{% block content_actions %}
+<a href="{% url 'adm_curso_detalhes' curso.id %}" class="btn-admin btn-secondary">
+  <i class="fas fa-arrow-left"></i>
+  <span>Voltar ao Curso</span>
+</a>
+{% endblock %}
+
+{% block admin_content %}
+<div class="admin-table">
+  <!-- Card com formulário -->
+  <div class="card border-0 shadow-sm" style="border-radius: 16px;">
+    <div class="card-header" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); color: white; border-radius: 16px 16px 0 0;">
+      <h5 class="mb-0 d-flex align-items-center">
+        <i class="fas fa-book-open me-3"></i>
+        Nova Disciplina para {{ curso.nome }}
+      </h5>
+    </div>
+    <div class="card-body p-4">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="row">
+          <div class="col-md-8">
+            <div class="mb-3">
+              <label for="nome" class="form-label">
+                <i class="fas fa-book me-2 text-primary"></i>
+                Nome da Disciplina *
+              </label>
+              <input type="text" class="form-control" id="nome" name="nome" required 
+                     placeholder="Ex: Matemática Básica, Algoritmos e Programação...">
+            </div>
+            
+            <div class="mb-3">
+              <label for="descricao" class="form-label">
+                <i class="fas fa-align-left me-2 text-primary"></i>
+                Descrição
+              </label>
+              <textarea class="form-control" id="descricao" name="descricao" rows="4" 
+                        placeholder="Descreva os objetivos e conteúdo da disciplina..."></textarea>
+            </div>
+          </div>
+          
+          <div class="col-md-4">
+            <div class="mb-3">
+              <label for="carga_horaria" class="form-label">
+                <i class="fas fa-clock me-2 text-primary"></i>
+                Carga Horária *
+              </label>
+              <div class="input-group">
+                <input type="number" class="form-control" id="carga_horaria" name="carga_horaria" 
+                       required min="1" placeholder="40">
+                <span class="input-group-text">horas</span>
+              </div>
+            </div>
+
+            <div class="card border-0 bg-light">
+              <div class="card-body text-center">
+                <i class="fas fa-info-circle fa-2x text-info mb-2"></i>
+                <h6 class="text-muted">Curso:</h6>
+                <p class="mb-0"><strong>{{ curso.nome }}</strong></p>
+                <small class="text-muted">{{ curso.categoria.nome }}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr class="my-4">
+
+        <div class="d-flex justify-content-between">
+          <a href="{% url 'adm_curso_detalhes' curso.id %}" class="btn btn-outline-secondary">
+            <i class="fas fa-times me-2"></i>
+            Cancelar
+          </a>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save me-2"></i>
+            Salvar Disciplina
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block admin_javascript %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animação para o card
+    const card = document.querySelector('.card');
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(20px)';
+    card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    
+    setTimeout(() => {
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0)';
+    }, 200);
+
+    // Focus no primeiro campo
+    document.getElementById('nome').focus();
+
+    console.log('📚 Página de Adicionar Disciplina carregada!');
+});
+</script>
+{% endblock %}

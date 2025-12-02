@@ -1,0 +1,100 @@
+.filtro {
+    align-items: center;
+}
+
+.btnacor {
+    border-color: #104a74;
+    background-color: #104a74;
+    color: white;
+}
+
+.btnacor:hover {
+    background-color: #104a74d7;
+    color: white;
+}
+
+.accordion-item:first-of-type .accordion-button {
+    border-radius: 0 !important;
+}
+
+.accordion-item:first-of-type {
+    border-radius: 0 !important;
+}
+
+.accordion-item:first-of-type,
+.accordion-item:last-of-type {
+    border-radius: 0 !important;
+}
+
+ul,
+li {
+    list-style: none !important;
+}
+
+li {
+    margin-bottom: 2px;
+}
+
+p {
+    margin: 0;
+}
+
+#id_curso {
+    background: #EEE;
+    pointer-events: none;
+    touch-action: none;
+}
+.nome_lugar{
+    background-color: red;
+    position: absolute;
+    top: 0;
+    right: 12px;
+    color: #fff;
+    border-radius: 4px;
+    padding: 0px 5px!important;
+    height: 23px;
+    line-height: 23px;
+    margin: 5px;
+}
+@media(max-width: 1024px){
+
+}
+@media(max-width: 768px){
+    .btn_matricula{
+        padding: 10px;
+        width: 25vw !important;
+    }
+}
+@media(max-width: 425px){
+    .btn_matricula{
+        padding: 10px;
+        width: 40vw !important;
+    }
+    #div_cursos_listados{
+        display: block !important;
+    }
+    .curso_listado{
+        width: 60vw !important;
+        margin: auto !important;
+        margin-bottom: 20px !important;
+    }
+    .curso_listado img{
+        width: 60vw !important;
+        height: 20vw !important;
+    }
+    .nome_lugar{
+        position: absolute;
+        right: 55px;
+        
+    }
+}
+@media(max-width: 375px){
+
+}
+@media(max-width: 320px){
+    .btn_matricula{
+        padding: 5px;
+        font-size: 14pt !important;
+        width: 45vw !important;
+    }
+}

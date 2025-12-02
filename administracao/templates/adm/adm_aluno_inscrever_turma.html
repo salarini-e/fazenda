@@ -1,0 +1,263 @@
+{% extends 'template_administrativo.html' %}
+{% load bootstrap5 %}
+{% load static %}
+
+{% block title %}Inscrever em Turma - {{ aluno.pessoa.nome }}{% endblock %}
+
+{% block nav_alunos_active %}active{% endblock %}
+
+{% block page_icon %}fas fa-graduation-cap{% endblock %}
+{% block page_title %}Inscrever em Turma{% endblock %}
+{% block page_subtitle %}Inscreva {{ aluno.pessoa.nome }} em uma turma{% endblock %}
+{% block page_header_icon %}fas fa-graduation-cap{% endblock %}
+
+{% block content_actions %}
+<a href="{% url 'adm_aluno_visualizar' aluno.id %}" class="btn-admin btn-secondary">
+  <i class="fas fa-arrow-left"></i>
+  <span>Voltar ao Aluno</span>
+</a>
+{% endblock %}
+
+{% block admin_content %}
+<!-- Informações do Aluno -->
+<div class="card border-0 shadow-sm mb-4" style="border-radius: 16px; overflow: hidden;">
+  <div class="card-header" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); color: white; padding: 1.5rem;">
+    <div class="d-flex align-items-center">
+      <div style="width: 60px; height: 60px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
+        <i class="fas fa-user-graduate fa-2x"></i>
+      </div>
+      <div>
+        <h4 class="mb-1" style="font-weight: 600;">{{ aluno.pessoa.nome }}</h4>
+        <p class="mb-0 opacity-75">CPF: {{ aluno.pessoa.cpf }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if turmas_disponiveis %}
+<div class="card border-0 shadow-sm" style="border-radius: 16px; overflow: hidden;">
+  <div class="card-header" style="background: linear-gradient(135deg, var(--secondary-color), #20c997); color: white; padding: 2rem;">
+    <h4 class="mb-0" style="font-weight: 600;">
+      <i class="fas fa-list me-2"></i>
+      Turmas Disponíveis
+    </h4>
+    <p class="mb-0 mt-2 opacity-75">
+      Selecione uma turma para inscrever o aluno
+    </p>
+  </div>
+  <div class="card-body" style="padding: 2rem;">
+    <form method="POST">
+      {% csrf_token %}
+      
+      <div class="search-container mb-4">
+        <input type="text" class="form-control" id="searchTurmas" 
+               placeholder="Buscar turmas por nome ou curso..." 
+               style="border: 2px solid var(--gray-200); border-radius: 8px; padding: 1rem;">
+      </div>
+      
+      <div class="turmas-grid">
+        {% for turma in turmas_disponiveis %}
+        <div class="turma-card" 
+             data-search="{{ turma|lower }} {{ turma.curso.nome|lower }}"
+             style="border: 2px solid var(--gray-200); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; cursor: pointer; transition: all 0.2s ease;">
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="turma_id" value="{{ turma.id }}" id="turma{{ turma.id }}" style="transform: scale(1.2);">
+            <label class="form-check-label w-100" for="turma{{ turma.id }}" style="cursor: pointer;">
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                  <h5 class="mb-2" style="color: var(--gray-800); font-weight: 600;">
+                    <i class="fas fa-users me-2 text-primary"></i>
+                    {{ turma }}
+                  </h5>
+                  
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="info-item mb-2">
+                        <i class="fas fa-graduation-cap me-2 text-secondary"></i>
+                        <strong>Curso:</strong> {{ turma.curso.nome }}
+                      </div>
+                      
+                      {% if turma.instrutor %}
+                      <div class="info-item mb-2">
+                        <i class="fas fa-chalkboard-teacher me-2 text-secondary"></i>
+                        <strong>Instrutor:</strong> {{ turma.instrutor.nome }}
+                      </div>
+                      {% endif %}
+                    </div>
+                    
+                    <div class="col-md-6">
+                      {% if turma.data_inicio %}
+                      <div class="info-item mb-2">
+                        <i class="fas fa-calendar-alt me-2 text-secondary"></i>
+                        <strong>Início:</strong> {{ turma.data_inicio|date:"d/m/Y" }}
+                      </div>
+                      {% endif %}
+                      
+                      {% if turma.quantidade_permitido %}
+                      <div class="info-item mb-2">
+                        <i class="fas fa-users me-2 text-secondary"></i>
+                        <strong>Vagas:</strong> {{ turma.quantidade_permitido }}
+                      </div>
+                      {% endif %}
+                    </div>
+                  </div>
+                  
+                  <div class="mt-2">
+                    {% if turma.status == 'ati' %}
+                      <span class="badge bg-success" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+                        <i class="fas fa-play me-1"></i>Ativa
+                      </span>
+                    {% elif turma.status == 'pre' %}
+                      <span class="badge bg-warning" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+                        <i class="fas fa-clock me-1"></i>Pré-inscrição
+                      </span>
+                    {% elif turma.status == 'acc' %}
+                      <span class="badge bg-primary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+                        <i class="fas fa-check me-1"></i>Aceitando
+                      </span>
+                    {% else %}
+                      <span class="badge bg-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+                        <i class="fas fa-pause me-1"></i>{{ turma.get_status_display }}
+                      </span>
+                    {% endif %}
+                    
+                    <span class="badge bg-info ms-2" style="font-size: 0.8rem; padding: 0.4rem 0.8rem;">
+                      <i class="fas fa-user-graduate me-1"></i>
+                      {{ turma.matricula_set.count }} inscrito{{ turma.matricula_set.count|pluralize:",s" }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </label>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      
+      <div class="mt-4 pt-3" style="border-top: 1px solid var(--gray-200);">
+        <button type="submit" class="btn btn-primary btn-lg" 
+                style="background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); border: none; padding: 1rem 2rem; border-radius: 12px;">
+          <i class="fas fa-user-plus me-2"></i>
+          Inscrever Aluno na Turma Selecionada
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% else %}
+<div class="card border-0 shadow-sm" style="border-radius: 16px; overflow: hidden;">
+  <div class="card-body text-center py-5">
+    <i class="fas fa-graduation-cap fa-4x text-muted mb-4"></i>
+    <h4 class="text-muted">Nenhuma turma disponível</h4>
+    <p class="text-muted">Este aluno já está inscrito em todas as turmas disponíveis ou não há turmas ativas no momento.</p>
+    <a href="{% url 'adm_turmas_listar' %}" class="btn btn-outline-primary mt-3">
+      <i class="fas fa-plus me-2"></i>
+      Ver Todas as Turmas
+    </a>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block admin_javascript %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Busca de turmas
+  const searchInput = document.getElementById('searchTurmas');
+  const turmaCards = document.querySelectorAll('.turma-card');
+  
+  if (searchInput) {
+    searchInput.addEventListener('input', function() {
+      const searchTerm = this.value.toLowerCase();
+      
+      turmaCards.forEach(card => {
+        const searchData = card.getAttribute('data-search');
+        if (searchData.includes(searchTerm)) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  }
+
+  // Seleção de turma
+  turmaCards.forEach(card => {
+    card.addEventListener('click', function() {
+      const radio = this.querySelector('input[type="radio"]');
+      if (radio) {
+        radio.checked = true;
+        
+        // Remove seleção de outros cards
+        turmaCards.forEach(otherCard => {
+          otherCard.style.borderColor = 'var(--gray-200)';
+          otherCard.style.backgroundColor = '';
+        });
+        
+        // Destaca card selecionado
+        this.style.borderColor = 'var(--primary-color)';
+        this.style.backgroundColor = 'rgba(0, 102, 204, 0.05)';
+      }
+    });
+
+    // Hover effect
+    card.addEventListener('mouseenter', function() {
+      if (!this.querySelector('input[type="radio"]').checked) {
+        this.style.borderColor = 'var(--primary-light)';
+        this.style.backgroundColor = 'rgba(0, 102, 204, 0.02)';
+        this.style.transform = 'translateY(-2px)';
+      }
+    });
+    
+    card.addEventListener('mouseleave', function() {
+      if (!this.querySelector('input[type="radio"]').checked) {
+        this.style.borderColor = 'var(--gray-200)';
+        this.style.backgroundColor = '';
+        this.style.transform = 'translateY(0)';
+      }
+    });
+  });
+
+  // Form validation
+  document.querySelector('form').addEventListener('submit', function(e) {
+    const selectedTurma = document.querySelector('input[name="turma_id"]:checked');
+    if (!selectedTurma) {
+      e.preventDefault();
+      alert('Por favor, selecione uma turma para inscrever o aluno.');
+    }
+  });
+
+  console.log('🎓 Página de Inscrição em Turma carregada com sucesso!');
+});
+</script>
+
+<style>
+.info-item {
+  font-size: 0.9rem;
+  color: var(--gray-700);
+}
+
+.turma-card {
+  position: relative;
+}
+
+.turma-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.form-check-input:checked + .form-check-label .turma-card {
+  border-color: var(--primary-color) !important;
+  background-color: rgba(0, 102, 204, 0.05) !important;
+}
+
+@media (max-width: 768px) {
+  .turmas-grid .turma-card {
+    margin-bottom: 1rem;
+  }
+  
+  .row .col-md-6 {
+    margin-bottom: 1rem;
+  }
+}
+</style>
+{% endblock %}

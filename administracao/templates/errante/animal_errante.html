@@ -1,0 +1,36 @@
+{% extends 'template_new.html' %}
+{% block title %}SSUBEA{% endblock %}
+{% block css %}{% endblock %}
+{% block nav %}
+{% include 'nav_bemestaranimal.html' %}
+{% endblock %}
+{% block main %}
+{% load bootstrap5 %}
+
+<div class="container pb-5">
+    <div class="row">
+            <h2>Animais errantes</h2>
+            <table class=" pt-5 table">
+                <thead>
+                    <tr>
+                        <th>Pelagem</th>
+                        <th>Tipo</th>
+                        <th class="text-center">Espécie</th>
+                        <th class="text-center">Visualizar imagem</th>
+                    </tr>
+                </thead>
+                {% for animal in errantes %}
+                    <tr>
+                        <td>{{animal.pelagem}}</td>
+                        <td>{{animal.tipo}}</td>
+                        <td class="text-center">{% if animal.especie.nome_especie %}{{animal.especie.nome_especie}}{% else %}-{% endif %}</td>
+                        
+                        <td class="text-center"><a href="{{animal.animal_image.url}}"><i class="fa-solid fa-image"></i></a></td>
+                    </tr>
+                {% endfor %}
+            </table>
+    </div>
+</div>
+<script>
+</script>
+{% endblock %}

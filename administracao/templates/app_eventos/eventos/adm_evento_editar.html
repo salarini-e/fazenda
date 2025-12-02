@@ -1,0 +1,68 @@
+{% extends 'template_new.html' %}
+{% load bootstrap5 %}
+{% load static%}
+{% block title %}BEM VINDO - CURSOS LIVRES{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/administrativo.css' %}">
+
+{% endblock %}
+{% block administrativo %}fw-bold{% endblock %}
+{% block main %}
+<div class="row">
+    <div class="col d-flex py-5"> 
+        <div class="row w-100">
+            <div class="col-10 pb-4 m-auto bg-white">
+                             
+                <div class="row">
+                    <div class="col text-dark px-4 pt-4">
+                       <div class="row">
+                        <div class="col">
+                          <h1 class="text-uppercase">
+                            Painel -> Evento
+                          </h1>
+                        </div>
+                        <div class="col d-flex">
+                            <a href="{% url 'administrativo' %}" class="btn btn-dark ms-auto my-auto">
+                              PAINEL
+                            </a>
+                        </div>
+                       </div>
+                        <div class="row px-2 pt-2 d-flex">
+                            <div class="col px-0 painel">
+                                <a href="#" onclick="alert('Funcionalidade de eventos em desenvolvimento')"><i class="fa-solid fa-plus me-3"></i>Novo evento</a>
+                                <a href="#" onclick="alert('Funcionalidade de eventos em desenvolvimento')" class="ativo"><i class="fa-regular fa-file-lines me-3"></i>Listas/editar eventos</a>
+                            </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-12 pt-4">
+                            <div class="row">
+                              <div class="col d-flex flex-row-reverse">
+                                <div>
+                                  <a class="ms-auto btn btn-outline-dark" href="{% url 'adm_categorias_listar' %}">
+                                    <i class="fas fa-undo-alt me-2"></i> Voltar
+                                  </a>
+                                </div>
+                              </div>
+                            </div>
+                            <form class="row px-2" method="POST">
+                              <div class="col-12">
+                                <div class="w-100 h-100">
+                                  {% csrf_token %}
+                                  {% bootstrap_form form %}
+                                </div>
+                              </div>                              
+                              
+                              <button class="btn btn-outline-primary mt-3">
+                                  Editar
+                              </button>
+                          </form>
+                          </div>                          
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>    
+    </div>
+</div>
+
+{% endblock %}

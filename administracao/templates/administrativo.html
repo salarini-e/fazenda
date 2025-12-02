@@ -1,0 +1,1196 @@
+{% extends 'template_new.html' %}
+{% load bootstrap5 %}
+{% load static%}
+{% block title %}Painel Administrativo - Prefeitura de Nova Friburgo{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/administrativo.css' %}">
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* Ajustes específicos para o painel do CEVEST */
+  .dashboard-wrapper {
+    font-family: 'Inter', sans-serif;
+  }
+
+  .dashboard-sidebar {
+    background: linear-gradient(180deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  }
+
+  .brand-logo i {
+    color: var(--accent-color);
+  }
+
+  .nav-link:hover,
+  .nav-item.active .nav-link {
+    border-left-color: var(--accent-color);
+  }
+
+  .stat-card.education {
+    border-left-color: #27ae60;
+  }
+
+  .stat-card.education .stat-period-badge {
+    background: linear-gradient(135deg, #27ae60, #229954);
+  }
+
+  .stat-card.students {
+    border-left-color: #3498db;
+  }
+
+  .stat-card.students .stat-period-badge {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+  }
+
+  .stat-card.instructors {
+    border-left-color: #f39c12;
+  }
+
+  .stat-card.instructors .stat-period-badge {
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+  }
+
+  .stat-card.events {
+    border-left-color: #9b59b6;
+  }
+
+  .stat-card.events .stat-period-badge {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+  }
+
+  /* Customização dos action cards */
+  .action-card .action-icon.education {
+    background: linear-gradient(135deg, #27ae60, #229954);
+  }
+
+  .action-card .action-icon.management {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+  }
+
+  .action-card .action-icon.configuration {
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+  }
+
+  .action-card .action-icon.reports {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+  }
+
+  .action-card .action-icon.system {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+  }
+
+  /* Estilos específicos para cards de turmas */
+  .turma-card {
+    border-left: 4px solid #3498db;
+  }
+
+  .turma-card .card-description {
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+
+  .turma-card .card-description strong {
+    color: var(--gray-700);
+    font-weight: 600;
+  }
+
+  .turma-card .feature-tag {
+    background: rgba(52, 152, 219, 0.1);
+    color: #2980b9;
+    border: 1px solid rgba(52, 152, 219, 0.2);
+  }
+
+  .turma-card .status-dot.active {
+    background: #27ae60;
+    animation: pulse-green 2s infinite;
+  }
+
+  .turma-card .status-dot.warning {
+    background: #f39c12;
+    animation: pulse-orange 2s infinite;
+  }
+
+  @keyframes pulse-green {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(39, 174, 96, 0.4);
+    }
+    50% {
+      box-shadow: 0 0 0 8px rgba(39, 174, 96, 0);
+    }
+  }
+
+  @keyframes pulse-orange {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(243, 156, 18, 0.4);
+    }
+    50% {
+      box-shadow: 0 0 0 8px rgba(243, 156, 18, 0);
+    }
+  }
+
+  /* Advanced Management Sections */
+  .management-sections {
+    margin-top: 2rem;
+    padding: 0 1rem;
+  }
+
+  .management-category {
+    background: white;
+    border-radius: 24px;
+    margin-bottom: 3rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .management-category:hover {
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12);
+  }
+
+  .management-category.danger-zone {
+    border: 2px solid rgba(239, 68, 68, 0.2);
+    background: linear-gradient(135deg, #fff5f5 0%, #fef2f2 100%);
+  }
+
+  .category-header {
+    padding: 2rem;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .category-icon-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .category-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .category-icon::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.2), transparent);
+  }
+
+  .category-icon.settings {
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+  }
+
+  .category-icon.academic {
+    background: linear-gradient(135deg, #27ae60, #229954);
+  }
+
+  .category-icon.activities {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+  }
+
+  .category-icon.system {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+  }
+
+  .category-info h2 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gray-800);
+    font-family: var(--font-secondary);
+  }
+
+  .category-info p {
+    margin: 0;
+    color: var(--gray-600);
+    font-size: 0.95rem;
+  }
+
+  .category-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(0, 102, 204, 0.1);
+    border: 1px solid rgba(0, 102, 204, 0.2);
+    border-radius: 12px;
+    padding: 0.5rem 1rem;
+  }
+
+  .category-badge.warning {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.2);
+  }
+
+  .badge-count {
+    font-weight: 700;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+  }
+
+  .category-badge.warning .badge-count {
+    color: #e74c3c;
+  }
+
+  .badge-label {
+    font-size: 0.8rem;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+  }
+
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem;
+  }
+
+  .demo-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+
+  /* Advanced Action Cards */
+  .advanced-action-card {
+    background: white;
+    border-radius: 20px;
+    padding: 1.5rem;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid rgba(112, 112, 112, 0.26);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 280px;
+  }
+
+  .advanced-action-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  .advanced-action-card.featured {
+    border-color: var(--accent-color);
+    background: linear-gradient(135deg, #fffbf0 0%, #fef3c7 100%);
+  }
+
+  .advanced-action-card.featured::before {
+    background: linear-gradient(90deg, var(--accent-color), #f59e0b);
+  }
+
+  .advanced-action-card.demo-install {
+    border-color: rgba(34, 197, 94, 0.2);
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  }
+
+  .advanced-action-card.demo-remove {
+    border-color: rgba(239, 68, 68, 0.2);
+    background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card-icon::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.2), transparent);
+  }
+
+  .card-icon.settings {
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+  }
+
+  .card-icon.academic {
+    background: linear-gradient(135deg, #27ae60, #229954);
+  }
+
+  .card-icon.activities {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+  }
+
+  .card-icon.success {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+  }
+
+  .card-icon.danger {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+  }
+
+  .card-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 20px;
+    padding: 0.25rem 0.75rem;
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  .status-dot.active {
+    background: #22c55e;
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+  }
+
+  .status-dot.warning {
+    background: #f59e0b;
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+  }
+
+  .status-dot.success {
+    background: #22c55e;
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+  }
+
+  .status-dot.danger {
+    background: #ef4444;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+  }
+
+  .status-dot.pending {
+    background: #64748b;
+    box-shadow: 0 0 0 2px rgba(100, 116, 139, 0.2);
+  }
+
+  .status-text {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--gray-600);
+  }
+
+  .card-content {
+    flex: 1;
+    margin-bottom: 1rem;
+  }
+
+  .card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    color: var(--gray-800);
+    font-family: var(--font-secondary);
+  }
+
+  .card-description {
+    font-size: 0.9rem;
+    color: var(--gray-600);
+    line-height: 1.5;
+    margin: 0 0 1rem 0;
+  }
+
+  .card-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .feature-tag {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    color: var(--gray-600);
+    font-weight: 500;
+  }
+
+  .feature-tag i {
+    font-size: 0.7rem;
+  }
+
+  .card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
+  .card-action-text {
+    font-weight: 600;
+    color: var(--primary-color);
+    font-size: 0.9rem;
+  }
+
+  .card-arrow {
+    color: var(--primary-color);
+  }
+
+  /* Responsividade mobile aprimorada */
+  @media (max-width: 768px) {
+    .dashboard-sidebar {
+      transform: translateX(-100%);
+    }
+    
+    .dashboard-sidebar.mobile-open {
+      transform: translateX(0);
+    }
+    
+    .dashboard-content {
+      margin-left: 0;
+      width: 100%;
+    }
+    
+    .mobile-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 998;
+      display: none;
+    }
+    
+    .mobile-overlay.active {
+      display: block;
+    }
+
+    /* Management sections mobile */
+    .management-sections {
+      padding: 0 0.5rem;
+    }
+
+    .management-category {
+      border-radius: 16px;
+      margin-bottom: 2rem;
+    }
+
+    .category-header {
+      padding: 1.5rem;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+
+    .category-icon-wrapper {
+      gap: 1rem;
+    }
+
+    .category-icon {
+      width: 48px;
+      height: 48px;
+      font-size: 1.4rem;
+    }
+
+    .category-info h2 {
+      font-size: 1.25rem;
+    }
+
+    .category-grid {
+      grid-template-columns: 1fr;
+      padding: 1.5rem;
+      gap: 1rem;
+    }
+
+    .advanced-action-card {
+      height: auto;
+      min-height: 240px;
+      padding: 1.25rem;
+    }
+
+    .card-icon {
+      width: 40px;
+      height: 40px;
+      font-size: 1.1rem;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+    }
+
+    .card-description {
+      font-size: 0.85rem;
+    }
+
+    .feature-tag {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.4rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .category-header {
+      padding: 1rem;
+    }
+
+    .category-grid {
+      padding: 1rem;
+    }
+
+    .advanced-action-card {
+      padding: 1rem;
+      border-radius: 16px;
+    }
+
+    .card-features {
+      gap: 0.25rem;
+    }
+
+    .feature-tag {
+      font-size: 0.65rem;
+    }
+  }
+
+  /* Animações avançadas */
+  @keyframes slideInFromLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes fadeInScale {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(0, 102, 204, 0.4);
+    }
+    50% {
+      box-shadow: 0 0 0 10px rgba(0, 102, 204, 0);
+    }
+  }
+
+  .management-category {
+    animation: slideInFromLeft 0.8s ease-out;
+    animation-fill-mode: backwards;
+  }
+
+  .management-category:nth-child(1) { animation-delay: 0.1s; }
+  .management-category:nth-child(2) { animation-delay: 0.3s; }
+  .management-category:nth-child(3) { animation-delay: 0.5s; }
+  .management-category:nth-child(4) { animation-delay: 0.7s; }
+
+  .advanced-action-card {
+    animation: fadeInScale 0.6s ease-out;
+    animation-fill-mode: backwards;
+  }
+
+  .advanced-action-card.featured {
+    animation: pulseGlow 2s infinite;
+  }
+
+  /* Estados de loading */
+  .loading-card {
+    pointer-events: none;
+    opacity: 0.6;
+  }
+
+  .loading-card::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 24px;
+    height: 24px;
+    margin: -12px 0 0 -12px;
+    border: 2px solid var(--primary-color);
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  /* Acessibilidade aprimorada */
+  .advanced-action-card:focus {
+    outline: 3px solid var(--primary-color);
+    outline-offset: 2px;
+  }
+
+  .advanced-action-card:focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* Tooltips para cards */
+  .card-tooltip {
+    position: relative;
+  }
+
+  .card-tooltip::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 1000;
+  }
+
+  .card-tooltip:hover::after {
+    opacity: 1;
+  }
+</style>
+{% endblock %}
+{% block nav %}
+{% include 'nav_cursos.html' %}
+{% endblock %}
+
+{% block main %}
+<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+
+<!-- Professional Dashboard Layout -->
+<div class="dashboard-wrapper">
+  <!-- Sidebar Menu -->
+  <div class="dashboard-sidebar" id="dashboardSidebar">
+    <div class="sidebar-header">
+      <div class="brand-logo">
+        <i class="fas fa-graduation-cap"></i>
+        <span>CEVEST Admin</span>
+      </div>
+      <button class="sidebar-toggle" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+    
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <h6 class="nav-section-title">Principal</h6>
+        <ul class="nav-menu">
+          <li class="nav-item active">
+            <a href="{% url 'administrativo' %}" class="nav-link">
+              <i class="fas fa-tachometer-alt"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      
+      <div class="nav-section">
+        <h6 class="nav-section-title">Configurações</h6>
+        <ul class="nav-menu">
+          <li class="nav-item">
+            <a href="{% url 'adm_locais_listar' %}" class="nav-link">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>Locais</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'adm_instituicoes_listar' %}" class="nav-link">
+              <i class="fas fa-university"></i>
+              <span>Instituições</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'adm_categorias_listar' %}" class="nav-link">
+              <i class="fas fa-tags"></i>
+              <span>Categorias</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      
+      <div class="nav-section">
+        <h6 class="nav-section-title">Gestão Acadêmica</h6>
+        <ul class="nav-menu">
+          <li class="nav-item">
+            <a href="{% url 'adm_cursos_listar' %}" class="nav-link">
+              <i class="fas fa-book-open"></i>
+              <span>Cursos</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'adm_alunos_listar' %}" class="nav-link">
+              <i class="fas fa-user-graduate"></i>
+              <span>Alunos</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'adm_professores_listar' %}" class="nav-link">
+              <i class="fas fa-chalkboard-teacher"></i>
+              <span>Instrutores</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      
+      <div class="nav-section">
+        <h6 class="nav-section-title">Atividades</h6>
+        <ul class="nav-menu">
+          <li class="nav-item">
+            <a href="{% url 'adm_turmas_listar' %}" class="nav-link">
+              <i class="fas fa-users"></i>
+              <span>Turmas</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link" onclick="alert('Funcionalidade de eventos temporariamente indisponível')">
+              <i class="fas fa-calendar-check"></i>
+              <span>Eventos</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="fas fa-presentation"></i>
+              <span>Palestras</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      
+      <div class="nav-section">
+        <h6 class="nav-section-title">Sistema</h6>
+        <ul class="nav-menu">
+          <li class="nav-item">
+            <a href="{% url 'demo_install' %}" class="nav-link">
+              <i class="fas fa-download"></i>
+              <span>Instalar Demo</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="{% url 'demo_uninstall' %}" class="nav-link danger">
+              <i class="fas fa-trash"></i>
+              <span>Remover Demo</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar">
+          <i class="fas fa-user"></i>
+        </div>
+        <div class="user-details">
+          <span class="user-name">{{ user.first_name|default:user.username }}</span>
+          <span class="user-role">Administrador</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Dashboard Content -->
+  <div class="dashboard-content">
+    <!-- Top Bar -->
+    <div class="dashboard-topbar">
+      <div class="topbar-left">
+        <h1 class="page-title">
+          <i class="fas fa-graduation-cap me-2"></i>
+          Painel Administrativo CEVEST
+        </h1>
+        <p class="page-subtitle">Centro de controle para gestão educacional</p>
+      </div>
+      <div class="topbar-right">
+        <div class="quick-actions">
+          <button class="btn-action" title="Atualizar dados" onclick="location.reload()">
+            <i class="fas fa-sync-alt"></i>
+          </button>
+          <button class="btn-action" title="Configurações">
+            <i class="fas fa-cog"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard Stats Grid -->
+    <div class="stats-grid">
+      <!-- Cursos Ativos -->
+      <div class="stat-card education">
+        <div class="stat-period-badge recent-badge">
+          <i class="fas fa-calendar-day"></i>
+          <span>ATIVOS</span>
+        </div>
+        <div class="stat-content">
+          <div class="stat-number">{{ total_cursos }}</div>
+          <div class="stat-label">Cursos Ativos</div>
+          <div class="stat-sublabel">Disponíveis para matrícula</div>
+        </div>
+      </div>
+
+      <!-- Alunos Matriculados -->
+      <div class="stat-card students">
+        <div class="stat-period-badge recent-badge">
+          <i class="fas fa-users"></i>
+          <span>TOTAL</span>
+        </div>
+        <div class="stat-content">
+          <div class="stat-number">{{ total_alunos }}</div>
+          <div class="stat-label">Alunos Matriculados</div>
+          <div class="stat-sublabel">Em cursos ativos</div>
+        </div>
+      </div>
+      
+      <!-- Instrutores -->
+      <div class="stat-card instructors">
+        <div class="stat-period-badge recent-badge">
+          <i class="fas fa-chalkboard-teacher"></i>
+          <span>ATIVO</span>
+        </div>
+        <div class="stat-content">
+          <div class="stat-number">{{ total_instrutores }}</div>
+          <div class="stat-label">Instrutores</div>
+          <div class="stat-sublabel">Professores cadastrados</div>
+        </div>
+      </div>
+
+      <!-- Eventos -->
+      <div class="stat-card events">
+        <div class="stat-period-badge recent-badge">
+          <i class="fas fa-calendar-check"></i>
+          <span>MÊS</span>
+        </div>
+        <div class="stat-content">
+          <div class="stat-number">{{ total_eventos }}</div>
+          <div class="stat-label">Eventos</div>
+          <div class="stat-sublabel">Programados este mês</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Turmas Ativas Section -->
+    {% if turmas_ativas %}
+    <div class="management-sections">
+      <div class="management-category">
+        <div class="category-header">
+          <div class="category-icon-wrapper">
+            <div class="category-icon academic">
+              <i class="fas fa-users"></i>
+            </div>
+            <div class="category-info">
+              <h2 class="category-title">Turmas Ativas</h2>
+              <p class="category-description">Acompanhe as turmas em andamento e aguardando início</p>
+            </div>
+          </div>
+          <div class="category-badge">
+            <span class="badge-count">{{ turmas_ativas|length }}</span>
+            <span class="badge-label">turmas</span>
+          </div>
+        </div>
+        
+        <div class="category-grid">
+          {% for turma in turmas_ativas %}
+          <a href="{% url 'adm_turma_visualizar' turma.id %}" class="advanced-action-card turma-card" data-category="turmas">
+            <div class="card-header">
+              <div class="card-icon academic">
+                <i class="fas fa-users"></i>
+              </div>
+              <div class="card-status">
+                {% if turma.status == 'ati' or turma.status == 'acc' %}
+                  <span class="status-dot active"></span>
+                  <span class="status-text">Em andamento</span>
+                {% elif turma.status == 'pre' or turma.status == 'agu' %}
+                  <span class="status-dot warning"></span>
+                  <span class="status-text">Aguardando</span>
+                {% endif %}
+              </div>
+            </div>
+            <div class="card-content">
+              <h3 class="card-title">{{ turma.curso.nome }}</h3>
+              <p class="card-description">
+                <strong>Local:</strong> {{ turma.local.nome }}<br>
+                <strong>Início:</strong> {{ turma.data_inicio|date:"d/m/Y" }}<br>
+                {% if turma.instrutores.all %}
+                  <strong>Instrutor:</strong> {{ turma.instrutores.all.0.nome }}
+                {% endif %}
+              </p>
+              <div class="card-features">
+                <span class="feature-tag">
+                  <i class="fas fa-calendar"></i>
+                  {% if turma.data_final %}{{ turma.data_final|date:"d/m" }}{% else %}A definir{% endif %}
+                </span>
+                <span class="feature-tag">
+                  <i class="fas fa-user-friends"></i>
+                  {{ turma.quantidade_permitido }} vagas
+                </span>
+                {% if turma.status == 'ati' or turma.status == 'acc' %}
+                <span class="feature-tag">
+                  <i class="fas fa-play-circle"></i>
+                  Ativo
+                </span>
+                {% endif %}
+              </div>
+            </div>
+            <div class="card-footer">
+              <span class="card-action-text">Ver Detalhes</span>
+              <i class="fas fa-arrow-right card-arrow"></i>
+            </div>
+          </a>
+          {% endfor %}
+        </div>
+        
+        {% if turmas_ativas|length >= 6 %}
+        <div style="text-align: center; padding: 1.5rem;">
+          <a href="{% url 'adm_turmas_listar' %}" class="btn btn-outline-primary">
+            <i class="fas fa-list me-2"></i>
+            Ver Todas as Turmas
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+
+<!-- Mobile Overlay -->
+<div class="mobile-overlay" id="mobileOverlay"></div>
+
+<!-- JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Sidebar toggle functionality
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('dashboardSidebar');
+    const mobileOverlay = document.getElementById('mobileOverlay');
+    
+    sidebarToggle.addEventListener('click', function() {
+        if (window.innerWidth <= 768) {
+            sidebar.classList.toggle('mobile-open');
+            mobileOverlay.classList.toggle('active');
+        } else {
+            sidebar.classList.toggle('collapsed');
+        }
+    });
+
+    // Close sidebar when clicking overlay
+    mobileOverlay.addEventListener('click', function() {
+        sidebar.classList.remove('mobile-open');
+        mobileOverlay.classList.remove('active');
+    });
+
+    // Handle window resize
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768) {
+            sidebar.classList.remove('mobile-open');
+            mobileOverlay.classList.remove('active');
+        }
+    });
+
+    // Animate stat numbers on page load
+    function animateValue(element, start, end, duration) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            element.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString();
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    // Animate stat numbers
+    setTimeout(() => {
+        document.querySelectorAll('.stat-number').forEach(stat => {
+            const finalValue = parseInt(stat.textContent.replace(/,/g, ''));
+            stat.textContent = '0';
+            animateValue(stat, 0, finalValue, 1500);
+        });
+    }, 500);
+
+    // Advanced card interactions - hover effects removed
+    const advancedCards = document.querySelectorAll('.advanced-action-card');
+    
+    advancedCards.forEach((card, index) => {
+        // Initial animation delay
+        card.style.animationDelay = `${0.1 + (index * 0.05)}s`;
+        
+        // Add click animation
+        card.addEventListener('click', function(e) {
+            // Add loading state if it's a link
+            if (this.href && !this.href.includes('#')) {
+                this.classList.add('loading-card');
+            }
+        });
+    });
+
+    // Intersection Observer for scroll animations
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const scrollObserver = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+                
+                // Add stagger animation for cards within the same category
+                const cards = entry.target.querySelectorAll('.advanced-action-card');
+                cards.forEach((card, index) => {
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, index * 100);
+                });
+            }
+        });
+    }, observerOptions);
+
+    // Observe management categories
+    document.querySelectorAll('.management-category').forEach(category => {
+        category.style.opacity = '0';
+        category.style.transform = 'translateY(30px)';
+        category.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+        scrollObserver.observe(category);
+    });
+
+    // Status indicator animations
+    const statusDots = document.querySelectorAll('.status-dot');
+    statusDots.forEach(dot => {
+        if (dot.classList.contains('active') || dot.classList.contains('success')) {
+            // Add pulse animation for active status
+            setInterval(() => {
+                dot.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    dot.style.transform = 'scale(1)';
+                }, 200);
+            }, 3000);
+        }
+    });
+
+    // Enhanced keyboard navigation
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            sidebar.classList.remove('mobile-open');
+            mobileOverlay.classList.remove('active');
+        }
+    });
+
+    // Card category filtering (future feature)
+    window.filterCardsByCategory = function(category) {
+        const cards = document.querySelectorAll('.advanced-action-card');
+        cards.forEach(card => {
+            if (category === 'all' || card.dataset.category === category) {
+                card.style.display = 'flex';
+                card.style.animation = 'fadeInScale 0.4s ease-out';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    };
+
+    // Performance optimization: Lazy load card interactions
+    const lazyLoadCards = function() {
+        const cards = document.querySelectorAll('.advanced-action-card:not(.loaded)');
+        cards.forEach(card => {
+            if (card.getBoundingClientRect().top < window.innerHeight + 100) {
+                card.classList.add('loaded');
+                
+                // Add feature tag hover effects
+                const featureTags = card.querySelectorAll('.feature-tag');
+                featureTags.forEach(tag => {
+                    tag.addEventListener('mouseenter', function() {
+                        this.style.transform = 'scale(1.05)';
+                        this.style.background = 'rgba(0, 102, 204, 0.1)';
+                    });
+                    
+                    tag.addEventListener('mouseleave', function() {
+                        this.style.transform = 'scale(1)';
+                        this.style.background = 'rgba(0, 0, 0, 0.05)';
+                    });
+                });
+            }
+        });
+    };
+
+    // Initial lazy load
+    lazyLoadCards();
+    
+    // Lazy load on scroll
+    let scrollTimeout;
+    window.addEventListener('scroll', function() {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(lazyLoadCards, 100);
+    });
+
+    // Add ripple animation styles
+    const rippleStyle = document.createElement('style');
+    rippleStyle.textContent = `
+        @keyframes ripple {
+            0% {
+                width: 0;
+                height: 0;
+                opacity: 1;
+            }
+            100% {
+                width: 200px;
+                height: 200px;
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(rippleStyle);
+
+    // Console message for developers
+    console.log('🎓 CEVEST Dashboard loaded successfully!');
+    console.log('💡 Advanced UI/UX features enabled');
+});
+</script>
+{% endblock %}

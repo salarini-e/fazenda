@@ -1,0 +1,270 @@
+{% extends 'template_new.html' %}
+{% load bootstrap5 %}
+{% load static%}
+{% block title %}Painel Administrativo - Prefeitura de Nova Friburgo{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/administrativo.css' %}">
+<style>
+  .admin-dashboard {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    min-height: calc(100vh - 140px);
+    padding: 2rem 0;
+  }
+  
+  .dashboard-card {
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    border: none;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.15);
+  }
+  
+  .dashboard-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    padding: 2rem;
+    margin: -1px -1px 0 -1px;
+  }
+  
+  .dashboard-title {
+    font-family: var(--font-secondary);
+    font-weight: 700;
+    font-size: 2.5rem;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .dashboard-subtitle {
+    opacity: 0.9;
+    margin-top: 0.5rem;
+    font-size: 1.1rem;
+  }
+  
+  .section-title {
+    color: var(--gray-700);
+    font-family: var(--font-secondary);
+    font-weight: 600;
+    font-size: 1.5rem;
+    margin: 2rem 0 1rem;
+    padding-left: 1rem;
+    border-left: 4px solid var(--primary-color);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .admin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    padding: 0 2rem;
+  }
+  
+  .admin-link {
+    display: flex;
+    align-items: center;
+    padding: 1.25rem;
+    background: white;
+    border: 2px solid var(--gray-200);
+    border-radius: 0.75rem;
+    text-decoration: none;
+    color: var(--gray-700);
+    transition: all 0.3s ease;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  
+  .admin-link:hover {
+    color: white;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+    border-color: var(--primary-color);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,102,204,0.3);
+  }
+  
+  .admin-link i {
+    font-size: 1.5rem;
+    margin-right: 1rem;
+    width: 32px;
+    text-align: center;
+    transition: transform 0.3s ease;
+  }
+  
+  .admin-link:hover i {
+    transform: scale(1.1);
+  }
+  
+  .demo-section {
+    background: linear-gradient(135deg, #f8f9fa, #e3f2fd);
+    border-radius: 1rem;
+    padding: 2rem;
+    margin: 2rem;
+    border: 1px solid rgba(0,102,204,0.1);
+  }
+  
+  .demo-link {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-radius: 0.75rem;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    margin-bottom: 0.75rem;
+  }
+  
+  .demo-link.install {
+    background: rgba(40, 167, 69, 0.1);
+    border: 2px solid rgba(40, 167, 69, 0.2);
+    color: #155724;
+  }
+  
+  .demo-link.install:hover {
+    background: #28a745;
+    color: white;
+    transform: translateX(5px);
+  }
+  
+  .demo-link.uninstall {
+    background: rgba(220, 53, 69, 0.1);
+    border: 2px solid rgba(220, 53, 69, 0.2);
+    color: #721c24;
+  }
+  
+  .demo-link.uninstall:hover {
+    background: #dc3545;
+    color: white;
+    transform: translateX(5px);
+  }
+  
+  .demo-link i {
+    font-size: 1.25rem;
+    margin-right: 1rem;
+    width: 24px;
+  }
+  
+  @media (max-width: 768px) {
+    .dashboard-title {
+      font-size: 2rem;
+    }
+    
+    .admin-grid {
+      grid-template-columns: 1fr;
+      padding: 0 1rem;
+    }
+    
+    .demo-section {
+      margin: 1rem;
+      padding: 1.5rem;
+    }
+  }
+</style>
+{% endblock %}
+{% block nav %}
+{% include 'nav_cursos.html' %}
+{% endblock %}
+{% block main %}
+<div class="admin-dashboard">
+  <div class="container-fluid">
+    <div class="row justify-content-center">
+      <div class="col-12 col-xl-10">
+        <div class="dashboard-card">
+          <div class="dashboard-header">
+            <h1 class="dashboard-title">
+              <i class="fas fa-tachometer-alt me-3"></i>Painel Administrativo
+            </h1>
+            <p class="dashboard-subtitle">
+              Gerencie cursos, alunos, instrutores e todo o sistema educacional
+            </p>
+          </div>
+          
+          <div class="p-2">
+            <!-- Seção Principais -->
+            <h2 class="section-title">
+              <i class="fas fa-cog me-2"></i>Configurações Principais
+            </h2>
+            <div class="admin-grid">
+              <a href="{% url 'adm_locais_listar' %}" class="admin-link">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Locais de Cursos</span>
+              </a>
+              <a href="{% url 'adm_instituicoes_listar' %}" class="admin-link">
+                <i class="fas fa-university"></i>
+                <span>Instituições</span>
+              </a>
+              <a href="{% url 'adm_categorias_listar' %}" class="admin-link">
+                <i class="fas fa-tags"></i>
+                <span>Categorias de Atividades</span>
+              </a>
+            </div>
+            
+            <!-- Seção Gestão Acadêmica -->
+            <h2 class="section-title">
+              <i class="fas fa-graduation-cap me-2"></i>Gestão Acadêmica
+            </h2>
+            <div class="admin-grid">
+              <a href="{% url 'adm_cursos_listar' %}" class="admin-link">
+                <i class="fas fa-book-open"></i>
+                <span>Cursos</span>
+              </a>
+              <a href="{% url 'adm_alunos_listar' %}" class="admin-link">
+                <i class="fas fa-user-graduate"></i>
+                <span>Alunos</span>
+              </a>
+              <a href="{% url 'adm_professores_listar' %}" class="admin-link">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span>Instrutores</span>
+              </a>
+            </div>
+            
+            <!-- Seção Atividades -->
+            <h2 class="section-title">
+              <i class="fas fa-calendar-alt me-2"></i>Atividades
+            </h2>
+            <div class="admin-grid">
+              <a href="{% url 'adm_turmas_listar' %}" class="admin-link">
+                <i class="fas fa-users"></i>
+                <span>Turmas</span>
+              </a>
+              <a href="#" onclick="alert('Funcionalidade de eventos em desenvolvimento')" class="admin-link">
+                <i class="fas fa-calendar-check"></i>
+                <span>Eventos</span>
+              </a>
+              <a href="#" class="admin-link">
+                <i class="fas fa-presentation"></i>
+                <span>Palestras</span>
+              </a>
+            </div>
+          </div>
+          
+          <!-- Seção de Demonstração -->
+          <div class="demo-section">
+            <h2 class="section-title">
+              <i class="fas fa-flask me-2"></i>Sistema de Demonstração
+            </h2>
+            <p class="text-muted mb-4">Gerencie dados de demonstração para testes e apresentações do sistema.</p>
+            
+            <a href="{% url 'demo_install' %}" class="demo-link install" 
+               onclick="return confirm('Deseja instalar os dados de demonstração? Isso criará cursos, alunos, professores e turmas de exemplo.')">
+              <i class="fas fa-download"></i>
+              <span>Instalar Dados Demo</span>
+            </a>
+            
+            <a href="{% url 'demo_uninstall' %}" class="demo-link uninstall" 
+               onclick="return confirm('Deseja remover TODOS os dados de demonstração? Esta ação não pode ser desfeita!')">
+              <i class="fas fa-trash-alt"></i>
+              <span>Remover Dados Demo</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

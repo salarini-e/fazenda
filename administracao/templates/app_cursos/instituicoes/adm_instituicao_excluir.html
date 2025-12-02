@@ -1,0 +1,168 @@
+{% extends 'base_admin_page.html' %}
+{% load static %}
+
+{% block title %}Excluir Instituição - Administração{% endblock %}
+
+{% with page_title="Excluir Instituição" page_subtitle="Confirme a exclusão da instituição selecionada" page_icon="fas fa-university" show_dashboard_btn=True show_breadcrumb=True show_navigation=True %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item">
+  <a href="{% url 'administrativo2' %}">Painel</a>
+</li>
+<li class="breadcrumb-item">
+  <a href="{% url 'adm_instituicoes_listar' %}">Instituições</a>
+</li>
+<li class="breadcrumb-item active" aria-current="page">Excluir</li>
+{% endblock %}
+
+{% block nav_items %}
+<div class="nav-item">
+  <a href="{% url 'adm_cadastrar_instituicao' %}" class="nav-link">
+    <i class="fa-solid fa-plus me-2"></i>Nova Instituição
+  </a>
+</div>
+<div class="nav-item">
+  <a href="{% url 'adm_instituicoes_listar' %}" class="nav-link">
+    <i class="fa-regular fa-file-lines me-2"></i>Listar/Editar Instituições
+  </a>
+</div>
+{% endblock %}
+
+{% block card_content %}
+<!-- Informações da Instituição -->
+<div class="alert alert-info mb-4">
+  <div class="d-flex align-items-center">
+    <div class="me-3">
+      <div class="icon-circle bg-primary">
+        <i class="fas fa-university"></i>
+      </div>
+    </div>
+    <div>
+      <h5 class="mb-1">{{ instituicao.nome }}</h5>
+      {% if instituicao.sigla %}
+        <p class="mb-0 text-muted">{{ instituicao.sigla }}</p>
+      {% endif %}
+      {% if instituicao.endereco %}
+        <small class="text-muted">
+          <i class="fas fa-map-marker-alt me-1"></i>
+          {{ instituicao.endereco }}
+        </small>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Aviso de Exclusão -->
+<div class="alert alert-warning border-warning">
+  <div class="d-flex align-items-center">
+    <div class="me-3">
+      <i class="fas fa-exclamation-triangle fa-2x text-warning"></i>
+    </div>
+    <div>
+      <h5 class="mb-2">
+        <i class="fas fa-triangle-exclamation me-2"></i>
+        Atenção! Confirme a exclusão
+      </h5>
+      <p class="mb-2">
+        Você tem certeza que deseja excluir a instituição <strong>"{{ instituicao.nome }}"</strong>?
+      </p>
+      <small class="text-muted">
+        <i class="fas fa-info-circle me-1"></i>
+        Esta ação não pode ser desfeita e todos os dados relacionados serão perdidos.
+      </small>
+    </div>
+  </div>
+</div>
+
+<!-- Botões de Ação -->
+<div class="d-flex justify-content-between align-items-center pt-3">
+  <div>
+    <a href="{% url 'adm_instituicoes_listar' %}" class="btn btn-secondary">
+      <i class="fas fa-arrow-left me-2"></i>
+      Voltar para Lista
+    </a>
+  </div>
+  
+  <div>
+    <form method="POST" class="d-inline" onsubmit="return confirmDelete()">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">
+        <i class="fas fa-trash me-2"></i>
+        Confirmar Exclusão
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% endwith %}
+
+<style>
+.icon-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.alert {
+  border-radius: 12px;
+  border-width: 2px;
+}
+
+.btn {
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-danger:hover {
+  background-color: #dc2626;
+  border-color: #dc2626;
+}
+</style>
+
+<script>
+function confirmDelete() {
+    return confirm(
+        '⚠️ CONFIRMAÇÃO DE EXCLUSÃO\n\n' +
+        'Tem certeza que deseja excluir a instituição "{{ instituicao.nome }}"?\n\n' +
+        '• Esta ação não pode ser desfeita\n' +
+        '• Todos os dados relacionados serão perdidos\n' +
+        '• Cursos associados podem ser afetados\n\n' +
+        'Digite OK para confirmar:'
+    );
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🗑️ Página de exclusão de instituição carregada com sucesso!');
+    
+    // Adicionar efeito de foco no botão de exclusão após 2 segundos
+    setTimeout(function() {
+        const deleteBtn = document.querySelector('.btn-danger');
+        if (deleteBtn) {
+            deleteBtn.style.animation = 'pulse 2s infinite';
+        }
+    }, 2000);
+});
+
+// CSS para animação de pulse
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+    }
+`;
+document.head.appendChild(style);
+</script>

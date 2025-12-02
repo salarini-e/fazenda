@@ -1,0 +1,524 @@
+{% extends 'template_administrativo.html' %}
+{% load static %}
+
+{% block title %}Instrutores - Administração{% endblock %}
+
+{% block nav_professores_active %}active{% endblock %}
+
+{% block page_icon %}fas fa-chalkboard-teacher{% endblock %}
+{% block page_title %}Gerenciar Instrutores{% endblock %}
+{% block page_subtitle %}Administre todos os instrutores e professores do sistema{% endblock %}
+{% block page_header_icon %}fas fa-chalkboard-teacher{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'administrativo2' %}">Painel</a></li>
+<li class="breadcrumb-item active" aria-current="page">Instrutores</li>
+{% endblock %}
+
+{% block content_title %}Lista de Instrutores{% endblock %}
+
+{% block content_actions %}
+<a href="{% url 'administrativo2' %}" class="btn-admin btn-secondary">
+  <i class="fas fa-arrow-left"></i>
+  <span>Voltar ao Painel</span>
+</a>
+<a href="{% url 'adm_professores_cadastrar' %}" class="btn-admin">
+  <i class="fas fa-user-plus"></i>
+  <span>Novo Instrutor</span>
+</a>
+{% endblock %}
+
+{% block content_body %}
+<!-- Filtros e Busca -->
+<div class="filters-section mb-4">
+  <div class="row">
+    <div class="col-md-6">
+      <div class="filter-group">
+        <label class="filter-label">
+          <i class="fas fa-search me-2"></i>Buscar Instrutor
+        </label>
+        <input type="text" class="form-control" id="searchFilter" placeholder="Digite nome, especialidade ou email...">
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="filter-group">
+        <label class="filter-label">
+          <i class="fas fa-filter me-2"></i>Status
+        </label>
+        <select class="form-control" id="statusFilter">
+          <option value="">Todos</option>
+          <option value="ativo">Ativo</option>
+          <option value="inativo">Inativo</option>
+        </select>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="filter-group">
+        <label class="filter-label">
+          <i class="fas fa-graduation-cap me-2"></i>Especialidade
+        </label>
+        <select class="form-control" id="especialidadeFilter">
+          <option value="">Todas</option>
+          {% for especialidade in especialidades %}
+          <option value="{{ especialidade }}">{{ especialidade }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="admin-table">
+  <table class="table table-modern">
+    <thead>
+      <tr>
+        <th><i class="fas fa-user me-2"></i>Instrutor</th>
+        <th><i class="fas fa-graduation-cap me-2"></i>Especialidade</th>
+        <th><i class="fas fa-envelope me-2"></i>Contato</th>
+        <th><i class="fas fa-chalkboard me-2"></i>Cursos</th>
+        <th><i class="fas fa-star me-2"></i>Avaliação</th>
+        <th class="text-center"><i class="fas fa-cogs me-2"></i>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for professor in professores %}
+      <tr data-search="{{ professor.pessoa.nome|lower }} {{ professor.especialidade|default:''|lower }} {{ professor.pessoa.email|default:''|lower }}">
+        <td>
+          <div class="d-flex align-items-center">
+            <div class="me-3">
+              {% if professor.pessoa.foto %}
+                <img src="{{ professor.pessoa.foto.url }}" alt="{{ professor.pessoa.nome }}" 
+                     style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;">
+              {% else %}
+                <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #f59e0b, #fbbf24); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">
+                  <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+              {% endif %}
+            </div>
+            <div>
+              <strong style="color: var(--gray-800);">{{ professor.pessoa.nome }}</strong>
+              {% if professor.titulo %}
+                <div style="font-size: 0.85rem; color: var(--gray-600);">
+                  <i class="fas fa-award me-1"></i>
+                  {{ professor.titulo }}
+                </div>
+              {% endif %}
+              {% if professor.experiencia %}
+                <span class="badge bg-info" style="font-size: 0.75rem;">
+                  {{ professor.experiencia }} anos
+                </span>
+              {% endif %}
+            </div>
+          </div>
+        </td>
+        <td>
+          {% if professor.especialidade %}
+            <span class="badge bg-warning text-dark" style="font-size: 0.85rem;">
+              <i class="fas fa-graduation-cap me-1"></i>
+              {{ professor.especialidade }}
+            </span>
+            {% if professor.formacao %}
+              <div style="font-size: 0.8rem; color: var(--gray-600); margin-top: 0.25rem;">
+                <i class="fas fa-university me-1"></i>
+                {{ professor.formacao|truncatechars:30 }}
+              </div>
+            {% endif %}
+          {% else %}
+            <span class="text-muted">
+              <i class="fas fa-minus me-2"></i>
+              Não informado
+            </span>
+          {% endif %}
+        </td>
+        <td>
+          <div class="contact-info">
+            {% if professor.pessoa.email %}
+              <div style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 0.25rem;">
+                <i class="fas fa-envelope me-1"></i>
+                {{ professor.pessoa.email|truncatechars:25 }}
+              </div>
+            {% endif %}
+            {% if professor.pessoa.numero %}
+              <div style="font-size: 0.85rem; color: var(--gray-600);">
+                <i class="fas fa-phone me-1"></i>
+                {{ professor.pessoa.numero }}
+              </div>
+            {% endif %}
+            {% if not professor.pessoa.email and not professor.pessoa.numero %}
+              <span class="text-muted">
+                <i class="fas fa-minus me-2"></i>
+                Não informado
+              </span>
+            {% endif %}
+          </div>
+        </td>
+        <td>
+          {% if professor.cursos_ministrados.count > 0 %}
+            <div class="courses-info">
+              <span class="badge bg-primary" style="font-size: 0.85rem;">
+                <i class="fas fa-chalkboard me-1"></i>
+                {{ professor.cursos_ministrados.count }} curso{{ professor.cursos_ministrados.count|pluralize:",s" }}
+              </span>
+              {% if professor.turmas_ativas.count > 0 %}
+                <span class="badge bg-success" style="font-size: 0.75rem; margin-left: 0.25rem;">
+                  <i class="fas fa-users me-1"></i>
+                  {{ professor.turmas_ativas.count }} turma{{ professor.turmas_ativas.count|pluralize:",s" }} ativa{{ professor.turmas_ativas.count|pluralize:",s" }}
+                </span>
+              {% endif %}
+            </div>
+          {% else %}
+            <span class="badge bg-warning" style="font-size: 0.85rem;">
+              <i class="fas fa-exclamation me-1"></i>
+              Sem cursos
+            </span>
+          {% endif %}
+        </td>
+        <td>
+          {% if professor.avaliacao_media %}
+            <div class="rating-display">
+              <div class="stars">
+                {% for i in "12345" %}
+                  {% if forloop.counter <= professor.avaliacao_media %}
+                    <i class="fas fa-star text-warning"></i>
+                  {% else %}
+                    <i class="far fa-star text-muted"></i>
+                  {% endif %}
+                {% endfor %}
+              </div>
+              <small class="text-muted">({{ professor.avaliacao_media }}/5)</small>
+            </div>
+          {% else %}
+            <div class="text-muted">
+              <i class="fas fa-star-half-alt me-1"></i>
+              Sem avaliações
+            </div>
+          {% endif %}
+        </td>
+        <td class="text-center">
+          <div class="btn-group" role="group">
+            <a href="{% url 'visualizar_professor' professor.id %}" class="table-action-btn btn-info" title="Ver perfil">
+              <i class="fas fa-eye"></i>
+              Perfil
+            </a>
+            <a href="{% url 'editar_professor' professor.id %}" class="table-action-btn" title="Editar professor">
+              <i class="fas fa-edit"></i>
+              Editar
+            </a>
+            <a href="{% url 'excluir_professor' professor.id %}" class="table-action-btn btn-danger" 
+               title="Excluir professor"
+               onclick="return confirm('⚠️ Tem certeza que deseja excluir o professor &quot;{{ professor.pessoa.nome }}&quot;?\n\n{% if professor.cursos_ministrados.count > 0 %}Este professor possui {{ professor.cursos_ministrados.count }} curso(s) vinculado(s).{% endif %}\n\nEsta ação não pode ser desfeita.')">
+              <i class="fas fa-trash"></i>
+              Excluir
+            </a>
+          </div>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="6">
+          <div class="empty-state">
+            <i class="fas fa-chalkboard-teacher"></i>
+            <h3>Nenhum instrutor cadastrado</h3>
+            <p>Comece cadastrando o primeiro instrutor no sistema.</p>
+            <a href="{% url 'adm_professores_cadastrar' %}" class="btn-admin">
+              <i class="fas fa-user-plus"></i>
+              Cadastrar Primeiro Instrutor
+            </a>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Statistics Cards -->
+{% if professores %}
+<div class="row mt-4">
+  <div class="col-md-3">
+    <div class="card border-0" style="background: linear-gradient(135deg, #fef3c7, #fde68a); border-radius: 16px;">
+      <div class="card-body text-center">
+        <i class="fas fa-chalkboard-teacher fa-2x text-warning mb-2"></i>
+        <h4 class="text-warning mb-0">{{ professores|length }}</h4>
+        <small class="text-muted">{{ professores|length|pluralize:"Instrutor,Instrutores" }} cadastrado{{ professores|length|pluralize:",s" }}</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0" style="background: linear-gradient(135deg, #dbeafe, #bfdbfe); border-radius: 16px;">
+      <div class="card-body text-center">
+        <i class="fas fa-chalkboard fa-2x text-primary mb-2"></i>
+        <h4 class="text-primary mb-0">
+          {% with total_cursos=0 %}
+            {% for prof in professores %}
+              {% widthratio prof.cursos_ministrados.count 1 1 as cursos %}
+              {{ total_cursos|add:cursos }}
+            {% endfor %}
+          {% endwith %}
+        </h4>
+        <small class="text-muted">Cursos ministrados</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0" style="background: linear-gradient(135deg, #d1fae5, #a7f3d0); border-radius: 16px;">
+      <div class="card-body text-center">
+        <i class="fas fa-users fa-2x text-success mb-2"></i>
+        <h4 class="text-success mb-0">
+          {% with total_turmas=0 %}
+            {% for prof in professores %}
+              {% widthratio prof.turmas_ativas.count 1 1 as turmas %}
+              {{ total_turmas|add:turmas }}
+            {% endfor %}
+          {% endwith %}
+        </h4>
+        <small class="text-muted">Turmas ativas</small>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card border-0" style="background: linear-gradient(135deg, #fce4ec, #f8bbd9); border-radius: 16px;">
+      <div class="card-body text-center">
+        <i class="fas fa-star fa-2x text-danger mb-2"></i>
+        <h4 class="text-danger mb-0">4.8</h4>
+        <small class="text-muted">Avaliação média</small>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Top Instructors -->
+{% if professores %}
+<div class="mt-4">
+  <h3 class="mb-3"><i class="fas fa-trophy me-2"></i>Instrutores Destaque</h3>
+  <div class="row">
+    {% for professor in professores|slice:":3" %}
+    <div class="col-md-4">
+      <div class="instructor-highlight-card">
+        <div class="instructor-avatar">
+          {% if professor.pessoa.foto %}
+            <img src="{{ professor.pessoa.foto.url }}" alt="{{ professor.pessoa.nome }}">
+          {% else %}
+            <div class="avatar-placeholder">
+              <i class="fas fa-chalkboard-teacher"></i>
+            </div>
+          {% endif %}
+        </div>
+        <div class="instructor-info">
+          <h5>{{ professor.pessoa.nome }}</h5>
+          {% if professor.especialidade %}
+            <p class="speciality">{{ professor.especialidade }}</p>
+          {% endif %}
+          <div class="instructor-stats">
+            <span class="stat">
+              <i class="fas fa-chalkboard"></i>
+              {{ professor.cursos_ministrados.count }} curso{{ professor.cursos_ministrados.count|pluralize:",s" }}
+            </span>
+            <span class="stat">
+              <i class="fas fa-users"></i>
+              {{ professor.turmas_ativas.count }} turma{{ professor.turmas_ativas.count|pluralize:",s" }}
+            </span>
+          </div>
+          {% if professor.avaliacao_media %}
+            <div class="rating">
+              {% for i in "12345" %}
+                {% if forloop.counter <= professor.avaliacao_media %}
+                  <i class="fas fa-star"></i>
+                {% else %}
+                  <i class="far fa-star"></i>
+                {% endif %}
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block admin_javascript %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Filtros e busca
+    const searchFilter = document.getElementById('searchFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    const especialidadeFilter = document.getElementById('especialidadeFilter');
+    const tableRows = document.querySelectorAll('.table-modern tbody tr[data-search]');
+
+    function applyFilters() {
+        const searchValue = searchFilter.value.toLowerCase();
+        const statusValue = statusFilter.value.toLowerCase();
+        const especialidadeValue = especialidadeFilter.value.toLowerCase();
+
+        tableRows.forEach(row => {
+            const searchData = row.getAttribute('data-search');
+            const searchMatch = !searchValue || searchData.includes(searchValue);
+            const statusMatch = true; // Implementar lógica de status se necessário
+            const especialidadeMatch = !especialidadeValue || searchData.includes(especialidadeValue);
+
+            if (searchMatch && statusMatch && especialidadeMatch) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    // Event listeners
+    searchFilter.addEventListener('input', applyFilters);
+    statusFilter.addEventListener('change', applyFilters);
+    especialidadeFilter.addEventListener('change', applyFilters);
+
+    // Inicializar tooltips do Bootstrap
+    document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function(element) {
+        new bootstrap.Tooltip(element);
+    });
+
+    // Animação suave para os cards de estatísticas
+    const statCards = document.querySelectorAll('.card');
+    statCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        
+        setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, 200 + (index * 100));
+    });
+
+    // Animação para os cards de destaque
+    const highlightCards = document.querySelectorAll('.instructor-highlight-card');
+    highlightCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateX(-20px)';
+        card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        
+        setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateX(0)';
+        }, 300 + (index * 100));
+    });
+
+    // Highlight da linha da tabela ao passar o mouse
+    document.querySelectorAll('.table-modern tbody tr').forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = 'rgba(245, 158, 11, 0.08)';
+            this.style.transform = 'translateX(5px)';
+            this.style.transition = 'all 0.2s ease';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = '';
+            this.style.transform = 'translateX(0)';
+        });
+    });
+
+    console.log('👨‍🏫 Página de Instrutores carregada com sucesso!');
+});
+</script>
+
+<style>
+.instructor-highlight-card {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  margin-bottom: 1rem;
+}
+
+.instructor-highlight-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.instructor-avatar {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1rem auto;
+  position: relative;
+}
+
+.instructor-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #f59e0b, #fbbf24);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+}
+
+.instructor-info h5 {
+  margin: 0 0 0.5rem 0;
+  color: var(--gray-800);
+  font-weight: 600;
+}
+
+.speciality {
+  color: var(--gray-600);
+  font-size: 0.9rem;
+  margin: 0 0 1rem 0;
+}
+
+.instructor-stats {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.stat {
+  font-size: 0.8rem;
+  color: var(--gray-600);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.rating {
+  color: #fbbf24;
+}
+
+.rating-display {
+  text-align: center;
+}
+
+.rating-display .stars {
+  margin-bottom: 0.25rem;
+}
+
+@media (max-width: 768px) {
+  .instructor-stats {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .btn-group {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .table-action-btn {
+    justify-content: center;
+    width: 100%;
+  }
+}
+</style>
+{% endblock %}

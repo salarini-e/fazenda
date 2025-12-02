@@ -1,0 +1,96 @@
+{% extends 'template_administrativo.html' %}
+{% load bootstrap5 %}
+{% load static %}
+
+{% block title %}Cadastrar Aluno - Administração{% endblock %}
+
+{% block nav_alunos_active %}active{% endblock %}
+
+{% block page_icon %}fas fa-user-graduate{% endblock %}
+{% block page_title %}Cadastrar Aluno{% endblock %}
+{% block page_subtitle %}Cadastre um novo aluno no sistema{% endblock %}
+{% block page_header_icon %}fas fa-user-graduate{% endblock %}
+
+{% block content_actions %}
+<a href="{% url 'administrativo2' %}" class="btn-admin btn-secondary">
+  <i class="fas fa-arrow-left"></i>
+  <span>Voltar ao Painel</span>
+</a>
+{% endblock %}
+
+{% block admin_content %}
+<div class="card border-0 shadow-sm" style="border-radius: 16px; overflow: hidden;">
+  <div class="card-header" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); color: white; padding: 2rem;">
+    <h4 class="mb-0" style="font-weight: 600;">
+      <i class="fas fa-plus me-2"></i>
+      Informações do Aluno
+    </h4>
+    <p class="mb-0 mt-2 opacity-75">
+      Preencha os dados pessoais do novo aluno
+    </p>
+  </div>
+  <div class="card-body" style="padding: 2rem;">
+    <form method="POST">
+      {% csrf_token %}
+      
+      <div class="django-bootstrap5">
+        {% bootstrap_form form %}
+      </div>
+      
+      <div class="alert alert-info mt-3" style="border-radius: 12px; border: none; background: linear-gradient(135deg, #e3f2fd, #bbdefb);">
+        <i class="fas fa-info-circle me-2"></i>
+        <strong>Informação:</strong> A senha padrão será gerada automaticamente usando a data de nascimento (DDMMAAAA).
+      </div>
+      
+      <div class="d-flex justify-content-between align-items-center mt-4 pt-3" style="border-top: 1px solid var(--gray-200);">
+        <a href="{% url 'administrativo2' %}" class="btn btn-outline-secondary">
+          <i class="fas fa-arrow-left me-2"></i>Voltar ao Painel
+        </a>
+        <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); border: none;">
+          <i class="fas fa-save me-2"></i>Cadastrar Aluno
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block admin_javascript %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Form validation enhancement
+  document.querySelector('form').addEventListener('submit', function(e) {
+    const requiredFields = document.querySelectorAll('[required]');
+    let hasError = false;
+    
+    requiredFields.forEach(field => {
+      if (!field.value.trim()) {
+        field.classList.add('is-invalid');
+        hasError = true;
+      } else {
+        field.classList.remove('is-invalid');
+      }
+    });
+    
+    if (hasError) {
+      e.preventDefault();
+      alert('Por favor, preencha todos os campos obrigatórios.');
+    }
+  });
+
+  // CPF validation (basic)
+  const cpfField = document.querySelector('input[name="cpf"]');
+  if (cpfField) {
+    cpfField.addEventListener('input', function() {
+      let value = this.value.replace(/\D/g, '');
+      value = value.replace(/(\d{3})(\d)/, '$1.$2');
+      value = value.replace(/(\d{3})(\d)/, '$1.$2');
+      value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+      this.value = value;
+    });
+  }
+
+  console.log('🎓 Formulário de Aluno carregado com sucesso!');
+});
+</script>
+{% endblock %}

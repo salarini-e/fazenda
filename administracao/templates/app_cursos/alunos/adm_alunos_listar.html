@@ -1,0 +1,407 @@
+{% extends 'template_new.html' %}
+{% load bootstrap5 %}
+{% load static %}
+{% load extras %}
+{% block title %}Gerenciar Alunos - Prefeitura de Nova Friburgo{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/administrativo.css' %}" />
+<style>
+  .admin-page {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    min-height: calc(100vh - 140px);
+    padding: 2rem 0;
+  }
+  
+  .admin-card {
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    border: none;
+    overflow: hidden;
+  }
+  
+  .admin-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    padding: 2rem;
+  }
+  
+  .admin-title {
+    font-family: var(--font-secondary);
+    font-weight: 700;
+    font-size: 2rem;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  
+  .student-counter {
+    background: rgba(255,255,255,0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    font-weight: 600;
+    display: inline-block;
+    margin-top: 0.5rem;
+  }
+  
+  .breadcrumb-custom {
+    background: rgba(255,255,255,0.1);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    margin-top: 1rem;
+  }
+  
+  .breadcrumb-custom a {
+    color: rgba(255,255,255,0.8);
+    text-decoration: none;
+  }
+  
+  .breadcrumb-custom a:hover {
+    color: white;
+  }
+  
+  .search-section {
+    background: var(--gray-50);
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--gray-200);
+  }
+  
+  .search-container {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+  }
+  
+  .search-input {
+    flex: 1;
+    border: 2px solid var(--gray-200);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .search-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(0,102,204,0.1);
+  }
+  
+  .btn-search {
+    background: var(--primary-color);
+    border: none;
+    color: white;
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-search:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    color: white;
+  }
+  
+  .btn-add-student {
+    background: linear-gradient(135deg, var(--secondary-color), #20c997);
+    border: none;
+    color: white;
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-add-student:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(40,167,69,0.3);
+    color: white;
+  }
+  
+  .data-table {
+    background: white;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    margin: 2rem;
+  }
+  
+  .table-modern {
+    margin: 0;
+  }
+  
+  .table-modern thead th {
+    background: linear-gradient(135deg, var(--gray-100), var(--gray-200));
+    border: none;
+    padding: 1rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    letter-spacing: 0.5px;
+  }
+  
+  .table-modern tbody td {
+    padding: 1rem;
+    border-color: var(--gray-200);
+    vertical-align: middle;
+  }
+  
+  .table-modern tbody tr:hover {
+    background-color: rgba(0,102,204,0.05);
+  }
+  
+  .whatsapp-link {
+    color: #25D366;
+    font-size: 1.25rem;
+    transition: all 0.3s ease;
+  }
+  
+  .whatsapp-link:hover {
+    color: #128C7E;
+    transform: scale(1.2);
+  }
+  
+  .btn-view {
+    background: linear-gradient(135deg, #17a2b8, #138496);
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+  
+  .btn-view:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(23,162,184,0.3);
+    color: white;
+  }
+  
+  .pagination-modern {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 2rem;
+    background: var(--gray-50);
+    border-top: 1px solid var(--gray-200);
+  }
+  
+  .page-btn {
+    padding: 0.5rem 0.75rem;
+    border: 2px solid var(--gray-300);
+    background: white;
+    color: var(--gray-600);
+    text-decoration: none;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    font-weight: 500;
+  }
+  
+  .page-btn:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    transform: translateY(-2px);
+  }
+  
+  .page-btn.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+  }
+  
+  .age-badge {
+    background: var(--accent-color);
+    color: var(--gray-800);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+  
+  @media (max-width: 768px) {
+    .admin-title {
+      font-size: 1.5rem;
+    }
+    
+    .search-container {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .table-responsive {
+      border-radius: 0.75rem;
+    }
+    
+    .pagination-modern {
+      flex-wrap: wrap;
+    }
+  }
+</style>
+{% endblock %}
+{% block administrativo %}fw-bold{% endblock %}
+{% block main %}
+<div class="admin-page">
+  <div class="container-fluid">
+    <div class="row justify-content-center">
+      <div class="col-12">
+        <div class="admin-card">
+          <div class="admin-header">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <h1 class="admin-title">
+                  <i class="fas fa-user-graduate me-3"></i>Gerenciar Alunos
+                </h1>
+                <span class="student-counter">
+                  <i class="fas fa-users me-2"></i>{{total_alunos}} alunos cadastrados
+                </span>
+                <div class="breadcrumb-custom">
+                  <a href="{% url 'administrativo2' %}">
+                    <i class="fas fa-home me-2"></i>Painel
+                  </a>
+                  <span class="mx-2">/</span>
+                  <span>Alunos</span>
+                </div>
+              </div>
+              <a href="{% url 'administrativo2' %}" class="btn btn-light">
+                <i class="fas fa-arrow-left me-2"></i>Voltar ao Painel
+              </a>
+            </div>
+          </div>
+          
+          <div class="search-section">
+            <form method="POST">
+              {% csrf_token %}
+              <div class="search-container">
+                <input
+                  type="text"
+                  name="pesquisa"
+                  class="search-input"
+                  placeholder="Pesquisar aluno pelo nome..."
+                  value="{{request.POST.pesquisa}}"
+                />
+                <button type="submit" class="btn-search">
+                  <i class="fas fa-search me-2"></i>Buscar
+                </button>
+                <a href="{% url 'adm_cadastrar_aluno' %}" class="btn-add-student">
+                  <i class="fas fa-user-plus me-2"></i>Novo Aluno
+                </a>
+                <a href="{% url 'adm_aluno_cadastro_completo' %}" class="btn-add-student ms-2" style="background: linear-gradient(135deg, #28a745, #20c997);">
+                  <i class="fas fa-user-cog me-2"></i>Cadastro Completo
+                </a>
+              </div>
+            </form>
+          </div>
+          
+          <div class="data-table">
+            <div class="table-responsive">
+              <table class="table table-modern">
+                <thead>
+                  <tr>
+                    <th style="width: 60px;">Contato</th>
+                    <th>Nome</th>
+                    <th class="text-center">Idade</th>
+                    <th>Telefone</th>
+                    <th>Email</th>
+                    <th class="text-center">Data Inclusão</th>
+                    <th class="text-center">Ações</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for aluno in alunos %}
+                  <tr>
+                    <td class="text-center">
+                      <a
+                        class="whatsapp-link"
+                        href="https://api.whatsapp.com/send?phone=55{{aluno.pessoa.telefone}}"
+                        target="_blank"
+                        title="Conversar no WhatsApp"
+                      >
+                        <i class="fab fa-whatsapp"></i>
+                      </a>
+                    </td>
+                    <td>
+                      <strong>{{aluno.pessoa.nome}}</strong>
+                    </td>
+                    <td class="text-center">
+                      <span class="age-badge">{{aluno.pessoa.dt_nascimento|bg_idade}} anos</span>
+                    </td>
+                    <td>{{aluno.pessoa.telefone|default:"-"}}</td>
+                    <td>{{aluno.pessoa.email|default:"-"}}</td>
+                    <td class="text-center">
+                      {{aluno.pessoa.dt_inclusao|date:"d/m/Y"}}
+                    </td>
+                    <td class="text-center">
+                      <a
+                        href="{% url 'adm_aluno_visualizar' aluno.id %}"
+                        class="btn-view"
+                        title="Visualizar perfil completo"
+                      >
+                        <i class="fas fa-eye me-1"></i>Ver
+                      </a>
+                    </td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                    <td colspan="7" class="text-center py-4">
+                      <div class="text-muted">
+                        <i class="fas fa-user-graduate fa-3x mb-3 d-block"></i>
+                        <h5>Nenhum aluno encontrado</h5>
+                        <p>{% if request.POST.pesquisa %}Nenhum resultado para "{{request.POST.pesquisa}}"{% else %}Cadastre o primeiro aluno do sistema{% endif %}</p>
+                      </div>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            
+            <!-- Paginação -->
+            {% if alunos.has_other_pages %}
+            <div class="pagination-modern">
+              {% if alunos.has_previous %}
+                <a href="?page={{ alunos.previous_page_number }}" class="page-btn">
+                  <i class="fas fa-chevron-left"></i>
+                </a>
+              {% endif %}
+              
+              {% for num in alunos.paginator.page_range %}
+                {% if alunos.number == num %}
+                  <span class="page-btn active">{{ num }}</span>
+                {% elif num > alunos.number|add:'-3' and num < alunos.number|add:'3' %}
+                  <a href="?page={{ num }}" class="page-btn">{{ num }}</a>
+                {% endif %}
+              {% endfor %}
+              
+              {% if alunos.has_next %}
+                <a href="?page={{ alunos.next_page_number }}" class="page-btn">
+                  <i class="fas fa-chevron-right"></i>
+                </a>
+              {% endif %}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Enhance search functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.querySelector('.search-input');
+    const searchForm = document.querySelector('form');
+    
+    // Auto-submit on Enter key
+    searchInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        searchForm.submit();
+      }
+    });
+    
+    // Focus on search input when page loads
+    searchInput.focus();
+  });
+</script>
+{% endblock %}

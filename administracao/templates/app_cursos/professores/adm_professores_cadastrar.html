@@ -1,0 +1,85 @@
+{% extends 'template_administrativo.html' %}
+{% load bootstrap5 %}
+{% load static %}
+
+{% block title %}Novo Instrutor - Administração{% endblock %}
+
+{% block nav_instrutores_active %}active{% endblock %}
+
+{% block page_icon %}fas fa-chalkboard-teacher{% endblock %}
+{% block page_title %}Novo Instrutor{% endblock %}
+{% block page_subtitle %}Cadastre um novo instrutor no sistema{% endblock %}
+
+{% block content_actions %}
+<a href="{% url 'adm_professores_listar' %}" class="btn-admin btn-secondary">
+  <i class="fas fa-arrow-left"></i>
+  <span>Voltar à Lista</span>
+</a>
+{% endblock %}
+
+{% block admin_content %}
+<div class="admin-table">
+  <!-- Card com formulário -->
+  <div class="card border-0 shadow-sm" style="border-radius: 16px;">
+    <div class="card-header" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); color: white; border-radius: 16px 16px 0 0;">
+      <h5 class="mb-0 d-flex align-items-center">
+        <i class="fas fa-chalkboard-teacher me-3"></i>
+        Cadastrar Novo Instrutor
+      </h5>
+    </div>
+    <div class="card-body p-4">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="POST">
+        {% csrf_token %}
+        <div class="django-bootstrap5">
+          {% bootstrap_form form %}
+        </div>
+
+        <hr class="my-4">
+
+        <div class="d-flex justify-content-between">
+          <a href="{% url 'adm_professores_listar' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-times me-2"></i>
+            Cancelar
+          </a>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save me-2"></i>
+            Cadastrar Instrutor
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block admin_javascript %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animação para o card
+    const card = document.querySelector('.card');
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(20px)';
+    card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    
+    setTimeout(() => {
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0)';
+    }, 200);
+
+    // Focus no primeiro campo
+    const firstInput = document.querySelector('input[type="text"], input[type="email"], textarea, select');
+    if (firstInput) firstInput.focus();
+
+    console.log('👨‍🏫 Página de Cadastro de Instrutor carregada!');
+});
+</script>
+{% endblock %}

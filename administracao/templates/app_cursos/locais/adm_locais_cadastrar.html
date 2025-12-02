@@ -1,0 +1,143 @@
+{% extends 'template_administrativo.html' %}
+{% load bootstrap5 %}
+{% load static %}
+
+{% block title %}Novo Local - Administração{% endblock %}
+
+{% block nav_locais_active %}active{% endblock %}
+
+{% block page_icon %}fas fa-map-marker-alt{% endblock %}
+{% block page_title %}Novo Local{% endblock %}
+{% block page_subtitle %}Cadastre um novo local para realização de cursos{% endblock %}
+
+{% block content_actions %}
+<a href="{% url 'adm_locais_listar' %}" class="btn-admin btn-secondary">
+  <i class="fas fa-arrow-left"></i>
+  <span>Voltar à Lista</span>
+</a>
+{% endblock %}
+
+{% block admin_content %}
+<div class="admin-table">
+  <!-- Card com formulário -->
+  <div class="card border-0 shadow-sm" style="border-radius: 16px;">
+    <div class="card-header" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); color: white; border-radius: 16px 16px 0 0;">
+      <h5 class="mb-0 d-flex align-items-center">
+        <i class="fas fa-map-marker-alt me-3"></i>
+        Cadastrar Novo Local
+      </h5>
+    </div>
+    <div class="card-body p-4">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <form method="POST">
+        {% csrf_token %}
+        <div class="django-bootstrap5">
+          {% bootstrap_form form %}
+        </div>
+
+        <hr class="my-4">
+
+        <div class="d-flex justify-content-between">
+          <a href="{% url 'adm_locais_listar' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-times me-2"></i>
+            Cancelar
+          </a>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save me-2"></i>
+            Cadastrar Local
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+
+<!-- <div class="modal fade" id="formCandidato" aria-hidden="true" aria-labelledby="formCandidatoLabel" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-dark text-center" id="exampleModalToggleLabel">CANDIDATAR-SE A ESCOLINHA DE SKATE</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-dark">            
+            <form id="form" action="#">
+                
+            </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" data-bs-target="#confirmarCadastro" data-bs-toggle="modal" onclick="enviarFormulario()">Enviar</button>
+        </div>
+      </div>
+    </div>
+  </div> -->
+  <!-- <div class="modal fade" id="confirmarCadastro" aria-hidden="true" aria-labelledby="confirmarCadastroLabel2" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-dark" id="exampleModalToggleLabel2">RESPOSTA AQUI</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Hide this modal and show the first with the button below.
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-target="#formCandidato" data-bs-toggle="modal">Voltar ao formulário</button>
+          <button class="btn btn-success" data-bs-dismiss="modal" aria-label="Close">Confirmar informações</button>
+        </div>
+      </div>
+    </div>
+  </div>   -->
+{% endblock %}
+
+{% block admin_javascript %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animação para o card
+    const card = document.querySelector('.card');
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(20px)';
+    card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    
+    setTimeout(() => {
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0)';
+    }, 200);
+
+    // Focus no primeiro campo
+    const firstInput = document.querySelector('input[type="text"], input[type="email"], textarea, select');
+    if (firstInput) firstInput.focus();
+
+    // Máscaras antigas mantidas para compatibilidade
+    function icep(v){
+        v=v.replace(/\D/g,"")                 
+        v=v.replace(/^(\d\d\d\d\d)(\d\d\d)/g,"$1-$2")
+        return v
+    }
+
+    function mascara(o,f){
+        v_obj=o
+        v_fun=f
+        setTimeout("execmascara()",1)
+    }            
+    function execmascara(){
+        v_obj.value=v_fun(v_obj.value)
+    }
+
+    // Disponibilizar funções globalmente se necessário
+    window.icep = icep;
+    window.mascara = mascara;
+
+    console.log('🏢 Página de Cadastro de Local carregada!');
+});
+</script>
+{% endblock %}

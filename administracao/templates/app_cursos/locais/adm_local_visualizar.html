@@ -1,0 +1,150 @@
+{% extends 'template_administrativo.html' %}
+{% load static %}
+
+{% block title %}{{ local.nome }} - Visualizar Local{% endblock %}
+
+{% block nav_locais_active %}active{% endblock %}
+
+{% block page_icon %}fas fa-map-marker-alt{% endblock %}
+{% block page_title %}{{ local.nome }}{% endblock %}
+{% block page_subtitle %}Detalhes do local e instituições vinculadas{% endblock %}
+
+{% block content_actions %}
+<a href="{% url 'adm_locais_listar' %}" class="btn-admin btn-secondary">
+  <i class="fas fa-arrow-left"></i>
+  <span>Voltar aos Locais</span>
+</a>
+<a href="{% url 'adm_locais_editar' local.id %}" class="btn-admin btn-warning">
+  <i class="fas fa-edit"></i>
+  <span>Editar Local</span>
+</a>
+{% endblock %}
+
+{% block admin_content %}
+<div class="admin-table">
+  <!-- Card com informações do Local -->
+  <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
+    <div class="card-header" style="background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); color: white; border-radius: 16px 16px 0 0;">
+      <h5 class="mb-0 d-flex align-items-center">
+        <i class="fas fa-map-marker-alt me-3"></i>
+        Informações do Local
+      </h5>
+    </div>
+    <div class="card-body p-4">
+      <div class="row">
+        <div class="col-md-6">
+          <table class="table table-borderless">
+            <tr>
+              <th width="30%">Nome:</th>
+              <td><strong>{{ local.nome }}</strong></td>
+            </tr>
+                                <tr>
+                                    <th>Endereço:</th>
+                                    <td>{{ local.endereco }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Bairro:</th>
+                                    <td>{{ local.bairro }}</td>
+                                </tr>
+                                <tr>
+                                    <th>CEP:</th>
+                                    <td>{{ local.cep }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Status:</th>
+                                    <td>
+                                        {% if local.ativo %}
+                                            <span class="badge bg-success">Ativo</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Inativo</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-muted">Estatísticas</h6>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="card bg-light text-center">
+                                        <div class="card-body">
+                                            <h4 class="text-primary">{{ instituicoes.count }}</h4>
+                                            <small class="text-muted">Instituições</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="card bg-light text-center">
+                                        <div class="card-body">
+                                            <h4 class="text-success">
+                                                {% with total_cursos=0 %}
+                                                    {% for inst in instituicoes %}
+                                                        {% with total_cursos=total_cursos|add:inst.curso_set.count %}
+                                                        {% endwith %}
+                                                    {% endfor %}
+                                                    {{ total_cursos }}
+                                                {% endwith %}
+                                            </h4>
+                                            <small class="text-muted">Cursos</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if instituicoes %}
+                        <hr>
+                        <h6 class="text-muted">Instituições neste Local</h6>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Sigla</th>
+                                        <th>Cursos</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for instituicao in instituicoes %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ instituicao.nome }}</strong>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">{{ instituicao.sigla }}</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-success">{{ instituicao.curso_set.count }}</span>
+                                            </td>
+                                            <td>
+                                                <a href="{% url 'adm_instituicao_visualizar' instituicao.id %}" 
+                                                   class="btn btn-sm btn-outline-primary" 
+                                                   title="Ver cursos desta instituição">
+                                                    <i class="fas fa-eye"></i> Ver Cursos
+                                                </a>
+                                                <a href="{% url 'adm_instituicoes_editar' instituicao.id %}" 
+                                                   class="btn btn-sm btn-outline-warning">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info text-center">
+                            <i class="fas fa-info-circle"></i>
+                            Nenhuma instituição cadastrada neste local.
+                            <br>
+                            <a href="{% url 'adm_cadastrar_instituicao' %}" class="btn btn-primary btn-sm mt-2">
+                                <i class="fas fa-plus"></i> Cadastrar Instituição
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+</div>
+{% endblock %}
