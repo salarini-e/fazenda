@@ -271,7 +271,7 @@
     
     <div class="courses-grid">
       {% for servico in servicos %}
-      <a href="{{ servico.link }}" target="_blank" class="course-card" data-aos="fade-up" style="text-decoration: none;">
+      <a {% if forloop.first %}href="#" onclick="openModal()"{% else %}href="{{ servico.link }}"{% endif %} target="_blank" class="course-card" data-aos="fade-up" style="text-decoration: none;">
 
         <div class="course-content">          
           <div class="course-icon">
@@ -410,6 +410,194 @@
 
 <script>
   document.getElementById('s-index').classList.add('s-nav-active');
+</script>
+<div id="tributosModal" class="custom-modal">
+
+  <div class="custom-modal-content">
+
+    <button class="modal-close" onclick="closeModal()">
+      <i class="fas fa-times"></i>
+    </button>
+
+    <h2 class="modal-title">Tributos Municipais</h2>
+    <p class="modal-subtitle">Selecione o serviço desejado:</p>
+
+    <div class="modal-grid">
+
+      <a href="/tributos/iptu/" class="modal-option">
+        <i class="fas fa-city"></i>
+        <span>IPTU</span>
+      </a>
+
+      <a href="/tributos/iss/" class="modal-option">
+        <i class="fas fa-file-invoice-dollar"></i>
+        <span>ISS</span>
+      </a>
+
+      <a href="/tributos/divida-ativa/" class="modal-option">
+        <i class="fas fa-balance-scale"></i>
+        <span>Dívida Ativa</span>
+      </a>
+
+      <a href="/tributos/certidoes/" class="modal-option">
+        <i class="fas fa-scroll"></i>
+        <span>Certidões</span>
+      </a>
+
+      <a href="/tributos/alvaras/" class="modal-option">
+        <i class="fas fa-store"></i>
+        <span>Alvarás</span>
+      </a>
+
+      <a href="/tributos/taxas/" class="modal-option">
+        <i class="fas fa-coins"></i>
+        <span>Taxas Diversas</span>
+      </a>
+
+    </div>
+
+  </div>
+
+</div>
+<style>
+  /* BACKDROP */
+.custom-modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  inset: 0;
+  background: rgba(10, 20, 40, 0.55);
+  backdrop-filter: blur(6px);
+  align-items: center;
+  justify-content: center;
+}
+
+/* MODAL BOX */
+.custom-modal-content {
+  background: #ffffff;
+  padding: 30px 25px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 650px;
+  position: relative;
+  animation: modalIn 0.35s ease;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+/* TITLE */
+.modal-title {
+  font-size: 26px;
+  margin-bottom: 5px;
+  text-align: center;
+}
+
+/* SUBTITLE */
+.modal-subtitle {
+  font-size: 14px;
+  text-align: center;
+  color: #6b7280;
+  margin-bottom: 25px;
+}
+
+/* CLOSE BUTTON */
+.modal-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  background: #f3f4f6;
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.modal-close:hover {
+  background: #0b61d6;
+  color: white;
+}
+
+/* GRID OPTIONS */
+.modal-grid {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 14px;
+}
+
+@media(max-width:600px){
+  .modal-grid {
+    grid-template-columns: repeat(2,1fr);
+  }
+}
+
+/* OPTION BUTTON */
+.modal-option {
+  text-decoration: none;
+  padding: 18px 10px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border:1px solid #e5e7eb;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap: 10px;
+  transition: all .2s ease;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.modal-option i{
+  font-size: 22px;
+  color: #0b61d6;
+}
+
+.modal-option:hover {
+  transform: translateY(-5px);
+  box-shadow:0 10px 18px rgba(11,97,214,0.15);
+  background:#ffffff;
+}
+
+/* ANIMATION */
+@keyframes modalIn {
+  from {
+    transform: scale(0.9) translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0px);
+    opacity: 1;
+  }
+}
+</style>
+<script>
+  function openModal() {
+  const modal = document.getElementById('tributosModal');
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  const modal = document.getElementById('tributosModal');
+  modal.style.display = 'none';
+  document.body.style.overflow = 'auto';
+}
+
+window.addEventListener('click', function(e){
+  const modal = document.getElementById('tributosModal');
+  if(e.target === modal){
+    closeModal();
+  }
+});
+
+// ESC to close
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape'){
+    closeModal();
+  }
+});
+
 </script>
 {% endblock %}
 {% block footer %}
