@@ -1,0 +1,126 @@
+{% load static %}
+<div class="container d-flex align-items-center justify-content-between">
+
+    <!-- LOGO + NOME -->
+    <a href="/" class="navbar-brand d-flex align-items-center">
+      <img src="{% static 'images/fazenda_logo.png' %}" alt="Logo" class="navbar-logo">      
+    </a>
+
+    <!-- LINKS -->
+    <nav class="navbar-links d-none d-md-flex">
+      <a href="/">Página Inicial</a>
+
+    </nav>
+
+
+    <!-- BOTÃO / AÇÃO -->
+    <!-- <div class="navbar-actions d-none d-md-flex">
+      <a href="#homologacao" class="btn btn-outline-light btn-sm">
+        Ambiente de homologação
+      </a>
+    </div> -->
+
+    <!-- MOBILE TOGGLE -->
+    <div class="mobile-menu-toggle d-md-none" onclick="toggleMenu()">
+      ☰
+    </div>
+
+  </div>
+
+  <!-- MENU MOBILE -->
+  <div class="mobile-menu d-md-none" id="mobileMenu">
+    <a href="/">Página Inicial</a>
+>
+  </div>
+  
+<style>
+/* NAVBAR BASE */
+.navbar-main{
+  position: fixed;
+  top:0;
+  left:0;
+  width:100%;
+  padding:14px 0;
+  z-index:1000;
+  background: rgba(3, 43, 80, 0.90);
+  backdrop-filter: blur(6px);
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.navbar-brand{
+  gap:12px;
+  text-decoration:none;
+  color:#fff;
+}
+
+.navbar-logo{
+  height:84px;
+}
+
+.navbar-title{
+  font-weight:700;
+  letter-spacing:.5px;
+  font-size:18px;
+}
+
+/* LINKS */
+.navbar-links a{
+  margin:0 16px;
+  color:#000000;
+  text-decoration:none;
+  font-weight:500;
+  position:relative;
+}
+
+.navbar-links a::after{
+  content:'';
+  position:absolute;
+  left:0;
+  bottom:-6px;
+  width:0;
+  height:2px;
+  background:#60a5fa;
+  transition:.3s;
+}
+
+.navbar-links a:hover::after{
+  width:100%;
+}
+
+/* BOTÃO */
+.navbar-actions .btn{
+  border-radius:30px;
+  padding:6px 20px;
+}
+
+/* MOBILE */
+.mobile-menu-toggle{
+  color:#fff;
+  font-size:26px;
+  cursor:pointer;
+}
+
+.mobile-menu{
+  display:none;
+  flex-direction:column;
+  padding:16px;
+  background:#032b50;
+}
+
+.mobile-menu a{
+  padding:10px 0;
+  color:#fff;
+  text-decoration:none;
+  border-bottom:1px solid rgba(255,255,255,.1);
+}
+
+.mobile-menu.show{
+  display:flex;
+}
+</style>
+
+<script>
+function toggleMenu(){
+  document.getElementById('mobileMenu').classList.toggle('show');
+}
+</script>
