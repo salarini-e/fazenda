@@ -664,6 +664,41 @@
 
     </div>
     </div>
+
+    <div class="section-header mt-5">
+        <h2 class="section-title">Páginas Relacionadas</h2>
+    </div>
+
+    <div class="related-gallery">
+        {% for item in paginas_relacionadas %}
+             <a href="{{ item.link }}" target="_blank" title="{{ item.titulo }}">
+                  <img src="{{ item.imagem.url }}" alt="{{ item.titulo }}">
+             </a>
+        {% endfor %}
+    </div>
+
+	<style>
+	.related-gallery {
+	    display: flex;
+	    flex-wrap: wrap;
+	    gap: 15px; /* espaçamento entre imagens */
+	    justify-content: flex-start;
+	}
+
+	.related-gallery a img {
+	    width: 350px;    /* largura fixa */
+	    height: 160px;   /* altura fixa */
+	    object-fit: cover; /* corta a imagem para preencher o tamanho */
+	    border-radius: 8px; /* cantos arredondados, opcional */
+	    transition: transform 0.3s;
+	    cursor: pointer;
+	}
+
+	.related-gallery a img:hover {
+	    transform: scale(1.05); /* efeito leve ao passar o mouse */
+	}
+	</style>
+
     <style>
        .news-section{
       /* max-width:1000px; */

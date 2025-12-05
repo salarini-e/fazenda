@@ -7,11 +7,10 @@ class Servico(models.Model):
         verbose_name_plural = "Serviços"
         ordering = ['id', 'titulo']
 
-         
     titulo = models.CharField(max_length=150)
     descricao = models.CharField(max_length=255, blank=True)
     link = models.URLField(blank=True)
-    
+
     icone = models.CharField(
         max_length=50,
         help_text="Ex: fa-file-invoice, fa-balance-scale, fa-comments",
@@ -19,7 +18,7 @@ class Servico(models.Model):
     # banner = models.ImageField(upload_to = 'cursos_livres/media/banner/', null=True)
     ordem = models.PositiveIntegerField(default=0)
     ativo = models.BooleanField(default=True)
-    
+
 
     dt_inclusao = models.DateTimeField(auto_now_add=True, editable=False)
     dt_alteracao = models.DateField(auto_now=True)
@@ -37,6 +36,13 @@ class Noticia(models.Model):
         verbose_name_plural = "Notícias"
         ordering = ['id', 'titulo']
 
-         
     titulo = models.CharField(max_length=150)
     corpo_da_noticia = models.TextField()
+
+class PaginasRelacionadas(models.Model):
+    titulo = models.CharField(max_length=100, help_text="Aparece ao passar o mouse")
+    imagem = models.ImageField(upload_to='paginasrelacionadas/')
+    link = models.URLField()
+
+    def __str__(self):
+        return self.titulo
